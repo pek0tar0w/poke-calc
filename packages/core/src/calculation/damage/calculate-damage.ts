@@ -1,0 +1,177 @@
+import type { NonHpStatKey } from "../../common/index.js";
+import type { DamageCalculationState } from "./damage-calculation-state.js";
+import type { DamageResult, DamageSummary } from "./damage-result.js";
+
+import {
+  applyNatureModifiers,
+  applyStatBoost,
+  calculatePokemonStats,
+} from "../stat/index.js";
+import { roundHalfDown } from "../utils/round-half-down.js";
+import { calculateBaseDamage } from "./calculate-base-damage.js";
+import { calculateKoProbability } from "./calculate-ko-probability.js";
+import { calculateRandomDamageValues } from "./calculate-random-damage-values.js";
+
+/** Championsのバトルレベル */
+const CHAMPIONS_BATTLE_LEVEL = 50;
+
+/** 急所補正倍率 */
+const CRITICAL_HIT_MULTIPLIER = 1.5;
+
+type CreateDamageSummaryParams = {
+  /** 乱数補正ごとのダメージ */
+  damages: readonly number[];
+
+  /** 防御側の最大HP */
+  defenderHp: number;
+};
+
+/**
+ * 攻撃側、防御側、技の条件からダメージ計算結果を返す
+ *
+ * @param state - ダメージ計算時の対戦状態
+ * @returns 通常時と急所時のダメージ計算結果
+ */
+export function calculateDamage(state: DamageCalculationState): DamageResult {
+  // Stateから解決済みのポケモンデータを取得する
+  const attackerPokemonData = state.attacker.pokemon;
+  const defenderPokemonData = state.defender.pokemon;
+
+  // 種族値と育成値から性格補正前の実数値を計算する
+  const attackerStatsBeforeNature = calculatePokemonStats({
+    baseStats: attackerPokemonData.baseStats,
+    statConfig: state.attacker.config,
+  });
+  const defenderStatsBeforeNature = calculatePokemonStats({
+    baseStats: defenderPokemonData.baseStats,
+    statConfig: state.defender.config,
+  });
+
+  // 性格補正を適用し、ランク補正前の実数値を計算する
+  const attackerStats = applyNatureModifiers({
+    stats: attackerStatsBeforeNature,
+    natureKey: state.attacker.config.natureKey,
+  });
+  const defenderStats = applyNatureModifiers({
+    stats: defenderStatsBeforeNature,
+    natureKey: state.defender.config.natureKey,
+  });
+
+  // 技の分類に応じて攻撃と防御に使用する能力を決定する
+  const attackingStatKey: NonHpStatKey =
+    state.move.damageClass === "physical" ? "attack" : "specialAttack";
+  const defendingStatKey: NonHpStatKey =
+    state.move.damageClass === "physical" ? "defense" : "specialDefense";
+
+  const attackingStatBoost = state.attacker.boosts[attackingStatKey];
+  const defendingStatBoost = state.defender.boosts[defendingStatKey];
+
+  const unboostedAttackingStat = attackerStats[attackingStatKey];
+  const unboostedDefendingStat = defenderStats[defendingStatKey];
+
+  // 通常時は攻撃側と防御側のランクをそのまま適用する
+  const normalAttackingStat = applyStatBoost({
+    stat: unboostedAttackingStat,
+    boost: attackingStatBoost,
+  });
+  const normalDefendingStat = applyStatBoost({
+    stat: unboostedDefendingStat,
+    boost: defendingStatBoost,
+  });
+
+  // 急所時に無視される下降ランクと上昇ランクを0へ置き換える
+  const criticalAttackingStatBoost =
+    attackingStatBoost < 0 ? 0 : attackingStatBoost;
+  const criticalDefendingStatBoost =
+    defendingStatBoost > 0 ? 0 : defendingStatBoost;
+
+  const criticalAttackingStat = applyStatBoost({
+    stat: unboostedAttackingStat,
+    boost: criticalAttackingStatBoost,
+  });
+  const criticalDefendingStat = applyStatBoost({
+    stat: unboostedDefendingStat,
+    boost: criticalDefendingStatBoost,
+  });
+
+  const attackerLevel =
+    state.game === "champions"
+      ? CHAMPIONS_BATTLE_LEVEL
+      : state.attacker.config.level;
+
+  // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
+  const normalBaseDamage = calculateBaseDamage({
+    attackerLevel,
+    movePower: state.move.power,
+    attackingStat: normalAttackingStat,
+    defendingStat: normalDefendingStat,
+  });
+
+  // 急所時は基本ダメージへ急所補正を適用する
+  const criticalBaseDamage = roundHalfDown(
+    calculateBaseDamage({
+      attackerLevel,
+      movePower: state.move.power,
+      attackingStat: criticalAttackingStat,
+      defendingStat: criticalDefendingStat,
+    }) * CRITICAL_HIT_MULTIPLIER,
+  );
+
+  const commonDamageParams = {
+    moveType: state.move.type,
+    attackerTypes: attackerPokemonData.types,
+    defenderTypes: defenderPokemonData.types,
+  };
+
+  // 通常時と急所時それぞれの16段階のダメージを計算する
+  const normalDamages = calculateRandomDamageValues({
+    ...commonDamageParams,
+    baseDamage: normalBaseDamage,
+  });
+
+  const criticalDamages = calculateRandomDamageValues({
+    ...commonDamageParams,
+    baseDamage: criticalBaseDamage,
+  });
+
+  return {
+    normal: createDamageSummary({
+      damages: normalDamages,
+      defenderHp: defenderStats.hp,
+    }),
+    critical: createDamageSummary({
+      damages: criticalDamages,
+      defenderHp: defenderStats.hp,
+    }),
+  };
+}
+
+/**
+ * 乱数ごとのダメージと防御側の最大HPから結果の要約を作る
+ *
+ * @param params - 乱数ごとのダメージと防御側の最大HP
+ * @returns ダメージ幅、割合、攻撃回数、撃破確率
+ */
+function createDamageSummary(params: CreateDamageSummaryParams): DamageSummary {
+  const { damages, defenderHp } = params;
+  const minimumDamage = Math.min(...damages);
+  const maximumDamage = Math.max(...damages);
+  const possibleHitCount =
+    maximumDamage === 0 ? null : Math.ceil(defenderHp / maximumDamage);
+  const guaranteedHitCount =
+    minimumDamage === 0 ? null : Math.ceil(defenderHp / minimumDamage);
+  const knockoutProbability =
+    possibleHitCount === null
+      ? 0
+      : calculateKoProbability(damages, possibleHitCount, defenderHp);
+
+  return {
+    minimumDamage,
+    maximumDamage,
+    minimumDamageRatio: minimumDamage / defenderHp,
+    maximumDamageRatio: maximumDamage / defenderHp,
+    possibleHitCount,
+    guaranteedHitCount,
+    knockoutProbability,
+  };
+}
