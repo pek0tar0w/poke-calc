@@ -3,7 +3,7 @@ import type { TypeKey } from "../type/type-key.js";
 import type { DamageRule } from "./damage-rule.js";
 import type { MoveTag } from "./move-tag.js";
 
-export type MoveCategory = DamagingMove["category"] & StatusMove["category"];
+export type MoveCategory = DamagingMove["category"] | StatusMove["category"];
 
 type MoveBase = {
   /** PokeAPI move.id */
