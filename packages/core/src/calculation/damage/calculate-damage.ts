@@ -2,12 +2,17 @@ import type { NonHpStatKey } from "../../common/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
 import type { DamageResult, DamageSummary } from "./damage-result.js";
 
+import { resolveMove } from "../move/index.js";
 import {
   applyNatureModifiers,
   applyStatBoost,
   calculatePokemonStats,
 } from "../stat/index.js";
 import { roundHalfDown } from "../utils/round-half-down.js";
+import {
+  applyWeatherDamageModifier,
+  applyWeatherDefenseModifier,
+} from "../weather/index.js";
 import { calculateBaseDamage } from "./calculate-base-damage.js";
 import { calculateKoProbability } from "./calculate-ko-probability.js";
 import { calculateRandomDamageValues } from "./calculate-random-damage-values.js";
@@ -57,6 +62,12 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     natureKey: state.defender.config.natureKey,
   });
 
+  // 技固有の威力・タイプ変更を反映する
+  const resolvedMove = resolveMove({
+    move: state.move,
+    weather: state.weather,
+  });
+
   // 技の分類に応じて攻撃と防御に使用する能力を決定する
   const attackingStatKey: NonHpStatKey =
     state.move.damageClass === "physical" ? "attack" : "specialAttack";
@@ -74,9 +85,16 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     stat: unboostedAttackingStat,
     boost: attackingStatBoost,
   });
-  const normalDefendingStat = applyStatBoost({
+  // 防御側はランク補正後に砂嵐・雪の能力補正を適用する
+  const normalDefendingStatBeforeWeather = applyStatBoost({
     stat: unboostedDefendingStat,
     boost: defendingStatBoost,
+  });
+  const normalDefendingStat = applyWeatherDefenseModifier({
+    stat: normalDefendingStatBeforeWeather,
+    statKey: defendingStatKey,
+    defenderTypes: defenderPokemonData.types,
+    weather: state.weather,
   });
 
   // 急所時に無視される下降ランクと上昇ランクを0へ置き換える
@@ -89,9 +107,16 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     stat: unboostedAttackingStat,
     boost: criticalAttackingStatBoost,
   });
-  const criticalDefendingStat = applyStatBoost({
+  // 急所でも砂嵐・雪の能力補正は無視しない
+  const criticalDefendingStatBeforeWeather = applyStatBoost({
     stat: unboostedDefendingStat,
     boost: criticalDefendingStatBoost,
+  });
+  const criticalDefendingStat = applyWeatherDefenseModifier({
+    stat: criticalDefendingStatBeforeWeather,
+    statKey: defendingStatKey,
+    defenderTypes: defenderPokemonData.types,
+    weather: state.weather,
   });
 
   const attackerLevel =
@@ -100,25 +125,39 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       : state.attacker.config.level;
 
   // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
-  const normalBaseDamage = calculateBaseDamage({
+  const normalBaseDamageBeforeWeather = calculateBaseDamage({
     attackerLevel,
-    movePower: state.move.power,
+    movePower: resolvedMove.power,
     attackingStat: normalAttackingStat,
     defendingStat: normalDefendingStat,
   });
+  // 基本ダメージへ晴れ・雨のタイプ別補正を適用する
+  const normalBaseDamage = applyWeatherDamageModifier({
+    damage: normalBaseDamageBeforeWeather,
+    weather: state.weather,
+    moveType: resolvedMove.type,
+  });
 
-  // 急所時は基本ダメージへ急所補正を適用する
+  const criticalBaseDamageBeforeWeather = calculateBaseDamage({
+    attackerLevel,
+    movePower: resolvedMove.power,
+    attackingStat: criticalAttackingStat,
+    defendingStat: criticalDefendingStat,
+  });
+  // 天候補正
+  const criticalBaseDamageAfterWeather = applyWeatherDamageModifier({
+    damage: criticalBaseDamageBeforeWeather,
+    weather: state.weather,
+    moveType: resolvedMove.type,
+  });
+
+  // 急所補正を適用する
   const criticalBaseDamage = roundHalfDown(
-    calculateBaseDamage({
-      attackerLevel,
-      movePower: state.move.power,
-      attackingStat: criticalAttackingStat,
-      defendingStat: criticalDefendingStat,
-    }) * CRITICAL_HIT_MULTIPLIER,
+    criticalBaseDamageAfterWeather * CRITICAL_HIT_MULTIPLIER,
   );
 
   const commonDamageParams = {
-    moveType: state.move.type,
+    moveType: resolvedMove.type,
     attackerTypes: attackerPokemonData.types,
     defenderTypes: defenderPokemonData.types,
   };
