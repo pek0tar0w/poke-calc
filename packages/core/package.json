@@ -16,11 +16,9 @@
   ],
   "scripts": {
     "build": "tsc -p .",
-    "typecheck": "tsc -p . --noEmit",
-    "dev": "tsx watch examples/calculate-damage.ts"
+    "typecheck": "tsc -p . --noEmit"
   },
   "devDependencies": {
-    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
 }

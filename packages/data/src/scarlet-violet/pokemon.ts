@@ -1,6 +1,7 @@
-import type { Pokemon } from "../../model/pokemon/index.js";
+import type { Pokemon } from "@poke-calc/core";
 
-export const scarletVioletPokemon: Record<string, Pokemon> = {
+/** Pokémon Scarlet/Violetのポケモンデータ */
+export const scarletVioletPokemon = {
   garchomp: {
     id: 445,
     key: "garchomp",
@@ -36,4 +37,4 @@ export const scarletVioletPokemon: Record<string, Pokemon> = {
       speed: 67,
     },
   },
-};
+} satisfies Record<string, Pokemon>;

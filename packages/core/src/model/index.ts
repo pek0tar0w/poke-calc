@@ -1,9 +1,4 @@
-export type {
-  Ability,
-  AbilityEffect,
-  AbilityEffectRequirement,
-} from "./ability/index.js";
-export type { GameData } from "./game/index.js";
+export type { Ability } from "./ability/index.js";
 export type { Item } from "./item/index.js";
 export type {
   DamageRule,

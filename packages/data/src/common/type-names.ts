@@ -1,5 +1,4 @@
-import type { LanguageCode } from "../../common/index.js";
-import type { TypeKey } from "../../model/type/type-key.js";
+import type { LanguageCode, TypeKey } from "@poke-calc/core";
 
 export const typeNames: Record<TypeKey, Record<LanguageCode, string>> = {
   normal: {

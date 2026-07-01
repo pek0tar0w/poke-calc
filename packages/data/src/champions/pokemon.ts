@@ -1,6 +1,7 @@
-import type { Pokemon } from "../../model/pokemon/index.js";
+import type { Pokemon } from "@poke-calc/core";
 
-export const championsPokemon: Record<string, Pokemon> = {
+/** Pokémon Championsのポケモンデータ */
+export const championsPokemon = {
   garchomp: {
     id: 445,
     key: "garchomp",
@@ -36,4 +37,4 @@ export const championsPokemon: Record<string, Pokemon> = {
       speed: 67,
     },
   },
-};
+} satisfies Record<string, Pokemon>;

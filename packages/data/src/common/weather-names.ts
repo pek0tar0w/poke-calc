@@ -1,5 +1,4 @@
-import type { LanguageCode } from "../../common/index.js";
-import type { WeatherKey } from "../../model/weather/index.js";
+import type { LanguageCode, WeatherKey } from "@poke-calc/core";
 
 export const weatherNames = {
   sun: {

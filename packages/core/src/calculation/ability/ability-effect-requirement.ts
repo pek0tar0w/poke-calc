@@ -1,6 +1,5 @@
 import type { Ratio } from "../../common/index.js";
-import type { MoveTag } from "../move/move-tag.js";
-import type { TypeKey } from "../type/type-key.js";
+import type { MoveTag, TypeKey } from "../../model/index.js";
 
 export type AbilityEffectRequirement =
   | {
