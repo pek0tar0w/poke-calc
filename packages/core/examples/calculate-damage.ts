@@ -88,6 +88,7 @@ const championsState: ChampionsDamageState = {
     boosts: { ...neutralBoosts, defense: 3 },
   },
   move: championsMove,
+  weather: null,
 };
 
 const scarletVioletAttackerConfig: ScarletVioletBattlePokemon = {
@@ -153,6 +154,7 @@ const scarletVioletState: ScarletVioletDamageState = {
     boosts: { ...neutralBoosts, defense: 3 },
   },
   move: scarletVioletMove,
+  weather: null,
   attackerTerastallized: false,
   defenderTerastallized: false,
 };

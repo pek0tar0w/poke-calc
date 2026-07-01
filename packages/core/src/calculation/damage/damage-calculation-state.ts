@@ -7,6 +7,7 @@ import type {
   Pokemon,
   ScarletVioletBattlePokemon,
 } from "../../model/pokemon/index.js";
+import type { WeatherKey } from "../../model/weather/index.js";
 import type { StatBoosts } from "../stat/index.js";
 
 /** 実データを解決した計算時のポケモン */
@@ -40,6 +41,9 @@ type DamageStateBase<TConfig extends BattlePokemon> = {
 
   /** 使用する技 */
   move: DamagingMove;
+
+  /** 現在の天候 */
+  weather: WeatherKey | null;
 };
 
 /** Scarlet/Violetのダメージ計算状態 */
