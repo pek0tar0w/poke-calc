@@ -6,13 +6,13 @@ import { scarletVioletMoves } from "./moves.js";
 import { scarletVioletPokemon } from "./pokemon.js";
 
 /** Pokémon Scarlet/Violetの実データ */
-export const scarletVioletData = {
+export const scarletVioletData: GameData = {
   game: "scarletViolet",
   pokemon: scarletVioletPokemon,
   moves: scarletVioletMoves,
   abilities: scarletVioletAbilities,
   items: scarletVioletItems,
-} satisfies GameData;
+};
 
 export {
   scarletVioletAbilities,
