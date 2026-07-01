@@ -3,8 +3,8 @@
   "private": true,
   "packageManager": "pnpm@10.13.1",
   "scripts": {
-    "build": "pnpm --filter @poke-calc/core build",
-    "typecheck": "pnpm --filter @poke-calc/core typecheck",
+    "build": "pnpm --recursive build",
+    "typecheck": "pnpm --recursive typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
