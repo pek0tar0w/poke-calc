@@ -1,4 +1,8 @@
 export type {
+  AbilityEffect,
+  AbilityEffectRequirement,
+} from "./ability/index.js";
+export type {
   BattlePokemonState,
   ChampionsDamageState,
   DamageCalculationState,
@@ -6,6 +10,7 @@ export type {
   DamageSummary,
   ScarletVioletDamageState,
 } from "./damage/index.js";
+export type { ItemEffect, ItemEffectTrigger } from "./item/index.js";
 export type { ResolvedMove, ResolveMoveParams } from "./move/index.js";
 export type {
   ApplyNatureModifiersParams,
@@ -19,7 +24,9 @@ export type {
   ApplyWeatherDefenseModifierParams,
 } from "./weather/index.js";
 
+export { abilityEffects } from "./ability/index.js";
 export { calculateDamage } from "./damage/index.js";
+export { itemEffects } from "./item/index.js";
 export { resolveMove } from "./move/index.js";
 export {
   applyNatureModifiers,

@@ -1,8 +1,4 @@
-import type { GameId } from "../../common/index.js";
-import type { Ability } from "../ability/index.js";
-import type { Item } from "../item/index.js";
-import type { Move } from "../move/index.js";
-import type { Pokemon } from "../pokemon/index.js";
+import type { Ability, GameId, Item, Move, Pokemon } from "@poke-calc/core";
 
 /** 1作品分の実データ */
 export type GameData = {

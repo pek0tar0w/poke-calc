@@ -1,18 +1,18 @@
-import type { StatBoosts } from "../src/calculation/stat/index.js";
+import type { StatBoosts } from "../packages/core/src/calculation/stat/index.js";
 import type {
   ChampionsBattlePokemon,
   PokemonStats,
   ScarletVioletBattlePokemon,
-} from "../src/model/pokemon/index.js";
+} from "../packages/core/src/model/pokemon/index.js";
 
 import {
   calculateDamage,
   type ChampionsDamageState,
   type DamageSummary,
   type ScarletVioletDamageState,
-} from "../src/calculation/damage/index.js";
-import { championsData } from "../src/data/champions/index.js";
-import { scarletVioletData } from "../src/data/scarlet-violet/index.js";
+} from "../packages/core/src/calculation/damage/index.js";
+import { championsData } from "../packages/data/src/champions/index.js";
+import { scarletVioletData } from "../packages/data/src/scarlet-violet/index.js";
 
 const maximumIndividualValues: PokemonStats = {
   hp: 31,

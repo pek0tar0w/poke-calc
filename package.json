@@ -3,8 +3,9 @@
   "private": true,
   "packageManager": "pnpm@10.13.1",
   "scripts": {
-    "build": "pnpm --filter @poke-calc/core build",
-    "typecheck": "pnpm --filter @poke-calc/core typecheck",
+    "dev": "tsx watch examples/calculate-damage.ts",
+    "build": "pnpm --recursive build",
+    "typecheck": "pnpm --recursive typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
@@ -12,6 +13,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "tsx": "^4.22.4",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",

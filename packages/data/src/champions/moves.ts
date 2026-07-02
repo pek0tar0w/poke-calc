@@ -1,6 +1,7 @@
-import type { Move } from "../../model/move/index.js";
+import type { Move } from "@poke-calc/core";
 
-export const scarletVioletMoves: Record<string, Move> = {
+/** Pokémon Championsの技データ */
+export const championsMoves = {
   outrage: {
     id: 200,
     key: "outrage",
@@ -24,4 +25,4 @@ export const scarletVioletMoves: Record<string, Move> = {
     damageClass: "physical",
     power: 120,
   },
-};
+} satisfies Record<string, Move>;
