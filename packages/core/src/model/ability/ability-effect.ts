@@ -1,4 +1,5 @@
 import type { NonHpStatKey, Ratio } from "../../common/index.js";
+import type { RecoveryEffect } from "../effect/index.js";
 import type { AbilityEffectRequirement } from "./ability-effect-requirement.js";
 
 export type AbilityEffect =
@@ -36,4 +37,5 @@ export type AbilityEffect =
       side: "defender";
       effect: "contactDamage";
       hpRatio: Ratio;
-    };
+    }
+  | RecoveryEffect;

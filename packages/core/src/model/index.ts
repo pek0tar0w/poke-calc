@@ -1,5 +1,14 @@
-export type { Ability } from "./ability/index.js";
-export type { Item } from "./item/index.js";
+export type {
+  Ability,
+  AbilityEffect,
+  AbilityEffectRequirement,
+} from "./ability/index.js";
+export type { RecoveryEffect } from "./effect/index.js";
+export type {
+  Item,
+  ItemEffect,
+  ItemEffectActivationTiming,
+} from "./item/index.js";
 export type {
   DamageRule,
   DamagingMove,

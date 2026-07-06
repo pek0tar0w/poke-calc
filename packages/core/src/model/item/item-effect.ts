@@ -1,4 +1,5 @@
 import type { DamageClass, NonHpStatKey } from "../../common/index.js";
+import type { RecoveryEffect } from "../effect/index.js";
 
 /** ダメージ計算で扱うアイテム効果 */
 export type ItemEffect =
@@ -7,13 +8,13 @@ export type ItemEffect =
       effect: "statMultiplier";
       stat: NonHpStatKey;
       multiplier: number;
-      trigger: "always";
+      activationTiming: "always";
     }
   | {
       /** 与ダメージ補正 例: いのちのたま、もくたん、しんぴのしずく */
       effect: "damageMultiplier";
       multiplier: number;
-      trigger: "always";
+      activationTiming: "always";
       moveTypeId?: number;
       damageClass?: DamageClass;
     }
@@ -21,16 +22,10 @@ export type ItemEffect =
       /** 被ダメージ補正 例: 半減きのみ */
       effect: "receivedDamageMultiplier";
       multiplier: number;
-      trigger: "always" | "superEffective";
+      activationTiming: "always" | "superEffective";
       moveTypeId?: number;
       damageClass?: DamageClass;
     }
-  | {
-      /** HP回復 例: たべのこし、オボンのみ */
-      effect: "recovery";
-      recoveryDivisor: number;
-      trigger: "afterDamage" | "turnEnd";
-      hpRatioAtOrBelow?: number;
-    };
+  | RecoveryEffect;
 
-export type ItemEffectTrigger = ItemEffect["trigger"];
+export type ItemEffectActivationTiming = ItemEffect["activationTiming"];

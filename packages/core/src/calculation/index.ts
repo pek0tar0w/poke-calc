@@ -1,17 +1,19 @@
 export type {
-  AbilityEffect,
-  AbilityEffectRequirement,
-} from "./ability/index.js";
-export type {
   BattlePokemonState,
+  CalculateKoProbabilityParams,
   ChampionsDamageState,
   DamageCalculationState,
   DamageResult,
   DamageSummary,
   ScarletVioletDamageState,
 } from "./damage/index.js";
-export type { ItemEffect, ItemEffectTrigger } from "./item/index.js";
 export type { ResolvedMove, ResolveMoveParams } from "./move/index.js";
+export type {
+  ActiveRecoveryEffect,
+  ApplyRecoveryEffectsParams,
+  ApplyRecoveryEffectsResult,
+  ResolveActiveRecoveryEffectsParams,
+} from "./recovery/index.js";
 export type {
   ApplyNatureModifiersParams,
   CalculateChampionsStatsParams,
@@ -24,10 +26,12 @@ export type {
   ApplyWeatherDefenseModifierParams,
 } from "./weather/index.js";
 
-export { abilityEffects } from "./ability/index.js";
-export { calculateDamage } from "./damage/index.js";
-export { itemEffects } from "./item/index.js";
+export { calculateDamage, calculateKoProbability } from "./damage/index.js";
 export { resolveMove } from "./move/index.js";
+export {
+  applyRecoveryEffects,
+  resolveActiveRecoveryEffects,
+} from "./recovery/index.js";
 export {
   applyNatureModifiers,
   calculateChampionsStats,
@@ -36,7 +40,6 @@ export {
   calculateScarletVioletStats,
 } from "./stat/index.js";
 export { calcTypeEffectiveness } from "./type/calculate-type-effectiveness.js";
-
 export {
   applyWeatherDamageModifier,
   applyWeatherDefenseModifier,

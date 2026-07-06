@@ -1,72 +1,97 @@
+import type { ActiveRecoveryEffect } from "../recovery/index.js";
+import type { KoDistribution } from "./ko-distribution.js";
+
+import { applyRecoveryEffects } from "../recovery/index.js";
+import { addKoStateProbability } from "./ko-distribution.js";
+
+export type CalculateKoProbabilityParams = {
+  /** 乱数ごとのダメージ */
+  damages: readonly number[];
+
+  /** 計算する攻撃回数 */
+  hitCount: number;
+
+  /** 計算開始時のHP */
+  currentHp: number;
+
+  /** 最大HP */
+  maximumHp: number;
+
+  /** 回復効果 */
+  recoveryEffects: readonly ActiveRecoveryEffect[];
+};
+
 /**
- * 指定回数以内の攻撃で相手を倒せる確率を計算する
+ * 回復効果を含め、指定回数以内に相手を倒せる確率を計算する
  *
- * @param damages - 1回の攻撃で発生する乱数ごとのダメージ
- * @param hitCount - 攻撃回数
- * @param defenderHp - 防御側のHP
- * @returns 指定回数以内に倒せる確率（0〜1）
+ * 各攻撃後の残りHPと道具の消費状態を確率分布として保持する
  */
 export function calculateKoProbability(
-  damages: readonly number[],
-  hitCount: number,
-  defenderHp: number,
+  params: CalculateKoProbabilityParams,
 ): number {
-  // let distribution = new Map<number, number>([[0, 1]]);
-  //
-  // for (let hit = 0; hit < hitCount; hit++) {
-  //   const nextDistribution = new Map<number, number>();
-  //
-  //   for (const [totalDamage, patternCount] of distribution) {
-  //     for (const damage of damages) {
-  //       const nextDamage = totalDamage + damage;
-  //
-  //       nextDistribution.set(
-  //         nextDamage,
-  //         (nextDistribution.get(nextDamage) ?? 0) + patternCount,
-  //       );
-  //     }
-  //   }
-  //
-  //   distribution = nextDistribution;
-  // }
-  //
-  // const knockoutPatternCount = [...distribution].reduce(
-  //   (count, [totalDamage, patternCount]) =>
-  //     totalDamage >= defenderHp ? count + patternCount : count,
-  //   0,
-  // );
-  //
-  // return knockoutPatternCount / damages.length ** hitCount;
+  const { damages, hitCount, currentHp, maximumHp, recoveryEffects } = params;
 
-  // 合計ダメージと、その合計ダメージになる確率
-  // 攻撃前は合計0ダメージになる確率が100%
-  let distribution = new Map<number, number>([[0, 1]]);
+  // 攻撃前は現在HP・道具未消費になる確率が100%
+  let distribution: KoDistribution = new Map([
+    [currentHp, new Map([[false, 1]])],
+  ]);
 
-  // 攻撃1回ごとに確率分布を更新する
+  // 指定回数以内にひんしになった分岐の確率
+  let knockoutProbability = 0;
+
+  // 攻撃1回ごとに生存状態の確率分布を更新する
   for (let hit = 0; hit < hitCount; hit++) {
-    const nextDistribution = new Map<number, number>();
+    const nextDistribution: KoDistribution = new Map();
 
-    // 現在の確率を次の攻撃で発生する各乱数へ均等に分配する
-    for (const [totalDamage, probability] of distribution) {
-      for (const damage of damages) {
-        const nextDamage = totalDamage + damage;
-        const nextProbability = probability / damages.length;
+    // 現在存在する残りHPごとの状態を処理する
+    for (const [remainingHp, itemStates] of distribution) {
+      // 同じ残りHPでも道具の消費状態ごとに処理する
+      for (const [itemConsumed, probability] of itemStates) {
+        // 現在の状態から乱数ごとのダメージへ分岐する
+        for (const damage of damages) {
+          const branchProbability = probability / damages.length;
+          let nextHp = remainingHp - damage;
+          let nextItemConsumed = itemConsumed;
 
-        // 同じ合計ダメージになる確率をまとめる
-        nextDistribution.set(
-          nextDamage,
-          (nextDistribution.get(nextDamage) ?? 0) + nextProbability,
-        );
+          // ひんしになった分岐は回復せず撃破確率へ加算する
+          if (nextHp <= 0) {
+            knockoutProbability += branchProbability;
+            continue;
+          }
+
+          // オボンのみなど、ダメージ直後に発動する回復を適用する
+          ({ remainingHp: nextHp, itemConsumed: nextItemConsumed } =
+            applyRecoveryEffects({
+              remainingHp: nextHp,
+              itemConsumed: nextItemConsumed,
+              maximumHp,
+              activationTiming: "afterDamage",
+              effects: recoveryEffects,
+            }));
+
+          // たべのこしやアイスボディなど、ターン終了時の回復を適用する
+          ({ remainingHp: nextHp, itemConsumed: nextItemConsumed } =
+            applyRecoveryEffects({
+              remainingHp: nextHp,
+              itemConsumed: nextItemConsumed,
+              maximumHp,
+              activationTiming: "turnEnd",
+              effects: recoveryEffects,
+            }));
+
+          // 生存した状態を次回攻撃用の確率分布へ追加する
+          addKoStateProbability({
+            distribution: nextDistribution,
+            remainingHp: nextHp,
+            itemConsumed: nextItemConsumed,
+            probability: branchProbability,
+          });
+        }
       }
     }
 
     distribution = nextDistribution;
   }
 
-  // 合計ダメージが防御側のHP以上になる確率を合計する
-  return [...distribution].reduce(
-    (probability, [totalDamage, damageProbability]) =>
-      totalDamage >= defenderHp ? probability + damageProbability : probability,
-    0,
-  );
+  return knockoutProbability;
 }

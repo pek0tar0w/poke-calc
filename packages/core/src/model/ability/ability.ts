@@ -1,4 +1,5 @@
 import type { LanguageCode } from "../../common/index.js";
+import type { AbilityEffect } from "./ability-effect.js";
 
 export type Ability = {
   /** PokeAPI ability.id */
@@ -12,4 +13,7 @@ export type Ability = {
 
   /** 説明文 */
   descriptions: Record<LanguageCode, string>;
+
+  /** ダメージ計算で扱う効果 */
+  effects: readonly AbilityEffect[];
 };

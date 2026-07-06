@@ -1,0 +1,30 @@
+import type { LanguageCode, NatureKey } from "@poke-calc/core";
+
+/** 性格の表示名 */
+export const natureNames: Record<NatureKey, Record<LanguageCode, string>> = {
+  hardy: { ja: "がんばりや", en: "Hardy" },
+  lonely: { ja: "さみしがり", en: "Lonely" },
+  brave: { ja: "ゆうかん", en: "Brave" },
+  adamant: { ja: "いじっぱり", en: "Adamant" },
+  naughty: { ja: "やんちゃ", en: "Naughty" },
+  bold: { ja: "ずぶとい", en: "Bold" },
+  docile: { ja: "すなお", en: "Docile" },
+  relaxed: { ja: "のんき", en: "Relaxed" },
+  impish: { ja: "わんぱく", en: "Impish" },
+  lax: { ja: "のうてんき", en: "Lax" },
+  timid: { ja: "おくびょう", en: "Timid" },
+  hasty: { ja: "せっかち", en: "Hasty" },
+  serious: { ja: "まじめ", en: "Serious" },
+  jolly: { ja: "ようき", en: "Jolly" },
+  naive: { ja: "むじゃき", en: "Naive" },
+  modest: { ja: "ひかえめ", en: "Modest" },
+  mild: { ja: "おっとり", en: "Mild" },
+  quiet: { ja: "れいせい", en: "Quiet" },
+  bashful: { ja: "てれや", en: "Bashful" },
+  rash: { ja: "うっかりや", en: "Rash" },
+  calm: { ja: "おだやか", en: "Calm" },
+  gentle: { ja: "おとなしい", en: "Gentle" },
+  sassy: { ja: "なまいき", en: "Sassy" },
+  careful: { ja: "しんちょう", en: "Careful" },
+  quirky: { ja: "きまぐれ", en: "Quirky" },
+};

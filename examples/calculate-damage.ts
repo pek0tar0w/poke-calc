@@ -1,4 +1,5 @@
 import type { StatBoosts } from "../packages/core/src/calculation/stat/index.js";
+import type { NatureKey } from "../packages/core/src/model/nature/index.js";
 import type {
   ChampionsBattlePokemon,
   PokemonStats,
@@ -8,10 +9,12 @@ import type {
 import {
   calculateDamage,
   type ChampionsDamageState,
+  type DamageCalculationState,
   type DamageSummary,
   type ScarletVioletDamageState,
 } from "../packages/core/src/calculation/damage/index.js";
 import { championsData } from "../packages/data/src/champions/index.js";
+import { natureNames } from "../packages/data/src/common/index.js";
 import { scarletVioletData } from "../packages/data/src/scarlet-violet/index.js";
 
 const maximumIndividualValues: PokemonStats = {
@@ -66,6 +69,8 @@ const championsAttackerPokemon =
 const championsDefenderPokemon =
   championsData.pokemon[championsDefenderConfig.pokemonKey];
 const championsMove = championsData.moves.outrage;
+const championsDefenderItem = championsData.items.sitrusBerry;
+const championsLeftovers = championsData.items.leftovers;
 
 if (!championsAttackerPokemon || !championsDefenderPokemon) {
   throw new Error("Champions Pokemon data not found");
@@ -73,6 +78,10 @@ if (!championsAttackerPokemon || !championsDefenderPokemon) {
 
 if (!championsMove || championsMove.category !== "damaging") {
   throw new Error("Champions damaging move data not found: outrage");
+}
+
+if (!championsDefenderItem || !championsLeftovers) {
+  throw new Error("Champions recovery item data not found");
 }
 
 const championsState: ChampionsDamageState = {
@@ -132,6 +141,8 @@ const scarletVioletAttackerPokemon =
 const scarletVioletDefenderPokemon =
   scarletVioletData.pokemon[scarletVioletDefenderConfig.pokemonKey];
 const scarletVioletMove = scarletVioletData.moves.outrage;
+const scarletVioletDefenderItem = scarletVioletData.items.sitrusBerry;
+const scarletVioletLeftovers = scarletVioletData.items.leftovers;
 
 if (!scarletVioletAttackerPokemon || !scarletVioletDefenderPokemon) {
   throw new Error("Scarlet/Violet Pokemon data not found");
@@ -139,6 +150,10 @@ if (!scarletVioletAttackerPokemon || !scarletVioletDefenderPokemon) {
 
 if (!scarletVioletMove || scarletVioletMove.category !== "damaging") {
   throw new Error("Scarlet/Violet damaging move data not found: outrage");
+}
+
+if (!scarletVioletDefenderItem || !scarletVioletLeftovers) {
+  throw new Error("Scarlet/Violet recovery item data not found");
 }
 
 const scarletVioletState: ScarletVioletDamageState = {
@@ -159,25 +174,129 @@ const scarletVioletState: ScarletVioletDamageState = {
   defenderTerastallized: false,
 };
 
-const championsResult = calculateDamage(championsState);
-const scarletVioletResult = calculateDamage(scarletVioletState);
+const championsSitrusBerryState: ChampionsDamageState = {
+  ...championsState,
+  defender: {
+    ...championsState.defender,
+    config: {
+      ...championsDefenderConfig,
+      itemKey: championsDefenderItem.key,
+    },
+    item: championsDefenderItem,
+  },
+};
 
-printDamageResult("Champions", championsResult);
-printDamageResult("Scarlet/Violet", scarletVioletResult);
+const championsLeftoversState: ChampionsDamageState = {
+  ...championsState,
+  defender: {
+    ...championsState.defender,
+    config: {
+      ...championsDefenderConfig,
+      itemKey: championsLeftovers.key,
+    },
+    item: championsLeftovers,
+  },
+};
+
+const scarletVioletSitrusBerryState: ScarletVioletDamageState = {
+  ...scarletVioletState,
+  defender: {
+    ...scarletVioletState.defender,
+    config: {
+      ...scarletVioletDefenderConfig,
+      itemKey: scarletVioletDefenderItem.key,
+    },
+    item: scarletVioletDefenderItem,
+  },
+};
+
+const scarletVioletLeftoversState: ScarletVioletDamageState = {
+  ...scarletVioletState,
+  defender: {
+    ...scarletVioletState.defender,
+    config: {
+      ...scarletVioletDefenderConfig,
+      itemKey: scarletVioletLeftovers.key,
+    },
+    item: scarletVioletLeftovers,
+  },
+};
+
+printDamageResult("Champions", championsState);
+printDamageResult("Champions（オボンのみ）", championsSitrusBerryState);
+printDamageResult("Champions（たべのこし）", championsLeftoversState);
+
+printDamageResult("Scarlet/Violet", scarletVioletState);
+printDamageResult(
+  "Scarlet/Violet（オボンのみ）",
+  scarletVioletSitrusBerryState,
+);
+printDamageResult("Scarlet/Violet（たべのこし）", scarletVioletLeftoversState);
 
 /** ダメージ計算結果をコンソールへ表示する */
-function printDamageResult(
-  game: string,
-  result: {
-    normal: DamageSummary;
-    critical: DamageSummary;
-  },
-): void {
+function printDamageResult(game: string, state: DamageCalculationState): void {
+  const result = calculateDamage(state);
+
   console.log(`${game}: ガブリアスのげきりん → アーマーガア`);
+  console.table([
+    formatPokemonStats({
+      side: "攻",
+      name: "ガブリアス",
+      stats: result.attackerStats,
+      natureKey: state.attacker.config.natureKey,
+      boosts: state.attacker.boosts,
+    }),
+    formatPokemonStats({
+      side: "防",
+      name: "アーマーガア",
+      stats: result.defenderStats,
+      natureKey: state.defender.config.natureKey,
+      boosts: state.defender.boosts,
+    }),
+  ]);
   console.table([
     formatDamageSummary("通常", result.normal),
     formatDamageSummary("急所", result.critical),
   ]);
+}
+
+/** ポケモンの実数値をコンソール表示用に整形する */
+function formatPokemonStats(params: {
+  side: "攻" | "防";
+  name: string;
+  stats: PokemonStats;
+  natureKey: NatureKey;
+  boosts: StatBoosts;
+}) {
+  return {
+    攻防: params.side,
+    ポケモン: params.name,
+    性格: natureNames[params.natureKey].ja,
+    ランク補正: formatStatBoosts(params.boosts),
+    HP: params.stats.hp,
+    攻撃: params.stats.attack,
+    防御: params.stats.defense,
+    特攻: params.stats.specialAttack,
+    特防: params.stats.specialDefense,
+    素早さ: params.stats.speed,
+  };
+}
+
+/** 0以外の能力ランクを表示用文字列へ変換する */
+function formatStatBoosts(boosts: StatBoosts): string {
+  const entries = [
+    ["攻撃", boosts.attack],
+    ["防御", boosts.defense],
+    ["特攻", boosts.specialAttack],
+    ["特防", boosts.specialDefense],
+    ["素早さ", boosts.speed],
+  ] as const;
+
+  const activeBoosts = entries
+    .filter(([, boost]) => boost !== 0)
+    .map(([stat, boost]) => `${stat}${boost > 0 ? "+" : ""}${boost}`);
+
+  return activeBoosts.length > 0 ? activeBoosts.join("、") : "なし";
 }
 
 /** ダメージ計算結果をコンソール表示用に整形する */

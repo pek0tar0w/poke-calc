@@ -5,7 +5,7 @@ export {
   championsMoves,
   championsPokemon,
 } from "./champions/index.js";
-export { typeNames, weatherNames } from "./common/index.js";
+export { natureNames, typeNames, weatherNames } from "./common/index.js";
 export {
   scarletVioletAbilities,
   scarletVioletData,

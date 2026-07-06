@@ -1,5 +1,5 @@
 import type { Ratio } from "../../common/index.js";
-import type { MoveTag, TypeKey } from "../../model/index.js";
+import type { MoveTag, TypeKey } from "../index.js";
 
 export type AbilityEffectRequirement =
   | {
@@ -18,7 +18,7 @@ export type AbilityEffectRequirement =
       hpRatio: Ratio;
     }
   | {
-      /** 残りHPが指定割合以下のときに発動する */
+      /** 技の威力が指定値以下のときに発動する */
       requirement: "movePowerAtOrBelow";
       power: number;
     };
