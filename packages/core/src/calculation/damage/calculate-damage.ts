@@ -1,7 +1,6 @@
 import type { NonHpStatKey } from "../../common/index.js";
-import type { ActiveRecoveryEffect } from "../recovery/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
-import type { DamageResult, DamageSummary } from "./damage-result.js";
+import type { DamageResult } from "./damage-result.js";
 
 import { resolveMove } from "../move/index.js";
 import { resolveActiveRecoveryEffects } from "../recovery/index.js";
@@ -16,31 +15,14 @@ import {
   applyWeatherDefenseModifier,
 } from "../weather/index.js";
 import { calculateBaseDamage } from "./calculate-base-damage.js";
-import { calculateKoProbability } from "./calculate-ko-probability.js";
 import { calculateRandomDamageValues } from "./calculate-random-damage-values.js";
+import { createDamageSummary } from "./create-damage-summary.js";
 
 /** Championsのバトルレベル */
 const CHAMPIONS_BATTLE_LEVEL = 50;
 
 /** 急所補正倍率 */
 const CRITICAL_HIT_MULTIPLIER = 1.5;
-
-/** 撃破回数を探索する上限 */
-const MAXIMUM_HIT_COUNT = 100;
-
-/** 浮動小数点誤差を考慮して確定とみなす許容値 */
-const PROBABILITY_TOLERANCE = 1e-12;
-
-type CreateDamageSummaryParams = {
-  /** 乱数補正ごとのダメージ */
-  damages: readonly number[];
-
-  /** 防御側の最大HP */
-  defenderHp: number;
-
-  /** 防御側に適用する回復効果 */
-  recoveryEffects: readonly ActiveRecoveryEffect[];
-};
 
 /**
  * 攻撃側、防御側、技の条件からダメージ計算結果を返す
@@ -200,58 +182,5 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       defenderHp: defenderStats.hp,
       recoveryEffects,
     }),
-  };
-}
-
-/**
- * 乱数ごとのダメージと防御側の最大HPから結果の要約を作る
- *
- * @param params - 乱数ごとのダメージと防御側の最大HP
- * @returns ダメージ幅、割合、攻撃回数、撃破確率
- */
-function createDamageSummary(params: CreateDamageSummaryParams): DamageSummary {
-  const { damages, defenderHp, recoveryEffects } = params;
-  const minimumDamage = Math.min(...damages);
-  const maximumDamage = Math.max(...damages);
-
-  let possibleHitCount: number | null = null;
-  let guaranteedHitCount: number | null = null;
-  let knockoutProbability = 0;
-
-  // ダメージが発生しない場合は撃破回数を探索しない
-  if (maximumDamage > 0) {
-    // 回復を各攻撃後に適用しながら、最短と確定の攻撃回数を探索する
-    for (let hitCount = 1; hitCount <= MAXIMUM_HIT_COUNT; hitCount++) {
-      const probability = calculateKoProbability({
-        damages,
-        hitCount,
-        currentHp: defenderHp,
-        maximumHp: defenderHp,
-        recoveryEffects,
-      });
-
-      // 初めて撃破確率が生じた回数を最短攻撃回数として記録する
-      if (possibleHitCount === null && probability > 0) {
-        possibleHitCount = hitCount;
-        knockoutProbability = probability;
-      }
-
-      // 撃破確率が100%になった回数を確定攻撃回数として記録する
-      if (probability >= 1 - PROBABILITY_TOLERANCE) {
-        guaranteedHitCount = hitCount;
-        break;
-      }
-    }
-  }
-
-  return {
-    damages,
-    minimumDamage,
-    maximumDamage,
-    minimumDamageRatio: minimumDamage / defenderHp,
-    maximumDamageRatio: maximumDamage / defenderHp,
-    possibleHitCount,
-    guaranteedHitCount,
-    knockoutProbability,
   };
 }
