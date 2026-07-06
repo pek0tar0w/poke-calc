@@ -26,7 +26,6 @@ export function resolveActiveRecoveryEffects(
         source: {
           type: "item",
           key: params.item.key,
-          consumable: effect.consumable,
         },
       });
     }

@@ -32,7 +32,7 @@ export function applyRecoveryEffects(
   let { remainingHp, itemConsumed } = params;
 
   for (const activeEffect of params.effects) {
-    const { effect, source } = activeEffect;
+    const { effect } = activeEffect;
 
     // 発動タイミングが異なる効果は処理しない
     if (effect.activationTiming !== params.activationTiming) {
@@ -40,7 +40,12 @@ export function applyRecoveryEffects(
     }
 
     // 消費済みの道具は再発動させない
-    if (source.type === "item" && source.consumable && itemConsumed) {
+    if (
+      activeEffect.source.type === "item" &&
+      "consumable" in activeEffect.effect &&
+      activeEffect.effect.consumable &&
+      itemConsumed
+    ) {
       continue;
     }
 
@@ -61,7 +66,11 @@ export function applyRecoveryEffects(
     remainingHp = Math.min(params.maximumHp, remainingHp + recoveryAmount);
 
     // 消費する道具が発動した場合は使用済みにする
-    if (source.type === "item" && source.consumable) {
+    if (
+      activeEffect.source.type === "item" &&
+      "consumable" in activeEffect.effect &&
+      activeEffect.effect.consumable
+    ) {
       itemConsumed = true;
     }
   }
