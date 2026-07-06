@@ -1,4 +1,4 @@
-import type { Ability, Item, RecoveryEffect } from "../../model/index.js";
+import type { Ability, Item } from "../../model/index.js";
 import type { ActiveRecoveryEffect } from "./active-recovery-effect.js";
 
 export type ResolveActiveRecoveryEffectsParams = {
@@ -17,39 +17,36 @@ export function resolveActiveRecoveryEffects(
 
   if (params.item) {
     for (const effect of params.item.effects) {
-      if (isRecoveryEffect(effect)) {
-        effects.push({
-          effect,
-          source: {
-            type: "item",
-            key: params.item.key,
-            consumable: params.item.consumable,
-          },
-        });
+      if (effect.effect !== "recovery") {
+        continue;
       }
+
+      effects.push({
+        effect,
+        source: {
+          type: "item",
+          key: params.item.key,
+          consumable: effect.consumable,
+        },
+      });
     }
   }
 
   if (params.ability) {
     for (const effect of params.ability.effects) {
-      if (isRecoveryEffect(effect)) {
-        effects.push({
-          effect,
-          source: {
-            type: "ability",
-            key: params.ability.key,
-          },
-        });
+      if (effect.effect !== "recovery") {
+        continue;
       }
+
+      effects.push({
+        effect,
+        source: {
+          type: "ability",
+          key: params.ability.key,
+        },
+      });
     }
   }
 
   return effects;
-}
-
-/** 効果がHP回復効果か判定する */
-function isRecoveryEffect(effect: {
-  effect: string;
-}): effect is RecoveryEffect {
-  return effect.effect === "recovery";
 }

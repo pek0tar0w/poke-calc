@@ -18,9 +18,9 @@ export const championsItems = {
         effect: "recovery",
         activationTiming: "turnEnd",
         recoveryDivisor: 16,
+        consumable: false,
       },
     ],
-    consumable: false,
   },
   sitrusBerry: {
     id: 135,
@@ -39,8 +39,8 @@ export const championsItems = {
         activationTiming: "afterDamage",
         recoveryDivisor: 4,
         hpRatioAtOrBelow: 0.5,
+        consumable: true,
       },
     ],
-    consumable: true,
   },
 } satisfies Record<string, Item>;

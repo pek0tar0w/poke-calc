@@ -29,9 +29,4 @@ export type Item = {
    * ダメージ計算で扱う効果
    */
   effects: readonly ItemEffect[];
-
-  /**
-   * 発動後に消費されるか
-   */
-  consumable: boolean;
 };
