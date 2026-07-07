@@ -1,10 +1,11 @@
 export type {
   BattlePokemonState,
-  CalculateKoProbabilityParams,
+  CalculateKnockoutResultParams,
   ChampionsDamageState,
   DamageCalculationState,
   DamageResult,
   DamageSummary,
+  KnockoutResult,
   ScarletVioletDamageState,
 } from "./damage/index.js";
 export type { ResolvedMove, ResolveMoveParams } from "./move/index.js";
@@ -26,7 +27,7 @@ export type {
   ApplyWeatherDefenseModifierParams,
 } from "./weather/index.js";
 
-export { calculateDamage, calculateKoProbability } from "./damage/index.js";
+export { calculateDamage, calculateKnockoutResult } from "./damage/index.js";
 export { resolveMove } from "./move/index.js";
 export {
   applyRecoveryEffects,

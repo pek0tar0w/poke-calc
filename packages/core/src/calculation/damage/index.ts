@@ -1,4 +1,7 @@
-export type { CalculateKoProbabilityParams } from "./calculate-ko-probability.js";
+export type {
+  CalculateKnockoutResultParams,
+  KnockoutResult,
+} from "./calculate-knockout-result.js";
 export type {
   BattlePokemonState,
   ChampionsDamageState,
@@ -8,4 +11,4 @@ export type {
 export type { DamageResult, DamageSummary } from "./damage-result.js";
 
 export { calculateDamage } from "./calculate-damage.js";
-export { calculateKoProbability } from "./calculate-ko-probability.js";
+export { calculateKnockoutResult } from "./calculate-knockout-result.js";

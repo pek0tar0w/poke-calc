@@ -9,7 +9,12 @@ export type ResolveActiveRecoveryEffectsParams = {
   ability?: Ability;
 };
 
-/** 道具と特性から、計算対象となる回復効果を取得する */
+/**
+ * 道具と特性から、計算対象となる回復効果を取得する
+ *
+ * @param params - 選択されている道具と特性
+ * @returns 所有者の情報を付加した回復効果
+ */
 export function resolveActiveRecoveryEffects(
   params: ResolveActiveRecoveryEffectsParams,
 ): ActiveRecoveryEffect[] {
