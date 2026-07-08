@@ -1,4 +1,5 @@
-import type { RecoveryEffect } from "../../model/index.js";
+import type { RecoveryEffect } from "../../../model/index.js";
+import type { ActiveEffectSource } from "../index.js";
 
 /** 所有者の情報を付加した計算対象の回復効果 */
 export type ActiveRecoveryEffect =
@@ -9,18 +10,12 @@ export type ActiveRecoveryEffect =
       };
 
       /** 効果の発生元 */
-      source: {
-        type: "item";
-        key: string;
-      };
+      source: Extract<ActiveEffectSource, { type: "item" }>;
     }
   | {
       /** 特性が持つ回復効果 */
       effect: RecoveryEffect;
 
       /** 効果の発生元 */
-      source: {
-        type: "ability";
-        key: string;
-      };
+      source: Extract<ActiveEffectSource, { type: "ability" }>;
     };

@@ -2,9 +2,9 @@ import type { NonHpStatKey } from "../../common/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
 import type { DamageResult } from "./damage-result.js";
 
-import { resolveActiveDamageReductionEffects } from "../damage-reduction/index.js";
+import { resolveActiveDamageReductionEffects } from "../effect/damage-reduction/index.js";
 import { resolveMove } from "../move/index.js";
-import { resolveActiveRecoveryEffects } from "../recovery/index.js";
+import { resolveActiveRecoveryEffects } from "../effect/recovery/index.js";
 import {
   applyNatureModifiers,
   applyStatBoost,

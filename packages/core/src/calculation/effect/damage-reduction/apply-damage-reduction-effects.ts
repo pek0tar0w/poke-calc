@@ -1,8 +1,11 @@
-import type { KoState } from "../damage/ko-distribution.js";
+import type { KoState } from "../../damage/knockout/ko-distribution.js";
 import type { ActiveDamageReductionEffect } from "./active-damage-reduction-effect.js";
 
-import { areRuntimeEffectRequirementsMet } from "../effect/index.js";
-import { roundHalfDown } from "../utils/round-half-down.js";
+import {
+  areRuntimeEffectRequirementsMet,
+  createActiveEffectKey,
+} from "../index.js";
+import { roundHalfDown } from "../../utils/round-half-down.js";
 
 /** 状態に応じて発動するダメージ軽減効果を適用する */
 export function applyDamageReductionEffects({
@@ -33,7 +36,10 @@ export function applyDamageReductionEffects({
   const consumedEffectKeys = [...state.consumedEffectKeys];
 
   for (const activeEffect of effects) {
-    const effectKey = createActiveDamageReductionEffectKey(activeEffect);
+    const effectKey = createActiveEffectKey({
+      source: activeEffect.source,
+      effect: activeEffect.effect.effect,
+    });
 
     if (
       isConsumableDamageReductionEffect(activeEffect) &&
@@ -87,10 +93,4 @@ function isConsumableDamageReductionEffect(
   activeEffect: ActiveDamageReductionEffect,
 ): boolean {
   return "consumable" in activeEffect.effect && activeEffect.effect.consumable;
-}
-
-function createActiveDamageReductionEffectKey(
-  activeEffect: ActiveDamageReductionEffect,
-): string {
-  return `${activeEffect.source.type}:${activeEffect.source.key}:damageReduction`;
 }

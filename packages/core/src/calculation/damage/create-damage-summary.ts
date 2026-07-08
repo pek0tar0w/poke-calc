@@ -1,10 +1,10 @@
-import type { ActiveDamageReductionEffect } from "../damage-reduction/index.js";
-import type { ActiveRecoveryEffect } from "../recovery/active-recovery-effect.js";
+import type { ActiveDamageReductionEffect } from "../effect/damage-reduction/index.js";
+import type { ActiveRecoveryEffect } from "../effect/recovery/active-recovery-effect.js";
 import type { DamageSummary } from "./damage-result.js";
 
-import { applyDamageReductionEffects } from "../damage-reduction/index.js";
-import { calculateKnockoutResult } from "./calculate-knockout-result.js";
-import { createInitialKoState } from "./ko-distribution.js";
+import { applyDamageReductionEffects } from "../effect/damage-reduction/index.js";
+import { calculateKnockoutResult } from "./knockout/calculate-knockout-result.js";
+import { createInitialKoState } from "./knockout/ko-distribution.js";
 
 /**
  * 乱数ごとのダメージと防御側の状態から結果の要約を作る

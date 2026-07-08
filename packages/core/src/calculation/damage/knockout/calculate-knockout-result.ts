@@ -1,9 +1,9 @@
-import type { ActiveRecoveryEffect } from "../recovery/active-recovery-effect.js";
-import type { ActiveDamageReductionEffect } from "../damage-reduction/index.js";
+import type { ActiveDamageReductionEffect } from "../../effect/damage-reduction/index.js";
+import type { ActiveRecoveryEffect } from "../../effect/recovery/active-recovery-effect.js";
 import type { KoDistribution } from "./ko-distribution.js";
 
-import { applyDamageReductionEffects } from "../damage-reduction/index.js";
-import { applyRecoveryEffects } from "../recovery/apply-recovery-effects.js";
+import { applyDamageReductionEffects } from "../../effect/damage-reduction/index.js";
+import { applyRecoveryEffects } from "../../effect/recovery/apply-recovery-effects.js";
 import {
   addKoStateProbability,
   createInitialKoState,

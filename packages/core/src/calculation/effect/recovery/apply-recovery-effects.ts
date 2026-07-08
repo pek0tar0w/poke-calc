@@ -1,6 +1,9 @@
 import type { ActiveRecoveryEffect } from "./active-recovery-effect.js";
 
-import { areRuntimeEffectRequirementsMet } from "../effect/index.js";
+import {
+  areRuntimeEffectRequirementsMet,
+  createActiveEffectKey,
+} from "../index.js";
 
 /**
  * 指定したタイミングで発動可能な回復効果を適用する
@@ -39,7 +42,10 @@ export function applyRecoveryEffects({
 
   for (const activeEffect of effects) {
     const { effect } = activeEffect;
-    const effectKey = createActiveRecoveryEffectKey(activeEffect);
+    const effectKey = createActiveEffectKey({
+      source: activeEffect.source,
+      effect: activeEffect.effect.effect,
+    });
 
     // 発動タイミングが異なる効果は処理しない
     if (effect.activationTiming !== activationTiming) {
@@ -87,10 +93,4 @@ function isConsumableRecoveryEffect(
   activeEffect: ActiveRecoveryEffect,
 ): boolean {
   return "consumable" in activeEffect.effect && activeEffect.effect.consumable;
-}
-
-function createActiveRecoveryEffectKey(
-  activeEffect: ActiveRecoveryEffect,
-): string {
-  return `${activeEffect.source.type}:${activeEffect.source.key}:recovery`;
 }

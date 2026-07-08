@@ -1,4 +1,5 @@
-import type { DamageReductionEffect } from "../../model/index.js";
+import type { DamageReductionEffect } from "../../../model/index.js";
+import type { ActiveEffectSource } from "../index.js";
 
 /** 所有者の情報を付加した計算対象のダメージ軽減効果 */
 export type ActiveDamageReductionEffect =
@@ -9,18 +10,12 @@ export type ActiveDamageReductionEffect =
       };
 
       /** 効果の発生元 */
-      source: {
-        type: "item";
-        key: string;
-      };
+      source: Extract<ActiveEffectSource, { type: "item" }>;
     }
   | {
       /** 特性が持つダメージ軽減効果 */
       effect: DamageReductionEffect;
 
       /** 効果の発生元 */
-      source: {
-        type: "ability";
-        key: string;
-      };
+      source: Extract<ActiveEffectSource, { type: "ability" }>;
     };
