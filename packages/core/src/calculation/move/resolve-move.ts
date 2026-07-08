@@ -10,14 +10,6 @@ const WEATHER_BALL_TYPES = {
   snow: "ice",
 } satisfies Record<WeatherKey, TypeKey>;
 
-export type ResolveMoveParams = {
-  /** 使用する技 */
-  move: DamagingMove;
-
-  /** 現在の天候 */
-  weather: WeatherKey | null;
-};
-
 export type ResolvedMove = {
   /** 条件による変更を反映した威力 */
   power: number;
@@ -31,13 +23,17 @@ export type ResolvedMove = {
  *
  * ウェザーボールは天候がある場合に威力が2倍になり、天候に応じたタイプへ変化する
  * ソーラービームとソーラーブレードは晴れ以外の天候で威力が半減する
- *
- * @param params - 使用する技と現在の天候
- * @returns ダメージ計算に使用する威力とタイプ
  */
-export function resolveMove(params: ResolveMoveParams): ResolvedMove {
-  const { move, weather } = params;
+export function resolveMove({
+  move,
+  weather,
+}: {
+  /** 使用する技 */
+  move: DamagingMove;
 
+  /** 現在の天候 */
+  weather: WeatherKey | null;
+}): ResolvedMove {
   // 天候なしの場合は元のノーマルタイプ・威力を使用する
   if (move.key === "weatherBall" && weather !== null) {
     return {

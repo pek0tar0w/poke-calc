@@ -26,26 +26,19 @@ export type PokemonStatConfig =
       level: number;
     };
 
-/** 全実数値計算に必要なパラメータ */
-export type CalculatePokemonStatsParams = {
+/**
+ * ゲーム別の計算方式で性格補正前の全実数値を計算する
+ */
+export function calculatePokemonStats({
+  baseStats,
+  statConfig,
+}: {
   /** 種族値 */
   baseStats: PokemonStats;
 
   /** ゲーム別の育成値 */
   statConfig: PokemonStatConfig;
-};
-
-/**
- * ゲーム別の計算方式で性格補正前の全実数値を計算する
- *
- * @param params - 種族値とゲーム別の育成値
- * @returns 性格補正前の全実数値
- */
-export function calculatePokemonStats(
-  params: CalculatePokemonStatsParams,
-): PokemonStats {
-  const { baseStats, statConfig } = params;
-
+}): PokemonStats {
   if (statConfig.game === "champions") {
     return calculateChampionsStats({
       baseStats,

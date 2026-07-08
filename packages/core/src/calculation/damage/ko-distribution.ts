@@ -1,46 +1,66 @@
-/**
- * 残りHPから道具の消費状態ごとの確率を取得する分布
- *
- * 1段目のキー: 残りHP
- * 2段目のキー: 道具が消費済みか
- * 値: その状態になる確率
- */
-export type KoDistribution = Map<number, Map<boolean, number>>;
-
-export type AddKoStateProbabilityParams = {
-  /** 追加先の確率分布 */
-  distribution: KoDistribution;
-
-  /** 追加する状態の残りHP */
+/** 撃破回数計算中に引き継ぐ生存状態 */
+export type KoState = {
+  /** 現在の残りHP */
   remainingHp: number;
 
-  /** 道具が消費済みか */
-  itemConsumed: boolean;
-
-  /** この状態になる確率 */
-  probability: number;
+  /** 一度だけ発動する効果のうち、すでに消費済みの効果キー */
+  consumedEffectKeys: readonly string[];
 };
+
+/**
+ * 生存状態ごとの確率分布
+ *
+ * 同じHPでも、オボンのみ使用済み・ばけのかわ発動済みなどで
+ * 以後の計算結果が変わるため、状態全体をキーにする
+ */
+export type KoDistribution = Map<
+  string,
+  {
+    /** 次の攻撃へ引き継ぐ生存状態 */
+    state: KoState;
+
+    /** この状態になる確率 */
+    probability: number;
+  }
+>;
+
+/** 計算開始時の生存状態を作る */
+export function createInitialKoState(currentHp: number): KoState {
+  return {
+    remainingHp: currentHp,
+    consumedEffectKeys: [],
+  };
+}
+
+/** 状態をMapのキーに変換する */
+export function createKoStateKey(state: KoState): string {
+  return `${state.remainingHp}:${[...state.consumedEffectKeys].sort().join(",")}`;
+}
 
 /**
  * 状態を確率分布へ追加する
  *
- * 同じ残りHP・道具状態が存在する場合は確率を合計する
+ * 同じHP・消費済み効果の状態が存在する場合は確率を合計する
  */
-export function addKoStateProbability(
-  params: AddKoStateProbabilityParams,
-): void {
-  const { distribution, remainingHp, itemConsumed, probability } = params;
-  let itemStates = distribution.get(remainingHp);
+export function addKoStateProbability({
+  distribution,
+  state,
+  probability,
+}: {
+  /** 追加先の確率分布 */
+  distribution: KoDistribution;
 
-  // この残りHPが初めて現れた場合は内側のMapを作る
-  if (!itemStates) {
-    itemStates = new Map();
-    distribution.set(remainingHp, itemStates);
-  }
+  /** 追加する生存状態 */
+  state: KoState;
 
-  // 同じ道具状態になる既存確率へ今回の分岐確率を加算する
-  itemStates.set(
-    itemConsumed,
-    (itemStates.get(itemConsumed) ?? 0) + probability,
-  );
+  /** この状態になる確率 */
+  probability: number;
+}): void {
+  const stateKey = createKoStateKey(state);
+  const current = distribution.get(stateKey);
+
+  distribution.set(stateKey, {
+    state,
+    probability: (current?.probability ?? 0) + probability,
+  });
 }

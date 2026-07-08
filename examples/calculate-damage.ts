@@ -3,7 +3,6 @@ import type { NatureKey } from "../packages/core/src/model/nature/index.js";
 import type {
   ChampionsBattlePokemon,
   PokemonStats,
-  ScarletVioletBattlePokemon,
 } from "../packages/core/src/model/pokemon/index.js";
 
 import {
@@ -11,21 +10,9 @@ import {
   type ChampionsDamageState,
   type DamageCalculationState,
   type DamageSummary,
-  type ScarletVioletDamageState,
 } from "../packages/core/src/calculation/damage/index.js";
 import { championsData } from "../packages/data/src/champions/index.js";
 import { natureNames } from "../packages/data/src/common/index.js";
-import { scarletVioletData } from "../packages/data/src/scarlet-violet/index.js";
-
-const maximumIndividualValues: PokemonStats = {
-  hp: 31,
-  attack: 31,
-  defense: 31,
-  specialAttack: 31,
-  specialDefense: 31,
-  speed: 31,
-};
-
 const neutralBoosts: StatBoosts = {
   attack: 0,
   defense: 0,
@@ -49,9 +36,9 @@ const championsAttackerConfig: ChampionsBattlePokemon = {
   },
 };
 
-const championsDefenderConfig: ChampionsBattlePokemon = {
+const glalieConfig: ChampionsBattlePokemon = {
   game: "champions",
-  pokemonKey: "corviknight",
+  pokemonKey: "glalie",
   natureKey: "bold",
   moveKeys: [],
   statPoints: {
@@ -59,20 +46,34 @@ const championsDefenderConfig: ChampionsBattlePokemon = {
     attack: 0,
     defense: 32,
     specialAttack: 0,
-    specialDefense: 0,
+    specialDefense: 32,
     speed: 0,
   },
 };
 
+const dragoniteConfig: ChampionsBattlePokemon = {
+  ...glalieConfig,
+  pokemonKey: "dragonite",
+};
+
+const mimikyuConfig: ChampionsBattlePokemon = {
+  ...glalieConfig,
+  pokemonKey: "mimikyu",
+};
+
 const championsAttackerPokemon =
   championsData.pokemon[championsAttackerConfig.pokemonKey];
-const championsDefenderPokemon =
-  championsData.pokemon[championsDefenderConfig.pokemonKey];
+const glalie = championsData.pokemon[glalieConfig.pokemonKey];
+const dragonite = championsData.pokemon[dragoniteConfig.pokemonKey];
+const mimikyu = championsData.pokemon[mimikyuConfig.pokemonKey];
 const championsMove = championsData.moves.outrage;
-const championsDefenderItem = championsData.items.sitrusBerry;
-const championsLeftovers = championsData.items.leftovers;
+const championsDisguiseMove = championsData.moves.earthquake;
+const championsDefenderMultiscale = championsData.abilities.multiscale;
+const championsDefenderSturdy = championsData.abilities.sturdy;
+const championsDefenderDisguise = championsData.abilities.disguise;
+const championsDefenderLeftovers = championsData.items.leftovers;
 
-if (!championsAttackerPokemon || !championsDefenderPokemon) {
+if (!championsAttackerPokemon || !glalie || !dragonite || !mimikyu) {
   throw new Error("Champions Pokemon data not found");
 }
 
@@ -80,8 +81,17 @@ if (!championsMove || championsMove.category !== "damaging") {
   throw new Error("Champions damaging move data not found: outrage");
 }
 
-if (!championsDefenderItem || !championsLeftovers) {
-  throw new Error("Champions recovery item data not found");
+if (!championsDisguiseMove || championsDisguiseMove.category !== "damaging") {
+  throw new Error("Champions damaging move data not found: earthquake");
+}
+
+if (
+  !championsDefenderMultiscale ||
+  !championsDefenderSturdy ||
+  !championsDefenderDisguise ||
+  !championsDefenderLeftovers
+) {
+  throw new Error("Champions damage reduction ability data not found");
 }
 
 const championsState: ChampionsDamageState = {
@@ -92,163 +102,81 @@ const championsState: ChampionsDamageState = {
     boosts: { ...neutralBoosts, attack: 1 },
   },
   defender: {
-    config: championsDefenderConfig,
-    pokemon: championsDefenderPokemon,
-    boosts: { ...neutralBoosts, defense: 3 },
+    config: glalieConfig,
+    pokemon: glalie,
+    boosts: { ...neutralBoosts, defense: 3, specialDefense: 3 },
   },
   move: championsMove,
   weather: null,
 };
 
-const scarletVioletAttackerConfig: ScarletVioletBattlePokemon = {
-  game: "scarletViolet",
-  pokemonKey: "garchomp",
-  natureKey: "adamant",
-  moveKeys: ["outrage"],
-  level: 50,
-  individualValues: maximumIndividualValues,
-  effortValues: {
-    hp: 0,
-    attack: 252,
-    defense: 0,
-    specialAttack: 0,
-    specialDefense: 0,
-    speed: 0,
-  },
-  teraType: "dragon",
-};
-
-const scarletVioletDefenderConfig: ScarletVioletBattlePokemon = {
-  game: "scarletViolet",
-  pokemonKey: "corviknight",
-  natureKey: "bold",
-  moveKeys: [],
-  level: 50,
-  individualValues: maximumIndividualValues,
-  effortValues: {
-    hp: 252,
-    attack: 0,
-    defense: 252,
-    specialAttack: 0,
-    specialDefense: 0,
-    speed: 0,
-  },
-  teraType: "flying",
-};
-
-const scarletVioletAttackerPokemon =
-  scarletVioletData.pokemon[scarletVioletAttackerConfig.pokemonKey];
-const scarletVioletDefenderPokemon =
-  scarletVioletData.pokemon[scarletVioletDefenderConfig.pokemonKey];
-const scarletVioletMove = scarletVioletData.moves.outrage;
-const scarletVioletDefenderItem = scarletVioletData.items.sitrusBerry;
-const scarletVioletLeftovers = scarletVioletData.items.leftovers;
-
-if (!scarletVioletAttackerPokemon || !scarletVioletDefenderPokemon) {
-  throw new Error("Scarlet/Violet Pokemon data not found");
-}
-
-if (!scarletVioletMove || scarletVioletMove.category !== "damaging") {
-  throw new Error("Scarlet/Violet damaging move data not found: outrage");
-}
-
-if (!scarletVioletDefenderItem || !scarletVioletLeftovers) {
-  throw new Error("Scarlet/Violet recovery item data not found");
-}
-
-const scarletVioletState: ScarletVioletDamageState = {
-  game: "scarletViolet",
-  attacker: {
-    config: scarletVioletAttackerConfig,
-    pokemon: scarletVioletAttackerPokemon,
-    boosts: { ...neutralBoosts, attack: 1 },
-  },
-  defender: {
-    config: scarletVioletDefenderConfig,
-    pokemon: scarletVioletDefenderPokemon,
-    boosts: { ...neutralBoosts, defense: 3 },
-  },
-  move: scarletVioletMove,
-  weather: null,
-  attackerTerastallized: false,
-  defenderTerastallized: false,
-};
-
-const championsSitrusBerryState: ChampionsDamageState = {
+const championsMultiscaleState: ChampionsDamageState = {
   ...championsState,
   defender: {
     ...championsState.defender,
     config: {
-      ...championsDefenderConfig,
-      itemKey: championsDefenderItem.key,
+      ...dragoniteConfig,
+      abilityKey: championsDefenderMultiscale.key,
     },
-    item: championsDefenderItem,
+    pokemon: dragonite,
+    ability: championsDefenderMultiscale,
   },
 };
 
-const championsLeftoversState: ChampionsDamageState = {
+const championsDisguiseState: ChampionsDamageState = {
   ...championsState,
   defender: {
     ...championsState.defender,
     config: {
-      ...championsDefenderConfig,
-      itemKey: championsLeftovers.key,
+      ...mimikyuConfig,
+      abilityKey: championsDefenderDisguise.key,
+      itemKey: championsDefenderLeftovers.key,
     },
-    item: championsLeftovers,
+    pokemon: mimikyu,
+    ability: championsDefenderDisguise,
+    item: championsDefenderLeftovers,
   },
+  move: championsDisguiseMove,
 };
 
-const scarletVioletSitrusBerryState: ScarletVioletDamageState = {
-  ...scarletVioletState,
+const championsSturdyState: ChampionsDamageState = {
+  ...championsState,
   defender: {
-    ...scarletVioletState.defender,
+    ...championsState.defender,
     config: {
-      ...scarletVioletDefenderConfig,
-      itemKey: scarletVioletDefenderItem.key,
+      ...glalieConfig,
+      abilityKey: championsDefenderSturdy.key,
     },
-    item: scarletVioletDefenderItem,
+    ability: championsDefenderSturdy,
   },
 };
 
-const scarletVioletLeftoversState: ScarletVioletDamageState = {
-  ...scarletVioletState,
-  defender: {
-    ...scarletVioletState.defender,
-    config: {
-      ...scarletVioletDefenderConfig,
-      itemKey: scarletVioletLeftovers.key,
-    },
-    item: scarletVioletLeftovers,
-  },
-};
-
-printDamageResult("Champions", championsState);
-printDamageResult("Champions（オボンのみ）", championsSitrusBerryState);
-printDamageResult("Champions（たべのこし）", championsLeftoversState);
-
-printDamageResult("Scarlet/Violet", scarletVioletState);
+printDamageResult("Champions（軽減なし）", championsState);
+printDamageResult("Champions（マルチスケイル）", championsMultiscaleState);
+printDamageResult("Champions（がんじょう）", championsSturdyState);
 printDamageResult(
-  "Scarlet/Violet（オボンのみ）",
-  scarletVioletSitrusBerryState,
+  "Champions（ばけのかわ・たべのこし）",
+  championsDisguiseState,
 );
-printDamageResult("Scarlet/Violet（たべのこし）", scarletVioletLeftoversState);
 
 /** ダメージ計算結果をコンソールへ表示する */
 function printDamageResult(game: string, state: DamageCalculationState): void {
   const result = calculateDamage(state);
 
-  console.log(`${game}: ガブリアスのげきりん → アーマーガア`);
+  console.log(
+    `${game}: ${state.attacker.pokemon.names.ja}の${state.move.names.ja} → ${state.defender.pokemon.names.ja}`,
+  );
   console.table([
     formatPokemonStats({
       side: "攻",
-      name: "ガブリアス",
+      name: state.attacker.pokemon.names.ja,
       stats: result.attackerStats,
       natureKey: state.attacker.config.natureKey,
       boosts: state.attacker.boosts,
     }),
     formatPokemonStats({
       side: "防",
-      name: "アーマーガア",
+      name: state.defender.pokemon.names.ja,
       stats: result.defenderStats,
       natureKey: state.defender.config.natureKey,
       boosts: state.defender.boosts,

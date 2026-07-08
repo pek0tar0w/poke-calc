@@ -38,7 +38,12 @@ export const scarletVioletItems = {
         effect: "recovery",
         activationTiming: "afterDamage",
         recoveryDivisor: 4,
-        hpRatioAtOrBelow: 0.5,
+        requirements: [
+          {
+            requirement: "hpRatioAtOrBelow",
+            hpRatio: 0.5,
+          },
+        ],
         consumable: true,
       },
     ],

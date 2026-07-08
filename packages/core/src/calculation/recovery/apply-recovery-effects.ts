@@ -1,11 +1,24 @@
 import type { ActiveRecoveryEffect } from "./active-recovery-effect.js";
 
-export type ApplyRecoveryEffectsParams = {
+import { areRuntimeEffectRequirementsMet } from "../effect/index.js";
+
+/**
+ * 指定したタイミングで発動可能な回復効果を適用する
+ *
+ * HP割合など計算中に変化する条件はここで判定する
+ */
+export function applyRecoveryEffects({
+  remainingHp,
+  consumedEffectKeys,
+  maximumHp,
+  activationTiming,
+  effects,
+}: {
   /** 回復前の残りHP */
   remainingHp: number;
 
-  /** 道具が消費済みか */
-  itemConsumed: boolean;
+  /** すでに消費済みの効果キー */
+  consumedEffectKeys: readonly string[];
 
   /** 最大HP */
   maximumHp: number;
@@ -15,68 +28,69 @@ export type ApplyRecoveryEffectsParams = {
 
   /** 適用候補の回復効果 */
   effects: readonly ActiveRecoveryEffect[];
-};
-
-export type ApplyRecoveryEffectsResult = {
+}): {
   /** 回復後の残りHP */
   remainingHp: number;
 
-  /** 回復処理後の道具消費状態 */
-  itemConsumed: boolean;
-};
+  /** 回復処理後の消費済み効果キー */
+  consumedEffectKeys: readonly string[];
+} {
+  const nextConsumedEffectKeys = [...consumedEffectKeys];
 
-/** 指定したタイミングで発動可能な回復効果を適用する */
-export function applyRecoveryEffects(
-  params: ApplyRecoveryEffectsParams,
-): ApplyRecoveryEffectsResult {
-  let { remainingHp, itemConsumed } = params;
-
-  for (const activeEffect of params.effects) {
+  for (const activeEffect of effects) {
     const { effect } = activeEffect;
+    const effectKey = createActiveRecoveryEffectKey(activeEffect);
 
     // 発動タイミングが異なる効果は処理しない
-    if (effect.activationTiming !== params.activationTiming) {
+    if (effect.activationTiming !== activationTiming) {
       continue;
     }
 
-    // 消費済みの道具は再発動させない
+    // 一度だけ発動する効果は、消費済みなら再発動させない
     if (
-      activeEffect.source.type === "item" &&
-      "consumable" in activeEffect.effect &&
-      activeEffect.effect.consumable &&
-      itemConsumed
+      isConsumableRecoveryEffect(activeEffect) &&
+      nextConsumedEffectKeys.includes(effectKey)
     ) {
       continue;
     }
 
-    // 現在HPが発動条件を満たしていなければ処理しない
+    // 現在HPなど、計算中に変化する条件を満たしていなければ処理しない
     if (
-      effect.hpRatioAtOrBelow !== undefined &&
-      remainingHp / params.maximumHp > effect.hpRatioAtOrBelow
+      !areRuntimeEffectRequirementsMet({
+        requirements: effect.requirements,
+        remainingHp,
+        maximumHp,
+      })
     ) {
       continue;
     }
 
     // 回復量は効果ごとに小数点以下を切り捨てる
-    const recoveryAmount = Math.floor(
-      params.maximumHp / effect.recoveryDivisor,
-    );
+    const recoveryAmount = Math.floor(maximumHp / effect.recoveryDivisor);
 
     // 最大HPを超えない範囲で回復する
-    remainingHp = Math.min(params.maximumHp, remainingHp + recoveryAmount);
+    remainingHp = Math.min(maximumHp, remainingHp + recoveryAmount);
 
-    // 消費する道具が発動した場合は使用済みにする
-    if (
-      activeEffect.source.type === "item" &&
-      "consumable" in activeEffect.effect &&
-      activeEffect.effect.consumable
-    ) {
-      itemConsumed = true;
+    // 一度だけ発動する効果が発動した場合は消費済みにする
+    if (isConsumableRecoveryEffect(activeEffect)) {
+      nextConsumedEffectKeys.push(effectKey);
     }
   }
 
   return {
     remainingHp,
-    itemConsumed,
+    consumedEffectKeys: nextConsumedEffectKeys,
   };
+}
+
+function isConsumableRecoveryEffect(
+  activeEffect: ActiveRecoveryEffect,
+): boolean {
+  return "consumable" in activeEffect.effect && activeEffect.effect.consumable;
+}
+
+function createActiveRecoveryEffectKey(
+  activeEffect: ActiveRecoveryEffect,
+): string {
+  return `${activeEffect.source.type}:${activeEffect.source.key}:recovery`;
 }

@@ -6,38 +6,19 @@ import { calculateNatureMultiplier } from "./calculate-nature-multiplier.js";
 
 const { floor } = Math;
 
-/** 性格補正に必要なパラメータ */
-export type ApplyNatureModifiersParams = {
+/**
+ * HP以外の全実数値へ性格補正を適用する
+ */
+export function applyNatureModifiers({
+  stats,
+  natureKey,
+}: {
   /** 性格補正前の全実数値 */
   stats: PokemonStats;
 
   /** 適用する性格 */
   natureKey: NatureKey;
-};
-
-/** 1つの能力値への性格補正に必要なパラメータ */
-type ApplyNatureModifierParams = {
-  /** 性格補正前の能力値 */
-  stat: number;
-
-  /** 補正対象の能力 */
-  statKey: NonHpStatKey;
-
-  /** 適用する性格 */
-  natureKey: NatureKey;
-};
-
-/**
- * HP以外の全実数値へ性格補正を適用する
- *
- * @param params - 性格補正前の全実数値と性格
- * @returns 性格補正後の全実数値
- */
-export function applyNatureModifiers(
-  params: ApplyNatureModifiersParams,
-): PokemonStats {
-  const { stats, natureKey } = params;
-
+}): PokemonStats {
   return {
     hp: stats.hp,
     attack: applyNatureModifier({
@@ -71,8 +52,20 @@ export function applyNatureModifiers(
 /**
  * 1つの能力値へ性格補正を適用する
  */
-function applyNatureModifier(params: ApplyNatureModifierParams): number {
-  const { stat, statKey, natureKey } = params;
+function applyNatureModifier({
+  stat,
+  statKey,
+  natureKey,
+}: {
+  /** 性格補正前の能力値 */
+  stat: number;
+
+  /** 補正対象の能力 */
+  statKey: NonHpStatKey;
+
+  /** 適用する性格 */
+  natureKey: NatureKey;
+}): number {
   const multiplier = calculateNatureMultiplier(natureKey, statKey);
 
   return floor(stat * multiplier);

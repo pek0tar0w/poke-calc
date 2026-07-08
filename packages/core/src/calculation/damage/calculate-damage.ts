@@ -2,6 +2,7 @@ import type { NonHpStatKey } from "../../common/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
 import type { DamageResult } from "./damage-result.js";
 
+import { resolveActiveDamageReductionEffects } from "../damage-reduction/index.js";
 import { resolveMove } from "../move/index.js";
 import { resolveActiveRecoveryEffects } from "../recovery/index.js";
 import {
@@ -28,7 +29,6 @@ const CRITICAL_HIT_MULTIPLIER = 1.5;
  * 攻撃側、防御側、技の条件からダメージ計算結果を返す
  *
  * @param state - ダメージ計算時の対戦状態
- * @returns 通常時と急所時のダメージ計算結果
  */
 export function calculateDamage(state: DamageCalculationState): DamageResult {
   // Stateから解決済みのポケモンデータを取得する
@@ -167,7 +167,18 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
   });
 
   // 防御側の道具と特性から回復効果を解決する
-  const recoveryEffects = resolveActiveRecoveryEffects(state.defender);
+  const recoveryEffects = resolveActiveRecoveryEffects({
+    item: state.defender.item,
+    ability: state.defender.ability,
+    weather: state.weather,
+  });
+
+  // 防御側の道具と特性からダメージ軽減効果を解決する
+  const damageReductionEffects = resolveActiveDamageReductionEffects({
+    item: state.defender.item,
+    ability: state.defender.ability,
+    weather: state.weather,
+  });
 
   return {
     attackerStats,
@@ -175,11 +186,13 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     normal: createDamageSummary({
       damages: normalDamages,
       defenderHp: defenderStats.hp,
+      damageReductionEffects,
       recoveryEffects,
     }),
     critical: createDamageSummary({
       damages: criticalDamages,
       defenderHp: defenderStats.hp,
+      damageReductionEffects,
       recoveryEffects,
     }),
   };

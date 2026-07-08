@@ -1,9 +1,9 @@
+export type { Ability, AbilityEffect } from "./ability/index.js";
 export type {
-  Ability,
-  AbilityEffect,
-  AbilityEffectRequirement,
-} from "./ability/index.js";
-export type { RecoveryEffect } from "./effect/index.js";
+  DamageReductionEffect,
+  EffectRequirement,
+  RecoveryEffect,
+} from "./effect/index.js";
 export type {
   Item,
   ItemEffect,

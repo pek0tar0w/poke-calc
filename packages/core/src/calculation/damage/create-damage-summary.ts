@@ -1,34 +1,51 @@
-import type { ActiveRecoveryEffect } from "../recovery/index.js";
+import type { ActiveDamageReductionEffect } from "../damage-reduction/index.js";
+import type { ActiveRecoveryEffect } from "../recovery/active-recovery-effect.js";
 import type { DamageSummary } from "./damage-result.js";
 
+import { applyDamageReductionEffects } from "../damage-reduction/index.js";
 import { calculateKnockoutResult } from "./calculate-knockout-result.js";
+import { createInitialKoState } from "./ko-distribution.js";
 
-export type CreateDamageSummaryParams = {
+/**
+ * 乱数ごとのダメージと防御側の状態から結果の要約を作る
+ *
+ * 回復効果を考慮して、最短撃破回数と確定撃破回数も計算する
+ */
+export function createDamageSummary({
+  damages,
+  defenderHp,
+  damageReductionEffects,
+  recoveryEffects,
+}: {
   /** 乱数補正ごとのダメージ */
   damages: readonly number[];
 
   /** 防御側の最大HP */
   defenderHp: number;
 
+  /** 防御側に適用するダメージ軽減効果 */
+  damageReductionEffects: readonly ActiveDamageReductionEffect[];
+
   /** 防御側に適用する回復効果 */
   recoveryEffects: readonly ActiveRecoveryEffect[];
-};
+}): DamageSummary {
+  const initialState = createInitialKoState(defenderHp);
+  const initialDamages = damages.map(
+    (damage) =>
+      applyDamageReductionEffects({
+        damage,
+        state: initialState,
+        maximumHp: defenderHp,
+        effects: damageReductionEffects,
+      }).damage,
+  );
 
-/**
- * 乱数ごとのダメージと防御側の状態から結果の要約を作る
- *
- * @param params - 乱数ごとのダメージ、防御側のHP、回復効果
- * @returns ダメージ幅、割合、撃破回数、撃破確率
- */
-export function createDamageSummary(
-  params: CreateDamageSummaryParams,
-): DamageSummary {
-  const { damages, defenderHp, recoveryEffects } = params;
-  const minimumDamage = Math.min(...damages);
-  const maximumDamage = Math.max(...damages);
+  const minimumDamage = Math.min(...initialDamages);
+  const maximumDamage = Math.max(...initialDamages);
+  const maximumRawDamage = Math.max(...damages);
 
   const knockoutResult =
-    maximumDamage === 0
+    maximumRawDamage === 0
       ? {
           possibleHitCount: null,
           guaranteedHitCount: null,
@@ -38,11 +55,12 @@ export function createDamageSummary(
           damages,
           currentHp: defenderHp,
           maximumHp: defenderHp,
+          damageReductionEffects,
           recoveryEffects,
         });
 
   return {
-    damages,
+    damages: initialDamages,
     minimumDamage,
     maximumDamage,
     minimumDamageRatio: minimumDamage / defenderHp,

@@ -1,3 +1,5 @@
+import type { EffectRequirement } from "./effect-requirement.js";
+
 /** HPを回復する効果 */
 export type RecoveryEffect = {
   /** 効果の種類 */
@@ -9,6 +11,6 @@ export type RecoveryEffect = {
   /** 最大HPを割って回復量を求める値 */
   recoveryDivisor: number;
 
-  /** 残りHPが指定割合以下なら発動する */
-  hpRatioAtOrBelow?: number;
+  /** 発動条件 */
+  requirements?: EffectRequirement[];
 };

@@ -25,4 +25,28 @@ export const championsMoves = {
     damageClass: "physical",
     power: 120,
   },
+
+  earthquake: {
+    id: 89,
+    key: "earthquake",
+    names: {
+      ja: "じしん",
+      en: "Earthquake",
+    },
+    descriptions: {
+      ja: "地震の衝撃で自分の周りにいるものを攻撃する。",
+      en: "The user attacks everything around it by causing an earthquake.",
+    },
+    type: "ground",
+    priority: 0,
+    accuracy: 100,
+    pp: 10,
+    isMultiTarget: true,
+    isProtectable: true,
+    makesContact: false,
+    moveTags: [],
+    category: "damaging",
+    damageClass: "physical",
+    power: 100,
+  },
 } satisfies Record<string, Move>;

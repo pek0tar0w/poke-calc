@@ -1,5 +1,5 @@
 import type { DamageClass, NonHpStatKey } from "../../common/index.js";
-import type { RecoveryEffect } from "../effect/index.js";
+import type { DamageReductionEffect, RecoveryEffect } from "../effect/index.js";
 
 /** ダメージ計算で扱うアイテム効果 */
 type ItemEffectDetails =
@@ -26,7 +26,8 @@ type ItemEffectDetails =
       moveTypeId?: number;
       damageClass?: DamageClass;
     }
-  | RecoveryEffect;
+  | RecoveryEffect
+  | DamageReductionEffect;
 
 /** アイテムが持つ計算上の効果 */
 export type ItemEffect = ItemEffectDetails & {
@@ -34,4 +35,7 @@ export type ItemEffect = ItemEffectDetails & {
   consumable: boolean;
 };
 
-export type ItemEffectActivationTiming = ItemEffect["activationTiming"];
+export type ItemEffectActivationTiming = Extract<
+  ItemEffect,
+  { activationTiming: string }
+>["activationTiming"];

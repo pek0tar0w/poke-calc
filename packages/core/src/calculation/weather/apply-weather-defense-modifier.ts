@@ -4,7 +4,19 @@ import type { WeatherKey } from "../../model/weather/index.js";
 
 import { roundHalfDown } from "../utils/round-half-down.js";
 
-export type ApplyWeatherDefenseModifierParams = {
+/**
+ * 砂嵐または雪による防御・特防補正を適用する
+ *
+ * 砂嵐ではいわタイプの特防、雪ではこおりタイプの防御を1.5倍にする
+ * ランク補正とは異なるため、急所時にもこの補正は無視されない
+ * 補正後は五捨五超入する
+ */
+export function applyWeatherDefenseModifier({
+  stat,
+  statKey,
+  defenderTypes,
+  weather,
+}: {
   /** 天候補正前の能力値 */
   stat: number;
 
@@ -16,23 +28,7 @@ export type ApplyWeatherDefenseModifierParams = {
 
   /** 現在の天候 */
   weather: WeatherKey | null;
-};
-
-/**
- * 砂嵐または雪による防御・特防補正を適用する
- *
- * 砂嵐ではいわタイプの特防、雪ではこおりタイプの防御を1.5倍にする
- * ランク補正とは異なるため、急所時にもこの補正は無視されない
- * 補正後は五捨五超入する
- *
- * @param params - 能力値、能力、タイプ、天候
- * @returns 天候補正後の能力値
- */
-export function applyWeatherDefenseModifier(
-  params: ApplyWeatherDefenseModifierParams,
-): number {
-  const { stat, statKey, defenderTypes, weather } = params;
-
+}): number {
   // 砂嵐はいわタイプへ特防補正を適用する
   const isRockSpecialDefenseBoost =
     weather === "sandstorm" &&
