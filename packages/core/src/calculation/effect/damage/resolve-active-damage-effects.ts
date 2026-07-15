@@ -79,87 +79,124 @@ const VOLATILE_DAMAGE_EFFECT_DEFINITIONS = {
 export function resolveActiveDamageEffects(
   context: EffectResolutionContext,
 ): ActiveDamageEffect[] {
-  const { defender, weather } = context;
-  const { ability, item, status, volatiles } = defender;
-  const effects: ActiveDamageEffect[] = [];
+  return [
+    ...resolveStatusDamageEffects(context),
+    ...resolveVolatileDamageEffects(context),
+    ...resolveItemDamageEffects(context),
+    ...resolveAbilityDamageEffects(context),
+  ];
+}
 
-  // 状態異常は、計算用のHPダメージ効果へ変換する
-  const statusEffect = status ? STATUS_DAMAGE_EFFECTS[status] : undefined;
+// どく、もうどく、やけどなどの主要状態異常をHPダメージ効果へ変換する
+function resolveStatusDamageEffects(
+  context: EffectResolutionContext,
+): ActiveDamageEffect[] {
+  const { status } = context.defender;
+  const effect = status ? STATUS_DAMAGE_EFFECTS[status] : undefined;
 
-  if (status && statusEffect) {
-    effects.push({
-      effect: statusEffect,
+  if (!status || !effect) {
+    return [];
+  }
+
+  return [
+    {
+      effect,
       source: {
         type: "condition",
         key: status,
       },
-    });
+    },
+  ];
+}
+
+// バインド、のろい、やどりぎなどの付加状態をHPダメージ効果へ変換する
+function resolveVolatileDamageEffects(
+  context: EffectResolutionContext,
+): ActiveDamageEffect[] {
+  const { volatiles } = context.defender;
+
+  return (volatiles ?? []).map((volatile) => ({
+    // しおづけなど、作品や防御側タイプで効果量が変わるものはここで解決する
+    effect: createVolatileDamageEffect({
+      definition: VOLATILE_DAMAGE_EFFECT_DEFINITIONS[volatile],
+      context,
+    }),
+    source: {
+      type: "condition",
+      key: volatile,
+    },
+  }));
+}
+
+// 道具が持つHPダメージ効果を、現在の固定条件で有効なものだけ集める
+function resolveItemDamageEffects(
+  context: EffectResolutionContext,
+): ActiveDamageEffect[] {
+  const { item } = context.defender;
+  const effects: ActiveDamageEffect[] = [];
+
+  if (!item) {
+    return effects;
   }
 
-  // 付加状態は、作品や防御側タイプを見て計算用のHPダメージ効果へ変換する
-  for (const volatile of volatiles ?? []) {
+  for (const effect of item.effects) {
+    if (!isDamageEffect(effect)) {
+      continue;
+    }
+
+    if (
+      !areStaticEffectRequirementsMet({
+        requirements: effect.requirements,
+        weather: context.weather,
+      })
+    ) {
+      continue;
+    }
+
     effects.push({
-      effect: createVolatileDamageEffect({
-        definition: VOLATILE_DAMAGE_EFFECT_DEFINITIONS[volatile],
-        context,
-      }),
+      effect,
       source: {
-        type: "condition",
-        key: volatile,
+        type: "item",
+        key: item.key,
       },
     });
   }
 
-  // 道具が持つHPダメージ効果を集める
-  if (item) {
-    for (const effect of item.effects) {
-      if (!isDamageEffect(effect)) {
-        continue;
-      }
+  return effects;
+}
 
-      if (
-        !areStaticEffectRequirementsMet({
-          requirements: effect.requirements,
-          weather,
-        })
-      ) {
-        continue;
-      }
+// 特性が持つHPダメージ効果を、現在の固定条件で有効なものだけ集める
+function resolveAbilityDamageEffects(
+  context: EffectResolutionContext,
+): ActiveDamageEffect[] {
+  const { ability } = context.defender;
+  const effects: ActiveDamageEffect[] = [];
 
-      effects.push({
-        effect,
-        source: {
-          type: "item",
-          key: item.key,
-        },
-      });
-    }
+  if (!ability) {
+    return effects;
   }
 
-  // 特性が持つHPダメージ効果を集める
-  if (ability) {
-    for (const effect of ability.effects) {
-      if (!isDamageEffect(effect)) {
-        continue;
-      }
-
-      if (
-        !areStaticEffectRequirementsMet({
-          requirements: effect.requirements,
-          weather,
-        })
-      ) {
-        continue;
-      }
-
-      effects.push({
-        effect,
-        source: {
-          type: "ability",
-          key: ability.key,
-        },
-      });
+  for (const effect of ability.effects) {
+    if (!isDamageEffect(effect)) {
+      continue;
     }
+
+    if (
+      !areStaticEffectRequirementsMet({
+        requirements: effect.requirements,
+        weather: context.weather,
+      })
+    ) {
+      continue;
+    }
+
+    effects.push({
+      effect,
+      source: {
+        type: "ability",
+        key: ability.key,
+      },
+    });
   }
 
   return effects;
