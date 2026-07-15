@@ -5,6 +5,9 @@ export type KoState = {
 
   /** 一度だけ発動する効果のうち、すでに消費済みの効果キー */
   consumedEffectKeys: readonly string[];
+
+  /** もうどくの現在カウンター、5なら次のもうどくダメージは5/16 */
+  badPoisonCounter: number;
 };
 
 /**
@@ -29,12 +32,17 @@ export function createInitialKoState(currentHp: number): KoState {
   return {
     remainingHp: currentHp,
     consumedEffectKeys: [],
+    badPoisonCounter: 1,
   };
 }
 
 /** 状態をMapのキーに変換する */
 export function createKoStateKey(state: KoState): string {
-  return `${state.remainingHp}:${[...state.consumedEffectKeys].sort().join(",")}`;
+  return `${state.remainingHp}:${state.badPoisonCounter}:${[
+    ...state.consumedEffectKeys,
+  ]
+    .sort()
+    .join(",")}`;
 }
 
 /**

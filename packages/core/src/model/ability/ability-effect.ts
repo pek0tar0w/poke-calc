@@ -1,5 +1,6 @@
 import type { NonHpStatKey, Ratio } from "../../common/index.js";
 import type {
+  DamageEffect,
   DamageReductionEffect,
   EffectRequirement,
   RecoveryEffect,
@@ -42,4 +43,5 @@ export type AbilityEffect =
       hpRatio: Ratio;
     }
   | RecoveryEffect
+  | DamageEffect
   | DamageReductionEffect;

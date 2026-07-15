@@ -1,4 +1,4 @@
-import type { Ability, Item, WeatherKey } from "../../../model/index.js";
+import type { EffectResolutionContext } from "../index.js";
 import type { ActiveRecoveryEffect } from "./active-recovery-effect.js";
 
 import { areStaticEffectRequirementsMet } from "../index.js";
@@ -9,19 +9,10 @@ import { areStaticEffectRequirementsMet } from "../index.js";
  * 天候など計算中に変化しない条件はここで判定する
  */
 export function resolveActiveRecoveryEffects({
-  item,
-  ability,
+  defender,
   weather,
-}: {
-  /** 選択されている道具 */
-  item?: Item | undefined;
-
-  /** 選択されている特性 */
-  ability?: Ability | undefined;
-
-  /** 現在の天候 */
-  weather: WeatherKey | null;
-}): ActiveRecoveryEffect[] {
+}: EffectResolutionContext): ActiveRecoveryEffect[] {
+  const { item, ability } = defender;
   const effects: ActiveRecoveryEffect[] = [];
 
   if (item) {

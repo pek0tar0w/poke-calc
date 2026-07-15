@@ -151,9 +151,45 @@ const championsSturdyState: ChampionsDamageState = {
   },
 };
 
+const championsPoisonState: ChampionsDamageState = {
+  ...championsState,
+  defender: {
+    ...championsState.defender,
+    status: "poison",
+  },
+};
+
+const championsBadPoisonState: ChampionsDamageState = {
+  ...championsState,
+  defender: {
+    ...championsState.defender,
+    status: "badPoison",
+  },
+};
+
+const championsBindState: ChampionsDamageState = {
+  ...championsState,
+  defender: {
+    ...championsState.defender,
+    volatiles: ["bind"],
+  },
+};
+
+const championsSaltCureState: ChampionsDamageState = {
+  ...championsState,
+  defender: {
+    ...championsState.defender,
+    volatiles: ["saltCure"],
+  },
+};
+
 printDamageResult("Champions（軽減なし）", championsState);
 printDamageResult("Champions（マルチスケイル）", championsMultiscaleState);
 printDamageResult("Champions（がんじょう）", championsSturdyState);
+printDamageResult("Champions（どく）", championsPoisonState);
+printDamageResult("Champions（もうどく）", championsBadPoisonState);
+printDamageResult("Champions（バインド）", championsBindState);
+printDamageResult("Champions（しおづけ）", championsSaltCureState);
 printDamageResult(
   "Champions（ばけのかわ・たべのこし）",
   championsDisguiseState,

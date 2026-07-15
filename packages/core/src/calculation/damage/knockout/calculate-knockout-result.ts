@@ -1,7 +1,9 @@
+import type { ActiveDamageEffect } from "../../effect/damage/index.js";
 import type { ActiveDamageReductionEffect } from "../../effect/damage-reduction/index.js";
 import type { ActiveRecoveryEffect } from "../../effect/recovery/active-recovery-effect.js";
 import type { KoDistribution } from "./ko-distribution.js";
 
+import { applyDamageEffects } from "../../effect/damage/index.js";
 import { applyDamageReductionEffects } from "../../effect/damage-reduction/index.js";
 import { applyRecoveryEffects } from "../../effect/recovery/apply-recovery-effects.js";
 import {
@@ -19,7 +21,7 @@ const PROBABILITY_TOLERANCE = 1e-12;
 /**
  * 分布を攻撃1回分ずつ更新し、最短と確定の撃破回数を求める
  *
- * 回復で生存した分岐は次の攻撃へ引き継ぎ、
+ * 回復で生存した分岐は次の攻撃へ引き継ぎ
  * ひんしになった分岐は撃破確率へ加算する
  */
 export function calculateKnockoutResult({
@@ -28,6 +30,7 @@ export function calculateKnockoutResult({
   maximumHp,
   damageReductionEffects,
   recoveryEffects,
+  damageEffects,
 }: {
   /** 乱数ごとのダメージ */
   damages: readonly number[];
@@ -43,6 +46,9 @@ export function calculateKnockoutResult({
 
   /** 回復効果 */
   recoveryEffects: readonly ActiveRecoveryEffect[];
+
+  /** HPダメージ効果 */
+  damageEffects: readonly ActiveDamageEffect[];
 }): {
   /** 初めて倒せる可能性が生じる攻撃回数 */
   possibleHitCount: number | null;
@@ -78,6 +84,7 @@ export function calculateKnockoutResult({
       maximumHp,
       damageReductionEffects,
       recoveryEffects,
+      damageEffects,
     });
 
     // 生存した状態だけを次の攻撃へ引き継ぐ
@@ -111,6 +118,7 @@ function advanceKoDistribution({
   maximumHp,
   damageReductionEffects,
   recoveryEffects,
+  damageEffects,
 }: {
   /** 攻撃前の生存状態 */
   distribution: KoDistribution;
@@ -126,6 +134,9 @@ function advanceKoDistribution({
 
   /** 回復効果 */
   recoveryEffects: readonly ActiveRecoveryEffect[];
+
+  /** HPダメージ効果 */
+  damageEffects: readonly ActiveDamageEffect[];
 }): {
   /** 次の攻撃へ引き継ぐ生存状態 */
   distribution: KoDistribution;
@@ -161,7 +172,7 @@ function advanceKoDistribution({
       }
 
       // ダメージ直後に発動する回復を適用する
-      nextState = applyRecoveryEffects({
+      const afterDamageRecoveryState = applyRecoveryEffects({
         remainingHp: nextState.remainingHp,
         consumedEffectKeys: nextState.consumedEffectKeys,
         maximumHp,
@@ -169,14 +180,46 @@ function advanceKoDistribution({
         effects: recoveryEffects,
       });
 
+      nextState = {
+        ...nextState,
+        ...afterDamageRecoveryState,
+      };
+
       // ターン終了時に発動する回復を適用する
-      nextState = applyRecoveryEffects({
+      const turnEndRecoveryState = applyRecoveryEffects({
         remainingHp: nextState.remainingHp,
         consumedEffectKeys: nextState.consumedEffectKeys,
         maximumHp,
         activationTiming: "turnEnd",
         effects: recoveryEffects,
       });
+
+      nextState = {
+        ...nextState,
+        ...turnEndRecoveryState,
+      };
+
+      // ターン終了時に発動するHPダメージを適用する、例: どく、もうどく、やけど
+      const turnEndDamageState = applyDamageEffects({
+        state: {
+          remainingHp: nextState.remainingHp,
+          badPoisonCounter: nextState.badPoisonCounter,
+        },
+        maximumHp,
+        activationTiming: "turnEnd",
+        effects: damageEffects,
+      });
+
+      nextState = {
+        ...nextState,
+        ...turnEndDamageState,
+      };
+
+      // ターン終了時ダメージでひんしになった分岐は撃破済みとして集計する
+      if (nextState.remainingHp <= 0) {
+        knockoutProbability += branchProbability;
+        continue;
+      }
 
       // 生存した分岐を次回攻撃用の分布へ追加する
       addKoStateProbability({

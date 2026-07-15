@@ -1,5 +1,6 @@
 export type { Ability, AbilityEffect } from "./ability/index.js";
 export type {
+  DamageEffect,
   DamageReductionEffect,
   EffectRequirement,
   RecoveryEffect,
@@ -32,6 +33,7 @@ export type {
 export type { TeraType } from "./terastal/index.js";
 export type { TerrainKey } from "./terrain/index.js";
 export type { TypeKey } from "./type/index.js";
+export type { VolatileStatus } from "./volatile-status/index.js";
 export type { WeatherKey } from "./weather/index.js";
 
 export { natureEffects } from "./nature/index.js";
