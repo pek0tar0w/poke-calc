@@ -1,5 +1,9 @@
 import type { NonHpStatKey, Ratio } from "../../common/index.js";
-import type { AbilityEffectRequirement } from "./ability-effect-requirement.js";
+import type {
+  DamageReductionEffect,
+  EffectRequirement,
+  RecoveryEffect,
+} from "../effect/index.js";
 
 export type AbilityEffect =
   | {
@@ -8,7 +12,7 @@ export type AbilityEffect =
       effect: "statMultiplier";
       stat: NonHpStatKey;
       multiplier: number;
-      requirements?: AbilityEffectRequirement[];
+      requirements?: EffectRequirement[];
     }
   | {
       /** 防御側の特性により、攻撃側の能力値に補正をかける */
@@ -16,14 +20,14 @@ export type AbilityEffect =
       effect: "attackerStatMultiplier";
       stat: NonHpStatKey;
       multiplier: number;
-      requirements?: AbilityEffectRequirement[];
+      requirements?: EffectRequirement[];
     }
   | {
       /** ダメージ倍率を変更する */
       side: "attacker";
       effect: "damageMultiplier";
       multiplier: number;
-      requirements?: AbilityEffectRequirement[];
+      requirements?: EffectRequirement[];
     }
   | {
       /** タイプ一致ボーナスを指定倍率に上書きする */
@@ -36,4 +40,6 @@ export type AbilityEffect =
       side: "defender";
       effect: "contactDamage";
       hpRatio: Ratio;
-    };
+    }
+  | RecoveryEffect
+  | DamageReductionEffect;

@@ -1,4 +1,5 @@
 import type { LanguageCode } from "../../common/language-code.js";
+import type { ItemEffect } from "./item-effect.js";
 
 export type Item = {
   /**
@@ -25,7 +26,7 @@ export type Item = {
   descriptions: Record<LanguageCode, string>;
 
   /**
-   * 発動後に消費されるか
+   * ダメージ計算で扱う効果
    */
-  consumable: boolean;
+  effects: readonly ItemEffect[];
 };

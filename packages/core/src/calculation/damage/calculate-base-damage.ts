@@ -1,7 +1,16 @@
 const { floor } = Math;
 
-/** 基本ダメージ計算に必要なパラメータ */
-type CalculateBaseDamageParams = {
+/**
+ * レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
+ *
+ * ポケモンのダメージ計算式のうち、乱数やタイプ補正より前の値を返す
+ */
+export function calculateBaseDamage({
+  attackerLevel,
+  movePower,
+  attackingStat,
+  defendingStat,
+}: {
   /** 攻撃側のレベル */
   attackerLevel: number;
 
@@ -13,16 +22,7 @@ type CalculateBaseDamageParams = {
 
   /** 防御に使用する実数値 */
   defendingStat: number;
-};
-
-/**
- * レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
- *
- * @param params - 基本ダメージ計算に必要な値
- * @returns 各種補正前の基本ダメージ
- */
-export function calculateBaseDamage(params: CalculateBaseDamageParams): number {
-  const { attackerLevel, movePower, attackingStat, defendingStat } = params;
+}): number {
   const levelDamageFactor = floor((attackerLevel * 2) / 5) + 2;
 
   return floor(

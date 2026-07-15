@@ -1,5 +1,10 @@
+import type { PokemonStats } from "../../model/index.js";
+
 /** 1種類のダメージ計算結果 */
 export type DamageSummary = {
+  /** 16段階の乱数ごとのダメージ */
+  damages: readonly number[];
+
   /** 最低ダメージ */
   minimumDamage: number;
 
@@ -24,6 +29,12 @@ export type DamageSummary = {
 
 /** 通常時と急所時を含むダメージ計算結果 */
 export type DamageResult = {
+  /** 攻撃側の性格補正適用後の実数値 */
+  attackerStats: PokemonStats;
+
+  /** 防御側の性格補正適用後の実数値 */
+  defenderStats: PokemonStats;
+
   /** 通常時 */
   normal: DamageSummary;
 

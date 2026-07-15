@@ -37,4 +37,58 @@ export const championsPokemon = {
       speed: 67,
     },
   },
+
+  glalie: {
+    id: 362,
+    key: "glalie",
+    names: {
+      ja: "オニゴーリ",
+      en: "Glalie",
+    },
+    types: ["ice"],
+    baseStats: {
+      hp: 80,
+      attack: 80,
+      defense: 80,
+      specialAttack: 80,
+      specialDefense: 80,
+      speed: 80,
+    },
+  },
+
+  dragonite: {
+    id: 149,
+    key: "dragonite",
+    names: {
+      ja: "カイリュー",
+      en: "Dragonite",
+    },
+    types: ["dragon", "flying"],
+    baseStats: {
+      hp: 91,
+      attack: 134,
+      defense: 95,
+      specialAttack: 100,
+      specialDefense: 100,
+      speed: 80,
+    },
+  },
+
+  mimikyu: {
+    id: 778,
+    key: "mimikyu",
+    names: {
+      ja: "ミミッキュ",
+      en: "Mimikyu",
+    },
+    types: ["ghost", "fairy"],
+    baseStats: {
+      hp: 55,
+      attack: 90,
+      defense: 80,
+      specialAttack: 50,
+      specialDefense: 105,
+      speed: 96,
+    },
+  },
 } satisfies Record<string, Pokemon>;

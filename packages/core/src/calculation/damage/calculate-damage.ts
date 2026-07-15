@@ -1,8 +1,10 @@
 import type { NonHpStatKey } from "../../common/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
-import type { DamageResult, DamageSummary } from "./damage-result.js";
+import type { DamageResult } from "./damage-result.js";
 
+import { resolveActiveDamageReductionEffects } from "../effect/damage-reduction/index.js";
 import { resolveMove } from "../move/index.js";
+import { resolveActiveRecoveryEffects } from "../effect/recovery/index.js";
 import {
   applyNatureModifiers,
   applyStatBoost,
@@ -14,8 +16,8 @@ import {
   applyWeatherDefenseModifier,
 } from "../weather/index.js";
 import { calculateBaseDamage } from "./calculate-base-damage.js";
-import { calculateKoProbability } from "./calculate-ko-probability.js";
 import { calculateRandomDamageValues } from "./calculate-random-damage-values.js";
+import { createDamageSummary } from "./create-damage-summary.js";
 
 /** Championsのバトルレベル */
 const CHAMPIONS_BATTLE_LEVEL = 50;
@@ -23,19 +25,10 @@ const CHAMPIONS_BATTLE_LEVEL = 50;
 /** 急所補正倍率 */
 const CRITICAL_HIT_MULTIPLIER = 1.5;
 
-type CreateDamageSummaryParams = {
-  /** 乱数補正ごとのダメージ */
-  damages: readonly number[];
-
-  /** 防御側の最大HP */
-  defenderHp: number;
-};
-
 /**
  * 攻撃側、防御側、技の条件からダメージ計算結果を返す
  *
  * @param state - ダメージ計算時の対戦状態
- * @returns 通常時と急所時のダメージ計算結果
  */
 export function calculateDamage(state: DamageCalculationState): DamageResult {
   // Stateから解決済みのポケモンデータを取得する
@@ -173,44 +166,34 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     baseDamage: criticalBaseDamage,
   });
 
+  // 防御側の道具と特性から回復効果を解決する
+  const recoveryEffects = resolveActiveRecoveryEffects({
+    item: state.defender.item,
+    ability: state.defender.ability,
+    weather: state.weather,
+  });
+
+  // 防御側の道具と特性からダメージ軽減効果を解決する
+  const damageReductionEffects = resolveActiveDamageReductionEffects({
+    item: state.defender.item,
+    ability: state.defender.ability,
+    weather: state.weather,
+  });
+
   return {
+    attackerStats,
+    defenderStats,
     normal: createDamageSummary({
       damages: normalDamages,
       defenderHp: defenderStats.hp,
+      damageReductionEffects,
+      recoveryEffects,
     }),
     critical: createDamageSummary({
       damages: criticalDamages,
       defenderHp: defenderStats.hp,
+      damageReductionEffects,
+      recoveryEffects,
     }),
-  };
-}
-
-/**
- * 乱数ごとのダメージと防御側の最大HPから結果の要約を作る
- *
- * @param params - 乱数ごとのダメージと防御側の最大HP
- * @returns ダメージ幅、割合、攻撃回数、撃破確率
- */
-function createDamageSummary(params: CreateDamageSummaryParams): DamageSummary {
-  const { damages, defenderHp } = params;
-  const minimumDamage = Math.min(...damages);
-  const maximumDamage = Math.max(...damages);
-  const possibleHitCount =
-    maximumDamage === 0 ? null : Math.ceil(defenderHp / maximumDamage);
-  const guaranteedHitCount =
-    minimumDamage === 0 ? null : Math.ceil(defenderHp / minimumDamage);
-  const knockoutProbability =
-    possibleHitCount === null
-      ? 0
-      : calculateKoProbability(damages, possibleHitCount, defenderHp);
-
-  return {
-    minimumDamage,
-    maximumDamage,
-    minimumDamageRatio: minimumDamage / defenderHp,
-    maximumDamageRatio: maximumDamage / defenderHp,
-    possibleHitCount,
-    guaranteedHitCount,
-    knockoutProbability,
   };
 }
