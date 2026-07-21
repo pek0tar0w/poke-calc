@@ -1,2 +1,2 @@
 export type StatusConditionKey =
-  "burn" | "freeze" | "paralysis" | "poison" | "sleep";
+  "badPoison" | "burn" | "freeze" | "paralysis" | "poison" | "sleep";

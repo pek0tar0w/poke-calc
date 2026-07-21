@@ -1,23 +1,14 @@
-import type { Ability, Item, WeatherKey } from "../../../model/index.js";
+import type { EffectResolutionContext } from "../index.js";
 import type { ActiveDamageReductionEffect } from "./active-damage-reduction-effect.js";
 
 import { areStaticEffectRequirementsMet } from "../index.js";
 
 /** 防御側の道具と特性から、現在の静的条件で候補になるダメージ軽減効果を集める */
 export function resolveActiveDamageReductionEffects({
-  item,
-  ability,
+  defender,
   weather,
-}: {
-  /** 防御側の道具 */
-  item: Item | undefined;
-
-  /** 防御側の特性 */
-  ability: Ability | undefined;
-
-  /** 現在の天候 */
-  weather: WeatherKey | null;
-}): ActiveDamageReductionEffect[] {
+}: EffectResolutionContext): ActiveDamageReductionEffect[] {
+  const { item, ability } = defender;
   const effects: ActiveDamageReductionEffect[] = [];
 
   if (item) {

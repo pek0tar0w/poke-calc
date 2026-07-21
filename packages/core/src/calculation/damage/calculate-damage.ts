@@ -2,6 +2,7 @@ import type { NonHpStatKey } from "../../common/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
 import type { DamageResult } from "./damage-result.js";
 
+import { resolveActiveDamageEffects } from "../effect/damage/index.js";
 import { resolveActiveDamageReductionEffects } from "../effect/damage-reduction/index.js";
 import { resolveMove } from "../move/index.js";
 import { resolveActiveRecoveryEffects } from "../effect/recovery/index.js";
@@ -166,19 +167,25 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     baseDamage: criticalBaseDamage,
   });
 
-  // 防御側の道具と特性から回復効果を解決する
-  const recoveryEffects = resolveActiveRecoveryEffects({
-    item: state.defender.item,
-    ability: state.defender.ability,
+  const effectResolutionContext = {
+    game: state.game,
+    attacker: state.attacker,
+    defender: state.defender,
+    move: state.move,
     weather: state.weather,
-  });
+  };
+
+  // 防御側の道具と特性から回復効果を解決する
+  const recoveryEffects = resolveActiveRecoveryEffects(effectResolutionContext);
+
+  // 防御側の道具、特性、状態異常、付加状態からHPダメージ効果を解決する
+  const damageEffects = resolveActiveDamageEffects(effectResolutionContext);
 
   // 防御側の道具と特性からダメージ軽減効果を解決する
-  const damageReductionEffects = resolveActiveDamageReductionEffects({
-    item: state.defender.item,
-    ability: state.defender.ability,
-    weather: state.weather,
-  });
+  const damageReductionEffects = resolveActiveDamageReductionEffects(
+    effectResolutionContext,
+  );
+  const badPoisonCounter = state.defender.statusState?.badPoisonCounter ?? 1;
 
   return {
     attackerStats,
@@ -188,12 +195,16 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       defenderHp: defenderStats.hp,
       damageReductionEffects,
       recoveryEffects,
+      damageEffects,
+      badPoisonCounter,
     }),
     critical: createDamageSummary({
       damages: criticalDamages,
       defenderHp: defenderStats.hp,
       damageReductionEffects,
       recoveryEffects,
+      damageEffects,
+      badPoisonCounter,
     }),
   };
 }

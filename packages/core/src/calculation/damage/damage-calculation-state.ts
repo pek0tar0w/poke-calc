@@ -7,6 +7,8 @@ import type {
   Pokemon,
   ScarletVioletBattlePokemon,
 } from "../../model/pokemon/index.js";
+import type { StatusConditionKey } from "../../model/status-condition/index.js";
+import type { VolatileStatus } from "../../model/volatile-status/index.js";
 import type { WeatherKey } from "../../model/weather/index.js";
 import type { StatBoosts } from "../stat/index.js";
 
@@ -26,6 +28,18 @@ export type BattlePokemonState<TConfig extends BattlePokemon> = {
 
   /** 戦闘中の能力ランク（HPを除く各能力の-6〜+6） */
   boosts: StatBoosts;
+
+  /** どく、もうどく、やけどなどの主要状態異常 */
+  status?: StatusConditionKey;
+
+  /** 状態異常の計算用状態 */
+  statusState?: {
+    /** もうどくの現在カウンター、2なら次のもうどくダメージは2/16 */
+    badPoisonCounter?: number;
+  };
+
+  /** やどりぎ、のろいなど、通常の状態異常とは別枠で付与される状態 */
+  volatiles?: readonly VolatileStatus[];
 };
 
 /** ダメージ計算時の対戦状態 */

@@ -13,6 +13,7 @@ import {
 } from "../packages/core/src/calculation/damage/index.js";
 import { championsData } from "../packages/data/src/champions/index.js";
 import { natureNames } from "../packages/data/src/common/index.js";
+
 const neutralBoosts: StatBoosts = {
   attack: 0,
   defense: 0,
@@ -21,11 +22,11 @@ const neutralBoosts: StatBoosts = {
   speed: 0,
 };
 
-const championsAttackerConfig: ChampionsBattlePokemon = {
+const garchompConfig: ChampionsBattlePokemon = {
   game: "champions",
   pokemonKey: "garchomp",
   natureKey: "adamant",
-  moveKeys: ["outrage"],
+  moveKeys: ["earthquake"],
   statPoints: {
     hp: 0,
     attack: 32,
@@ -36,128 +37,54 @@ const championsAttackerConfig: ChampionsBattlePokemon = {
   },
 };
 
-const glalieConfig: ChampionsBattlePokemon = {
+const mimikyuConfig: ChampionsBattlePokemon = {
   game: "champions",
-  pokemonKey: "glalie",
-  natureKey: "bold",
+  pokemonKey: "mimikyu",
+  natureKey: "mild",
   moveKeys: [],
   statPoints: {
     hp: 32,
     attack: 0,
-    defense: 32,
+    defense: 0,
     specialAttack: 0,
-    specialDefense: 32,
+    specialDefense: 0,
     speed: 0,
   },
 };
 
-const dragoniteConfig: ChampionsBattlePokemon = {
-  ...glalieConfig,
-  pokemonKey: "dragonite",
-};
-
-const mimikyuConfig: ChampionsBattlePokemon = {
-  ...glalieConfig,
-  pokemonKey: "mimikyu",
-};
-
-const championsAttackerPokemon =
-  championsData.pokemon[championsAttackerConfig.pokemonKey];
-const glalie = championsData.pokemon[glalieConfig.pokemonKey];
-const dragonite = championsData.pokemon[dragoniteConfig.pokemonKey];
+const garchomp = championsData.pokemon[garchompConfig.pokemonKey];
 const mimikyu = championsData.pokemon[mimikyuConfig.pokemonKey];
-const championsMove = championsData.moves.outrage;
-const championsDisguiseMove = championsData.moves.earthquake;
-const championsDefenderMultiscale = championsData.abilities.multiscale;
-const championsDefenderSturdy = championsData.abilities.sturdy;
-const championsDefenderDisguise = championsData.abilities.disguise;
-const championsDefenderLeftovers = championsData.items.leftovers;
+const earthquake = championsData.moves.earthquake;
 
-if (!championsAttackerPokemon || !glalie || !dragonite || !mimikyu) {
+if (!garchomp || !mimikyu) {
   throw new Error("Champions Pokemon data not found");
 }
 
-if (!championsMove || championsMove.category !== "damaging") {
-  throw new Error("Champions damaging move data not found: outrage");
-}
-
-if (!championsDisguiseMove || championsDisguiseMove.category !== "damaging") {
+if (!earthquake || earthquake.category !== "damaging") {
   throw new Error("Champions damaging move data not found: earthquake");
 }
 
-if (
-  !championsDefenderMultiscale ||
-  !championsDefenderSturdy ||
-  !championsDefenderDisguise ||
-  !championsDefenderLeftovers
-) {
-  throw new Error("Champions damage reduction ability data not found");
-}
-
-const championsState: ChampionsDamageState = {
+const state: ChampionsDamageState = {
   game: "champions",
   attacker: {
-    config: championsAttackerConfig,
-    pokemon: championsAttackerPokemon,
-    boosts: { ...neutralBoosts, attack: 1 },
+    config: garchompConfig,
+    pokemon: garchomp,
+    boosts: neutralBoosts,
   },
   defender: {
-    config: glalieConfig,
-    pokemon: glalie,
-    boosts: { ...neutralBoosts, defense: 3, specialDefense: 3 },
-  },
-  move: championsMove,
-  weather: null,
-};
-
-const championsMultiscaleState: ChampionsDamageState = {
-  ...championsState,
-  defender: {
-    ...championsState.defender,
-    config: {
-      ...dragoniteConfig,
-      abilityKey: championsDefenderMultiscale.key,
-    },
-    pokemon: dragonite,
-    ability: championsDefenderMultiscale,
-  },
-};
-
-const championsDisguiseState: ChampionsDamageState = {
-  ...championsState,
-  defender: {
-    ...championsState.defender,
-    config: {
-      ...mimikyuConfig,
-      abilityKey: championsDefenderDisguise.key,
-      itemKey: championsDefenderLeftovers.key,
-    },
+    config: mimikyuConfig,
     pokemon: mimikyu,
-    ability: championsDefenderDisguise,
-    item: championsDefenderLeftovers,
-  },
-  move: championsDisguiseMove,
-};
-
-const championsSturdyState: ChampionsDamageState = {
-  ...championsState,
-  defender: {
-    ...championsState.defender,
-    config: {
-      ...glalieConfig,
-      abilityKey: championsDefenderSturdy.key,
+    boosts: neutralBoosts,
+    status: "badPoison",
+    statusState: {
+      badPoisonCounter: 2,
     },
-    ability: championsDefenderSturdy,
   },
+  move: earthquake,
+  weather: "sandstorm",
 };
 
-printDamageResult("Champions（軽減なし）", championsState);
-printDamageResult("Champions（マルチスケイル）", championsMultiscaleState);
-printDamageResult("Champions（がんじょう）", championsSturdyState);
-printDamageResult(
-  "Champions（ばけのかわ・たべのこし）",
-  championsDisguiseState,
-);
+printDamageResult("Champions（ばけのかわ無効・すなあらし・もうどく）", state);
 
 /** ダメージ計算結果をコンソールへ表示する */
 function printDamageResult(game: string, state: DamageCalculationState): void {
@@ -186,6 +113,7 @@ function printDamageResult(game: string, state: DamageCalculationState): void {
     formatDamageSummary("通常", result.normal),
     formatDamageSummary("急所", result.critical),
   ]);
+  printDamageBreakdown(result.normal, result.defenderStats.hp);
 }
 
 /** ポケモンの実数値をコンソール表示用に整形する */
@@ -257,4 +185,123 @@ function formatKnockout(summary: DamageSummary): string {
   return `乱数${summary.possibleHitCount}発 ${(
     summary.knockoutProbability * 100
   ).toFixed(2)}%`;
+}
+
+/** HP変化内訳を画像の表示内容に合わせてテーブル出力する */
+function printDamageBreakdown(
+  summary: DamageSummary,
+  defenderHp: number,
+): void {
+  const firstTurn = summary.turns[0];
+
+  if (firstTurn === undefined) {
+    return;
+  }
+
+  console.table(
+    firstTurn.steps
+      .filter((step) => step.timing !== "moveDamage")
+      .map((step) =>
+        formatDamageStep({
+          step,
+          defenderHp,
+        }),
+      ),
+  );
+}
+
+function formatDamageStep({
+  step,
+  defenderHp,
+}: {
+  step: DamageSummary["turns"][number]["steps"][number];
+  defenderHp: number;
+}) {
+  return {
+    発生元: formatBreakdownSource(step.source),
+    初期HP: formatRange(step.hpBefore.minimum, step.hpBefore.maximum),
+    残りHP: formatRange(step.hpAfter.minimum, step.hpAfter.maximum),
+    変化: formatStepAmount(step, defenderHp),
+    累計: formatStepTotalDamage(step, defenderHp),
+    判定: formatStepKnockout(step.knockout),
+  };
+}
+
+function formatStepAmount(
+  step: DamageSummary["turns"][number]["steps"][number],
+  defenderHp: number,
+): string {
+  const label = step.kind === "recovery" ? "回復" : "ダメージ";
+  const sign = step.kind === "recovery" ? "+" : "";
+  const amount = `${sign}${formatRange(step.amount.minimum, step.amount.maximum)}`;
+  const ratio = formatRatioRange({
+    minimum: step.amount.minimum,
+    maximum: step.amount.maximum,
+    maximumHp: defenderHp,
+  });
+
+  return `${label} ${amount} (${ratio})`;
+}
+
+function formatStepTotalDamage(
+  step: DamageSummary["turns"][number]["steps"][number],
+  defenderHp: number,
+): string {
+  const totalDamage = formatRange(
+    step.totalDamage.minimum,
+    step.totalDamage.maximum,
+  );
+  const ratio = formatRatioRange({
+    minimum: step.totalDamage.minimum,
+    maximum: step.totalDamage.maximum,
+    maximumHp: defenderHp,
+  });
+
+  return `${totalDamage} (${ratio})`;
+}
+
+function formatStepKnockout(
+  knockout: DamageSummary["turns"][number]["steps"][number]["knockout"],
+): string {
+  if (knockout.result === "survive") {
+    return "耐え";
+  }
+
+  if (knockout.result === "guaranteed") {
+    return "確定";
+  }
+
+  return `乱数 ${formatPercentage(knockout.probability)}`;
+}
+
+function formatRatioRange({
+  minimum,
+  maximum,
+  maximumHp,
+}: {
+  minimum: number;
+  maximum: number;
+  maximumHp: number;
+}): string {
+  const minimumRatio = formatPercentage(minimum / maximumHp);
+  const maximumRatio = formatPercentage(maximum / maximumHp);
+
+  return minimumRatio === maximumRatio
+    ? minimumRatio
+    : `${minimumRatio}〜${maximumRatio}`;
+}
+
+function formatBreakdownSource(
+  source: DamageSummary["turns"][number]["steps"][number]["source"],
+): string {
+  const sourceNames: Record<string, string> = {
+    badPoison: "もうどく",
+    sandstorm: "すなあらし",
+  };
+
+  return sourceNames[source.key] ?? source.key;
+}
+
+function formatRange(minimum: number, maximum: number): string {
+  return minimum === maximum ? `${minimum}` : `${minimum}〜${maximum}`;
 }

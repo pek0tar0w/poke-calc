@@ -5,6 +5,9 @@ export type KoState = {
 
   /** 一度だけ発動する効果のうち、すでに消費済みの効果キー */
   consumedEffectKeys: readonly string[];
+
+  /** もうどくの現在カウンター、5なら次のもうどくダメージは5/16 */
+  badPoisonCounter: number;
 };
 
 /**
@@ -25,16 +28,30 @@ export type KoDistribution = Map<
 >;
 
 /** 計算開始時の生存状態を作る */
-export function createInitialKoState(currentHp: number): KoState {
+export function createInitialKoState({
+  currentHp,
+  badPoisonCounter = 1,
+}: {
+  /** 計算開始時のHP */
+  currentHp: number;
+
+  /** もうどくの現在カウンター */
+  badPoisonCounter?: number;
+}): KoState {
   return {
     remainingHp: currentHp,
     consumedEffectKeys: [],
+    badPoisonCounter,
   };
 }
 
 /** 状態をMapのキーに変換する */
 export function createKoStateKey(state: KoState): string {
-  return `${state.remainingHp}:${[...state.consumedEffectKeys].sort().join(",")}`;
+  return `${state.remainingHp}:${state.badPoisonCounter}:${[
+    ...state.consumedEffectKeys,
+  ]
+    .sort()
+    .join(",")}`;
 }
 
 /**

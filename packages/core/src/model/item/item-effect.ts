@@ -1,5 +1,9 @@
 import type { DamageClass, NonHpStatKey } from "../../common/index.js";
-import type { DamageReductionEffect, RecoveryEffect } from "../effect/index.js";
+import type {
+  DamageEffect,
+  DamageReductionEffect,
+  RecoveryEffect,
+} from "../effect/index.js";
 
 /** ダメージ計算で扱うアイテム効果 */
 type ItemEffectDetails =
@@ -27,6 +31,7 @@ type ItemEffectDetails =
       damageClass?: DamageClass;
     }
   | RecoveryEffect
+  | DamageEffect
   | DamageReductionEffect;
 
 /** アイテムが持つ計算上の効果 */
