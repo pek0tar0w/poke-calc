@@ -1,3 +1,9 @@
+import type {
+  StatusConditionKey,
+  VolatileStatus,
+  WeatherKey,
+} from "../../model/index.js";
+
 /** 計算対象の効果がどこから発生したか */
 export type ActiveEffectSource =
   | {
@@ -11,7 +17,17 @@ export type ActiveEffectSource =
       key: string;
     }
   | {
-      /** 状態異常や場の条件由来の効果 */
-      type: "condition";
-      key: string;
+      /** 天候由来の効果 */
+      type: "weather";
+      key: WeatherKey;
+    }
+  | {
+      /** 状態異常由来の効果 */
+      type: "status";
+      key: StatusConditionKey;
+    }
+  | {
+      /** 付加状態由来の効果 */
+      type: "volatile";
+      key: VolatileStatus;
     };

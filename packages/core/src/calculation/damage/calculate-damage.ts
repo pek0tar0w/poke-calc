@@ -185,6 +185,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
   const damageReductionEffects = resolveActiveDamageReductionEffects(
     effectResolutionContext,
   );
+  const badPoisonCounter = state.defender.statusState?.badPoisonCounter ?? 1;
 
   return {
     attackerStats,
@@ -195,6 +196,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       damageReductionEffects,
       recoveryEffects,
       damageEffects,
+      badPoisonCounter,
     }),
     critical: createDamageSummary({
       damages: criticalDamages,
@@ -202,6 +204,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       damageReductionEffects,
       recoveryEffects,
       damageEffects,
+      badPoisonCounter,
     }),
   };
 }

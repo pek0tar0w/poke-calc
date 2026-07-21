@@ -32,6 +32,12 @@ export type BattlePokemonState<TConfig extends BattlePokemon> = {
   /** どく、もうどく、やけどなどの主要状態異常 */
   status?: StatusConditionKey;
 
+  /** 状態異常の計算用状態 */
+  statusState?: {
+    /** もうどくの現在カウンター、2なら次のもうどくダメージは2/16 */
+    badPoisonCounter?: number;
+  };
+
   /** やどりぎ、のろいなど、通常の状態異常とは別枠で付与される状態 */
   volatiles?: readonly VolatileStatus[];
 };

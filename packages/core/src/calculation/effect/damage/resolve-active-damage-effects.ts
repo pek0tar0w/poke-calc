@@ -80,10 +80,42 @@ export function resolveActiveDamageEffects(
   context: EffectResolutionContext,
 ): ActiveDamageEffect[] {
   return [
+    ...resolveWeatherDamageEffects(context),
     ...resolveStatusDamageEffects(context),
     ...resolveVolatileDamageEffects(context),
     ...resolveItemDamageEffects(context),
     ...resolveAbilityDamageEffects(context),
+  ];
+}
+
+// すなあらしなど、天候によるターン終了時HPダメージを解決する
+function resolveWeatherDamageEffects(
+  context: EffectResolutionContext,
+): ActiveDamageEffect[] {
+  if (context.weather !== "sandstorm") {
+    return [];
+  }
+
+  if (
+    context.defender.pokemon.types.some(
+      (type) => type === "rock" || type === "ground" || type === "steel",
+    )
+  ) {
+    return [];
+  }
+
+  return [
+    {
+      effect: {
+        effect: "damage",
+        activationTiming: "turnEnd",
+        damageDivisor: 16,
+      },
+      source: {
+        type: "weather",
+        key: "sandstorm",
+      },
+    },
   ];
 }
 
@@ -102,7 +134,7 @@ function resolveStatusDamageEffects(
     {
       effect,
       source: {
-        type: "condition",
+        type: "status",
         key: status,
       },
     },
@@ -122,7 +154,7 @@ function resolveVolatileDamageEffects(
       context,
     }),
     source: {
-      type: "condition",
+      type: "volatile",
       key: volatile,
     },
   }));

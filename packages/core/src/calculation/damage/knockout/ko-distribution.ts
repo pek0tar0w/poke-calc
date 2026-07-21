@@ -28,11 +28,20 @@ export type KoDistribution = Map<
 >;
 
 /** 計算開始時の生存状態を作る */
-export function createInitialKoState(currentHp: number): KoState {
+export function createInitialKoState({
+  currentHp,
+  badPoisonCounter = 1,
+}: {
+  /** 計算開始時のHP */
+  currentHp: number;
+
+  /** もうどくの現在カウンター */
+  badPoisonCounter?: number;
+}): KoState {
   return {
     remainingHp: currentHp,
     consumedEffectKeys: [],
-    badPoisonCounter: 1,
+    badPoisonCounter,
   };
 }
 
