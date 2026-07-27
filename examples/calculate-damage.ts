@@ -389,7 +389,11 @@ function printDamageResult(game: string, state: DamageCalculationState): void {
     formatDamageSummary("通常", result.normal),
     formatDamageSummary("急所", result.critical),
   ]);
-  printDamageBreakdown(result.normal, result.defenderStats.hp);
+  printDamageBreakdown({
+    summary: result.normal,
+    defenderHp: result.defenderStats.hp,
+    showMoveDamageSteps: hasAdditionalHitEffect(state),
+  });
 }
 
 /** ポケモンの実数値をコンソール表示用に整形する */
@@ -464,10 +468,15 @@ function formatKnockout(summary: DamageSummary): string {
 }
 
 /** HP変化内訳を画像の表示内容に合わせてテーブル出力する */
-function printDamageBreakdown(
-  summary: DamageSummary,
-  defenderHp: number,
-): void {
+function printDamageBreakdown({
+  summary,
+  defenderHp,
+  showMoveDamageSteps,
+}: {
+  summary: DamageSummary;
+  defenderHp: number;
+  showMoveDamageSteps: boolean;
+}): void {
   const firstTurn = summary.turns[0];
 
   if (firstTurn === undefined) {
@@ -475,7 +484,7 @@ function printDamageBreakdown(
   }
 
   const visibleSteps = firstTurn.steps
-    .filter((step) => step.timing !== "moveDamage")
+    .filter((step) => showMoveDamageSteps || step.timing !== "moveDamage")
     .map((step) =>
       formatDamageStep({
         step,
@@ -490,6 +499,14 @@ function printDamageBreakdown(
   console.table(visibleSteps);
 }
 
+function hasAdditionalHitEffect(state: DamageCalculationState): boolean {
+  return (
+    state.attacker.ability?.effects.some(
+      (effect) => "side" in effect && effect.effect === "additionalHit",
+    ) ?? false
+  );
+}
+
 function formatDamageStep({
   step,
   defenderHp,
@@ -498,7 +515,7 @@ function formatDamageStep({
   defenderHp: number;
 }) {
   return {
-    発生元: formatBreakdownSource(step.source),
+    発生元: formatBreakdownSource(step),
     初期HP: formatRange(step.hpBefore.minimum, step.hpBefore.maximum),
     残りHP: formatRange(step.hpAfter.minimum, step.hpAfter.maximum),
     変化: formatStepAmount(step, defenderHp),
@@ -573,8 +590,12 @@ function formatRatioRange({
 }
 
 function formatBreakdownSource(
-  source: DamageSummary["turns"][number]["steps"][number]["source"],
+  step: DamageSummary["turns"][number]["steps"][number],
 ): string {
+  if (step.timing === "moveDamage" && step.moveHit !== undefined) {
+    return `${step.moveHit.index}回目`;
+  }
+
   const sourceNames: Record<string, string> = {
     badPoison: "もうどく",
     curse: "のろい",
@@ -582,7 +603,7 @@ function formatBreakdownSource(
     "sitrus-berry": "オボンのみ",
   };
 
-  return sourceNames[source.key] ?? source.key;
+  return sourceNames[step.source.key] ?? step.source.key;
 }
 
 function formatRange(minimum: number, maximum: number): string {

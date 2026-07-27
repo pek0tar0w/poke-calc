@@ -366,6 +366,10 @@ function applyMoveDamageStep({
       source: { type: "move", key: "move" },
       kind: "damage",
       timing: "moveDamage",
+      moveHit: {
+        index: hitIndex + 1,
+        count: damageSequences[0]?.length ?? 0,
+      },
       beforeDistribution: distribution,
       afterDistribution: nextDistribution,
       amounts: appliedAmounts,
@@ -637,6 +641,7 @@ function createDamageStep({
   source,
   kind,
   timing,
+  moveHit,
   beforeDistribution,
   afterDistribution,
   amounts,
@@ -647,6 +652,7 @@ function createDamageStep({
   source: DamageStepSource;
   kind: DamageStepResult["kind"];
   timing: DamageStepResult["timing"];
+  moveHit?: DamageStepResult["moveHit"];
   beforeDistribution: KoDistribution;
   afterDistribution: KoDistribution;
   amounts: readonly number[];
@@ -666,6 +672,7 @@ function createDamageStep({
     source,
     kind,
     timing,
+    ...(moveHit === undefined ? {} : { moveHit }),
     hpBefore,
     amount,
     activationProbability,

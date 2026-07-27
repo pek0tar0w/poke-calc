@@ -48,6 +48,15 @@ export type DamageStepResult = {
   /** HP変化が発生するタイミング */
   timing: "moveDamage" | "afterDamage" | "turnEnd";
 
+  /** 同じ行動内で発生した攻撃hitの位置 */
+  moveHit?: {
+    /** 1始まりのhit番号 */
+    index: number;
+
+    /** この行動で発生する合計hit数 */
+    count: number;
+  };
+
   /** 適用前の残りHP幅 */
   hpBefore: DamageHpRange;
 
