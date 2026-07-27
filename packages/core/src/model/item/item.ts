@@ -29,4 +29,9 @@ export type Item = {
    * ダメージ計算で扱う効果
    */
   effects: readonly ItemEffect[];
+
+  /**
+   * なげつけるで使用したときの威力、投げられない道具はnull
+   */
+  flingPower: number | null;
 };
