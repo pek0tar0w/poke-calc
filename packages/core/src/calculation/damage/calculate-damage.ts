@@ -4,7 +4,7 @@ import type { DamageResult } from "./damage-result.js";
 
 import { resolveActiveDamageEffects } from "../effect/damage/index.js";
 import { resolveActiveDamageReductionEffects } from "../effect/damage-reduction/index.js";
-import { resolveMove } from "../move/index.js";
+import { resolveHitCount, resolveMove } from "../move/index.js";
 import { resolveActiveRecoveryEffects } from "../effect/recovery/index.js";
 import {
   applyNatureModifiers,
@@ -118,6 +118,12 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       ? CHAMPIONS_BATTLE_LEVEL
       : state.attacker.config.level;
 
+  const hitCount = resolveHitCount({
+    move: state.move,
+    attacker: state.attacker,
+    selectedHitCount: state.selectedHitCount,
+  });
+
   // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
   const normalBaseDamageBeforeWeather = calculateBaseDamage({
     attackerLevel,
@@ -156,15 +162,24 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     defenderTypes: defenderPokemonData.types,
   };
 
-  // 通常時と急所時それぞれの16段階のダメージを計算する
-  const normalDamages = calculateRandomDamageValues({
+  // 通常時と急所時それぞれの1hit分の乱数ダメージを計算する
+  // 連続技はKO分布側でhitごとに処理し、オボンのみなどの途中発動を扱う
+  const normalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: normalBaseDamage,
   });
+  const normalDamageSequences = createDamageSequences({
+    damageRolls: normalDamageRolls,
+    hitCount,
+  });
 
-  const criticalDamages = calculateRandomDamageValues({
+  const criticalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: criticalBaseDamage,
+  });
+  const criticalDamageSequences = createDamageSequences({
+    damageRolls: criticalDamageRolls,
+    hitCount,
   });
 
   const effectResolutionContext = {
@@ -191,7 +206,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     attackerStats,
     defenderStats,
     normal: createDamageSummary({
-      damages: normalDamages,
+      damageSequences: normalDamageSequences,
       defenderHp: defenderStats.hp,
       damageReductionEffects,
       recoveryEffects,
@@ -199,7 +214,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       badPoisonCounter,
     }),
     critical: createDamageSummary({
-      damages: criticalDamages,
+      damageSequences: criticalDamageSequences,
       defenderHp: defenderStats.hp,
       damageReductionEffects,
       recoveryEffects,
@@ -207,4 +222,20 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       badPoisonCounter,
     }),
   };
+}
+
+/** 乱数枠ごとに、この行動で発生するhit列を作る */
+function createDamageSequences({
+  damageRolls,
+  hitCount,
+}: {
+  /** 1hit分の乱数ダメージ */
+  damageRolls: readonly number[];
+
+  /** この行動で発生するhit数 */
+  hitCount: number;
+}): readonly (readonly number[])[] {
+  return damageRolls.map((damage) =>
+    Array.from({ length: hitCount }, () => damage),
+  );
 }

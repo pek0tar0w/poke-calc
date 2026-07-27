@@ -43,7 +43,7 @@ type StepDistributionResult = {
  * ここでは、すなあらしやもうどくなどの各行で倒れる確率を求める
  */
 export function calculateKnockoutResult({
-  damages,
+  damageSequences,
   currentHp,
   maximumHp,
   damageReductionEffects,
@@ -51,8 +51,8 @@ export function calculateKnockoutResult({
   damageEffects,
   badPoisonCounter = 1,
 }: {
-  /** 乱数ごとのダメージ */
-  damages: readonly number[];
+  /** 乱数枠ごとのhit列 */
+  damageSequences: readonly (readonly number[])[];
 
   /** 計算開始時のHP */
   currentHp: number;
@@ -106,7 +106,7 @@ export function calculateKnockoutResult({
   for (let hitCount = 1; hitCount <= MAXIMUM_HIT_COUNT; hitCount++) {
     const result = advanceKoDistribution({
       distribution,
-      damages,
+      damageSequences,
       maximumHp,
       damageReductionEffects,
       recoveryEffects,
@@ -145,7 +145,7 @@ export function calculateKnockoutResult({
 /** 現在の生存状態を攻撃1発分だけ進める */
 function advanceKoDistribution({
   distribution,
-  damages,
+  damageSequences,
   maximumHp,
   damageReductionEffects,
   recoveryEffects,
@@ -154,8 +154,8 @@ function advanceKoDistribution({
   /** 攻撃前の生存状態 */
   distribution: KoDistribution;
 
-  /** 乱数ごとのダメージ */
-  damages: readonly number[];
+  /** 乱数枠ごとのhit列 */
+  damageSequences: readonly (readonly number[])[];
 
   /** 最大HP */
   maximumHp: number;
@@ -178,34 +178,48 @@ function advanceKoDistribution({
   /** 今回の攻撃中に起きたHP変化 */
   steps: DamageStepResult[];
 } {
-  let currentDistribution = distribution;
+  let currentDistribution = attachDamageSequenceIndex({
+    distribution,
+    sequenceCount: damageSequences.length,
+  });
   let knockoutProbability = 0;
   const steps: DamageStepResult[] = [];
+  const hitCount = damageSequences[0]?.length ?? 0;
 
-  // 1 攻撃ダメージを適用する
-  const moveDamageResult = applyMoveDamageStep({
-    distribution: currentDistribution,
-    damages,
-    maximumHp,
-    damageReductionEffects,
-  });
+  // 1 同じ行動内のhitを順番に適用する
+  // 乱数枠は行動開始時に1つ選び、その枠のダメージを全hitで使う
+  for (let hitIndex = 0; hitIndex < hitCount; hitIndex++) {
+    const moveDamageResult = applyMoveDamageStep({
+      distribution: currentDistribution,
+      damageSequences,
+      hitIndex,
+      maximumHp,
+      damageReductionEffects,
+    });
 
-  currentDistribution = moveDamageResult.distribution;
-  knockoutProbability += moveDamageResult.knockoutProbability;
-  pushStep(steps, moveDamageResult.step);
+    currentDistribution = moveDamageResult.distribution;
+    knockoutProbability += moveDamageResult.knockoutProbability;
+    pushStep(steps, moveDamageResult.step);
 
-  // 2 オボンのみなど、ダメージ直後に発動する回復を適用する
-  const afterDamageRecoveryResult = applyRecoverySteps({
-    distribution: currentDistribution,
-    maximumHp,
-    activationTiming: "afterDamage",
-    effects: recoveryEffects,
-  });
+    // オボンのみなど、ダメージ直後に発動する回復をhitごとに適用する
+    const afterDamageRecoveryResult = applyRecoverySteps({
+      distribution: currentDistribution,
+      maximumHp,
+      activationTiming: "afterDamage",
+      effects: recoveryEffects,
+    });
 
-  currentDistribution = afterDamageRecoveryResult.distribution;
-  steps.push(...afterDamageRecoveryResult.steps);
+    currentDistribution = afterDamageRecoveryResult.distribution;
+    steps.push(...afterDamageRecoveryResult.steps);
 
-  // 3 たべのこしなど、ターン終了時の回復を適用する
+    if (currentDistribution.size === 0 && hitIndex < hitCount - 1) {
+      break;
+    }
+  }
+
+  currentDistribution = clearDamageSequenceIndex(currentDistribution);
+
+  // 2 たべのこしなど、ターン終了時の回復を適用する
   const turnEndRecoveryResult = applyRecoverySteps({
     distribution: currentDistribution,
     maximumHp,
@@ -216,7 +230,7 @@ function advanceKoDistribution({
   currentDistribution = turnEndRecoveryResult.distribution;
   steps.push(...turnEndRecoveryResult.steps);
 
-  // 4 すなあらし、どく、もうどくなど、ターン終了時のHPダメージを適用する
+  // 3 すなあらし、どく、もうどくなど、ターン終了時のHPダメージを適用する
   const turnEndDamageResult = applyDamageEffectSteps({
     distribution: currentDistribution,
     maximumHp,
@@ -235,15 +249,70 @@ function advanceKoDistribution({
   };
 }
 
+/** 行動開始時に乱数枠を1つ選び、以後のhitへ引き継ぐ */
+function attachDamageSequenceIndex({
+  distribution,
+  sequenceCount,
+}: {
+  distribution: KoDistribution;
+  sequenceCount: number;
+}): KoDistribution {
+  const nextDistribution: KoDistribution = new Map();
+
+  for (const { state, probability } of distribution.values()) {
+    for (
+      let sequenceIndex = 0;
+      sequenceIndex < sequenceCount;
+      sequenceIndex++
+    ) {
+      addKoStateProbability({
+        distribution: nextDistribution,
+        state: {
+          ...state,
+          damageSequenceIndex: sequenceIndex,
+        },
+        probability: probability / sequenceCount,
+      });
+    }
+  }
+
+  return nextDistribution;
+}
+
+/** ターン終了効果へ進む前に、行動中だけ使う乱数枠を状態から外す */
+function clearDamageSequenceIndex(
+  distribution: KoDistribution,
+): KoDistribution {
+  const nextDistribution: KoDistribution = new Map();
+
+  for (const { state, probability } of distribution.values()) {
+    const nextState: KoState = {
+      remainingHp: state.remainingHp,
+      consumedEffectKeys: state.consumedEffectKeys,
+      badPoisonCounter: state.badPoisonCounter,
+    };
+
+    addKoStateProbability({
+      distribution: nextDistribution,
+      state: nextState,
+      probability,
+    });
+  }
+
+  return nextDistribution;
+}
+
 /** 攻撃ダメージを分布へ適用する */
 function applyMoveDamageStep({
   distribution,
-  damages,
+  damageSequences,
+  hitIndex,
   maximumHp,
   damageReductionEffects,
 }: {
   distribution: KoDistribution;
-  damages: readonly number[];
+  damageSequences: readonly (readonly number[])[];
+  hitIndex: number;
   maximumHp: number;
   damageReductionEffects: readonly ActiveDamageReductionEffect[];
 }): StepDistributionResult {
@@ -252,35 +321,42 @@ function applyMoveDamageStep({
   let knockoutProbability = 0;
 
   for (const { state, probability } of distribution.values()) {
-    for (const damage of damages) {
-      // 各乱数ダメージは同じ確率で発生するため、現在の確率を均等に分ける
-      const branchProbability = probability / damages.length;
-      // ばけのかわ、マルチスケイル、がんじょうなどを攻撃ダメージへ反映する
-      const reductionResult = applyDamageReductionEffects({
-        damage,
-        state,
-        maximumHp,
-        effects: damageReductionEffects,
-      });
-      const nextState = {
-        ...reductionResult.state,
-        remainingHp: reductionResult.state.remainingHp - reductionResult.damage,
-      };
+    const damage = damageSequences[state.damageSequenceIndex ?? 0]?.[hitIndex];
 
-      appliedAmounts.push(reductionResult.damage);
-
-      // ここで倒れた分岐は次のstepへ進めず、このstepの撃破確率に加算する
-      if (nextState.remainingHp <= 0) {
-        knockoutProbability += branchProbability;
-        continue;
-      }
-
+    if (damage === undefined) {
       addKoStateProbability({
         distribution: nextDistribution,
-        state: nextState,
-        probability: branchProbability,
+        state,
+        probability,
       });
+      continue;
     }
+
+    // ばけのかわ、マルチスケイル、がんじょうなどを攻撃ダメージへ反映する
+    const reductionResult = applyDamageReductionEffects({
+      damage,
+      state,
+      maximumHp,
+      effects: damageReductionEffects,
+    });
+    const nextState = {
+      ...reductionResult.state,
+      remainingHp: reductionResult.state.remainingHp - reductionResult.damage,
+    };
+
+    appliedAmounts.push(reductionResult.damage);
+
+    // ここで倒れた分岐は次のstepへ進めず、このstepの撃破確率に加算する
+    if (nextState.remainingHp <= 0) {
+      knockoutProbability += probability;
+      continue;
+    }
+
+    addKoStateProbability({
+      distribution: nextDistribution,
+      state: nextState,
+      probability,
+    });
   }
 
   return {
@@ -295,6 +371,7 @@ function applyMoveDamageStep({
       amounts: appliedAmounts,
       knockoutProbability,
       maximumHp,
+      activationProbability: 1,
     }),
   };
 }
@@ -350,6 +427,7 @@ function applyRecoveryStep({
 }): StepDistributionResult {
   const nextDistribution: KoDistribution = new Map();
   const appliedAmounts: number[] = [];
+  let activationProbability = 0;
 
   for (const { state, probability } of distribution.values()) {
     const effectKey = createActiveEffectKey({
@@ -401,6 +479,7 @@ function applyRecoveryStep({
     };
 
     appliedAmounts.push(remainingHp - state.remainingHp);
+    activationProbability += probability;
 
     addKoStateProbability({
       distribution: nextDistribution,
@@ -422,6 +501,7 @@ function applyRecoveryStep({
             beforeDistribution: distribution,
             afterDistribution: nextDistribution,
             amounts: appliedAmounts,
+            activationProbability,
             knockoutProbability: 0,
             maximumHp,
           }),
@@ -483,6 +563,7 @@ function applyDamageEffectStep({
 }): StepDistributionResult {
   const nextDistribution: KoDistribution = new Map();
   const appliedAmounts: number[] = [];
+  let activationProbability = 0;
   let knockoutProbability = 0;
 
   for (const { state, probability } of distribution.values()) {
@@ -517,6 +598,7 @@ function applyDamageEffectStep({
     };
 
     appliedAmounts.push(damage);
+    activationProbability += probability;
 
     if (nextState.remainingHp <= 0) {
       knockoutProbability += probability;
@@ -543,6 +625,7 @@ function applyDamageEffectStep({
             beforeDistribution: distribution,
             afterDistribution: nextDistribution,
             amounts: appliedAmounts,
+            activationProbability,
             knockoutProbability,
             maximumHp,
           }),
@@ -557,6 +640,7 @@ function createDamageStep({
   beforeDistribution,
   afterDistribution,
   amounts,
+  activationProbability,
   knockoutProbability,
   maximumHp,
 }: {
@@ -566,6 +650,7 @@ function createDamageStep({
   beforeDistribution: KoDistribution;
   afterDistribution: KoDistribution;
   amounts: readonly number[];
+  activationProbability: number;
   knockoutProbability: number;
   maximumHp: number;
 }): DamageStepResult {
@@ -583,6 +668,7 @@ function createDamageStep({
     timing,
     hpBefore,
     amount,
+    activationProbability,
     hpAfter,
     // 実質累計ダメージは「最大HP - 残りHP」で表す
     totalDamage: {

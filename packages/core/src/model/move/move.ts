@@ -1,6 +1,7 @@
 import type { DamageClass, LanguageCode } from "../../common/index.js";
 import type { TypeKey } from "../type/type-key.js";
 import type { DamageRule } from "./damage-rule.js";
+import type { MoveHitCount } from "./move-hit-count.js";
 import type { MoveTag } from "./move-tag.js";
 
 export type MoveCategory = DamagingMove["category"] | StatusMove["category"];
@@ -35,6 +36,9 @@ type MoveBase = {
 
   /** わざのタグ */
   moveTags: MoveTag[];
+
+  /** 1回の行動で発生する攻撃回数 */
+  hitCount: MoveHitCount;
 };
 
 /** こうげきわざ */

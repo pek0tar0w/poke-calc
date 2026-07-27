@@ -54,6 +54,9 @@ export type DamageStepResult = {
   /** HP変化量 */
   amount: DamageHpRange;
 
+  /** このHP変化が発生する確率（0〜1） */
+  activationProbability: number;
+
   /** 適用後の残りHP幅 */
   hpAfter: DamageHpRange;
 
@@ -78,7 +81,7 @@ export type DamageTurnResult = {
 
 /** 1種類のダメージ計算結果 */
 export type DamageSummary = {
-  /** 16段階の乱数ごとのダメージ */
+  /** 1回の行動で発生しうるダメージ候補 */
   damages: readonly number[];
 
   /** 最低ダメージ */

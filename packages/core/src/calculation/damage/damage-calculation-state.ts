@@ -56,6 +56,9 @@ type DamageStateBase<TConfig extends BattlePokemon> = {
   /** 使用する技 */
   move: DamagingMove;
 
+  /** 連続技のhit数を手動指定する場合の回数 */
+  selectedHitCount?: number;
+
   /** 現在の天候 */
   weather: WeatherKey | null;
 };

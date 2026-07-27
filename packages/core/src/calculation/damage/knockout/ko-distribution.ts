@@ -8,6 +8,9 @@ export type KoState = {
 
   /** もうどくの現在カウンター、5なら次のもうどくダメージは5/16 */
   badPoisonCounter: number;
+
+  /** 行動中に選ばれたダメージ乱数枠 */
+  damageSequenceIndex?: number;
 };
 
 /**
@@ -47,7 +50,7 @@ export function createInitialKoState({
 
 /** 状態をMapのキーに変換する */
 export function createKoStateKey(state: KoState): string {
-  return `${state.remainingHp}:${state.badPoisonCounter}:${[
+  return `${state.remainingHp}:${state.badPoisonCounter}:${state.damageSequenceIndex ?? ""}:${[
     ...state.consumedEffectKeys,
   ]
     .sort()

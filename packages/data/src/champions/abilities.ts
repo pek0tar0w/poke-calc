@@ -120,4 +120,23 @@ export const championsAbilities = {
       },
     ],
   },
+
+  skillLink: {
+    id: 92,
+    key: "skillLink",
+    names: {
+      ja: "スキルリンク",
+      en: "Skill Link",
+    },
+    descriptions: {
+      ja: "連続技が必ず最大回数命中する。",
+      en: "Makes multi-hit moves always hit the maximum number of times.",
+    },
+    effects: [
+      {
+        side: "attacker",
+        effect: "maximizeMoveHitCount",
+      },
+    ],
+  },
 } satisfies Record<string, Ability>;
