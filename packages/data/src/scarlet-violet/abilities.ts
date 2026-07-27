@@ -121,6 +121,27 @@ export const scarletVioletAbilities = {
     ],
   },
 
+  parentalBond: {
+    id: 185,
+    key: "parentalBond",
+    names: {
+      ja: "おやこあい",
+      en: "Parental Bond",
+    },
+    descriptions: {
+      ja: "単体攻撃が2回当たり、2回目のダメージが下がる。",
+      en: "Makes single-target attacks hit twice, with reduced damage on the second hit.",
+    },
+    effects: [
+      {
+        side: "attacker",
+        effect: "additionalHit",
+        hitCount: 1,
+        damageMultiplier: 0.25,
+      },
+    ],
+  },
+
   skillLink: {
     id: 92,
     key: "skillLink",

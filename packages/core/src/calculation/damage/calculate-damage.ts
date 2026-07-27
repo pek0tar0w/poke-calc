@@ -1,4 +1,6 @@
 import type { NonHpStatKey } from "../../common/index.js";
+import type { AbilityEffect } from "../../model/ability/index.js";
+import type { DamagingMove } from "../../model/move/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
 import type { DamageResult } from "./damage-result.js";
 
@@ -168,18 +170,26 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     ...commonDamageParams,
     baseDamage: normalBaseDamage,
   });
-  const normalDamageSequences = createDamageSequences({
-    damageRolls: normalDamageRolls,
-    hitCount,
+  const normalDamageSequences = applyAdditionalHitEffects({
+    damageSequences: createDamageSequences({
+      damageRolls: normalDamageRolls,
+      hitCount,
+    }),
+    move: state.move,
+    attackerAbilityEffects: state.attacker.ability?.effects ?? [],
   });
 
   const criticalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: criticalBaseDamage,
   });
-  const criticalDamageSequences = createDamageSequences({
-    damageRolls: criticalDamageRolls,
-    hitCount,
+  const criticalDamageSequences = applyAdditionalHitEffects({
+    damageSequences: createDamageSequences({
+      damageRolls: criticalDamageRolls,
+      hitCount,
+    }),
+    move: state.move,
+    attackerAbilityEffects: state.attacker.ability?.effects ?? [],
   });
 
   const effectResolutionContext = {
@@ -238,4 +248,47 @@ function createDamageSequences({
   return damageRolls.map((damage) =>
     Array.from({ length: hitCount }, () => damage),
   );
+}
+
+/** おやこあいなど、特性による追加hitをダメージ列へ反映する */
+function applyAdditionalHitEffects({
+  damageSequences,
+  move,
+  attackerAbilityEffects,
+}: {
+  /** 乱数枠ごとのhit列 */
+  damageSequences: readonly (readonly number[])[];
+
+  /** 使用する攻撃技 */
+  move: DamagingMove;
+
+  /** 攻撃側の特性効果 */
+  attackerAbilityEffects: readonly AbilityEffect[];
+}): readonly (readonly number[])[] {
+  if (move.isMultiTarget || move.hitCount.kind !== "single") {
+    return damageSequences;
+  }
+
+  const additionalHitEffects = attackerAbilityEffects.filter(
+    (effect): effect is Extract<AbilityEffect, { effect: "additionalHit" }> =>
+      "side" in effect &&
+      effect.side === "attacker" &&
+      effect.effect === "additionalHit",
+  );
+
+  if (additionalHitEffects.length === 0) {
+    return damageSequences;
+  }
+
+  return damageSequences.map((damageSequence) => {
+    const additionalHits = additionalHitEffects.flatMap((effect) =>
+      damageSequence.flatMap((damage) =>
+        Array.from({ length: effect.hitCount }, () =>
+          roundHalfDown(damage * effect.damageMultiplier),
+        ),
+      ),
+    );
+
+    return [...damageSequence, ...additionalHits];
+  });
 }

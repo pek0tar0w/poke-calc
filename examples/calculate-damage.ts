@@ -71,6 +71,21 @@ const toucannonConfig: ChampionsBattlePokemon = {
   },
 };
 
+const megaKangaskhanConfig: ChampionsBattlePokemon = {
+  game: "champions",
+  pokemonKey: "mega-kangaskhan",
+  natureKey: "hardy",
+  moveKeys: ["thunderPunch"],
+  statPoints: {
+    hp: 0,
+    attack: 32,
+    defense: 0,
+    specialAttack: 0,
+    specialDefense: 0,
+    speed: 0,
+  },
+};
+
 const primarinaConfig: ChampionsBattlePokemon = {
   game: "champions",
   pokemonKey: "primarina",
@@ -101,6 +116,24 @@ const toucannon: Pokemon = {
     specialAttack: 75,
     specialDefense: 75,
     speed: 60,
+  },
+};
+
+const megaKangaskhan: Pokemon = {
+  id: 115,
+  key: "mega-kangaskhan",
+  names: {
+    ja: "メガガルーラ",
+    en: "Mega Kangaskhan",
+  },
+  types: ["normal"],
+  baseStats: {
+    hp: 105,
+    attack: 125,
+    defense: 100,
+    specialAttack: 60,
+    specialDefense: 100,
+    speed: 100,
   },
 };
 
@@ -145,6 +178,27 @@ const sitrusBerry: Item = {
           hpRatio: 0.5,
         },
       ],
+    },
+  ],
+};
+
+const parentalBond: Ability = {
+  id: 185,
+  key: "parentalBond",
+  names: {
+    ja: "おやこあい",
+    en: "Parental Bond",
+  },
+  descriptions: {
+    ja: "単体攻撃が2回当たり、2回目のダメージが下がる。",
+    en: "Makes single-target attacks hit twice, with reduced damage on the second hit.",
+  },
+  effects: [
+    {
+      side: "attacker",
+      effect: "additionalHit",
+      hitCount: 1,
+      damageMultiplier: 0.25,
     },
   ],
 };
@@ -197,6 +251,31 @@ const bulletSeed: DamagingMove = {
   },
 };
 
+const thunderPunch: DamagingMove = {
+  id: 9,
+  key: "thunder-punch",
+  names: {
+    ja: "かみなりパンチ",
+    en: "Thunder Punch",
+  },
+  descriptions: {
+    ja: "電撃をこめたパンチで相手を攻撃する。",
+    en: "The target is punched with an electrified fist.",
+  },
+  type: "electric",
+  priority: 0,
+  accuracy: 100,
+  pp: 15,
+  isMultiTarget: false,
+  isProtectable: true,
+  makesContact: true,
+  moveTags: ["punch"],
+  category: "damaging",
+  damageClass: "physical",
+  power: 75,
+  hitCount: { kind: "single" },
+};
+
 const garchomp = championsData.pokemon[garchompConfig.pokemonKey];
 const mimikyu = championsData.pokemon[mimikyuConfig.pokemonKey];
 const earthquake = championsData.moves.earthquake;
@@ -231,6 +310,29 @@ const state: ChampionsDamageState = {
 
 printDamageResult("Champions（ばけのかわ無効・すなあらし・もうどく）", state);
 
+const parentalBondThunderPunchState: ChampionsDamageState = {
+  game: "champions",
+  attacker: {
+    config: megaKangaskhanConfig,
+    pokemon: megaKangaskhan,
+    ability: parentalBond,
+    boosts: neutralBoosts,
+  },
+  defender: {
+    config: primarinaConfig,
+    pokemon: primarina,
+    item: sitrusBerry,
+    boosts: neutralBoosts,
+  },
+  move: thunderPunch,
+  weather: null,
+};
+
+printDamageResult(
+  "Champions（おやこあい・メガガルーラのかみなりパンチ）",
+  parentalBondThunderPunchState,
+);
+
 const multiHitState: ChampionsDamageState = {
   game: "champions",
   attacker: {
@@ -263,7 +365,6 @@ printDamageResult(
 /** ダメージ計算結果をコンソールへ表示する */
 function printDamageResult(game: string, state: DamageCalculationState): void {
   const result = calculateDamage(state);
-  console.log(JSON.stringify(result, null, 2));
 
   console.log(
     `${game}: ${state.attacker.pokemon.names.ja}の${state.move.names.ja} → ${state.defender.pokemon.names.ja}`,
