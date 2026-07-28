@@ -1,10 +1,12 @@
 import type { NonHpStatKey } from "../../common/index.js";
+import type { AbilityEffect } from "../../model/ability/index.js";
+import type { DamagingMove } from "../../model/move/index.js";
 import type { DamageCalculationState } from "./damage-calculation-state.js";
 import type { DamageResult } from "./damage-result.js";
 
 import { resolveActiveDamageEffects } from "../effect/damage/index.js";
 import { resolveActiveDamageReductionEffects } from "../effect/damage-reduction/index.js";
-import { resolveMove } from "../move/index.js";
+import { resolveHitCount, resolveMove } from "../move/index.js";
 import { resolveActiveRecoveryEffects } from "../effect/recovery/index.js";
 import {
   applyNatureModifiers,
@@ -25,6 +27,9 @@ const CHAMPIONS_BATTLE_LEVEL = 50;
 
 /** 急所補正倍率 */
 const CRITICAL_HIT_MULTIPLIER = 1.5;
+
+/** ダブルで複数対象に当たる技の範囲補正倍率 */
+const SPREAD_DAMAGE_MULTIPLIER = 0.75;
 
 /**
  * 攻撃側、防御側、技の条件からダメージ計算結果を返す
@@ -118,12 +123,24 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       ? CHAMPIONS_BATTLE_LEVEL
       : state.attacker.config.level;
 
+  const hitCount = resolveHitCount({
+    move: state.move,
+    attacker: state.attacker,
+    selectedHitCount: state.selectedHitCount,
+  });
+
   // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
-  const normalBaseDamageBeforeWeather = calculateBaseDamage({
+  const normalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
     movePower: resolvedMove.power,
     attackingStat: normalAttackingStat,
     defendingStat: normalDefendingStat,
+  });
+  // ダブルで複数対象に当たる技だけ範囲補正を適用する
+  const normalBaseDamageBeforeWeather = applySpreadDamageModifier({
+    damage: normalBaseDamageBeforeSpread,
+    battleType: state.battleType,
+    isMultiTarget: state.move.isMultiTarget,
   });
   // 基本ダメージへ晴れ・雨のタイプ別補正を適用する
   const normalBaseDamage = applyWeatherDamageModifier({
@@ -132,11 +149,17 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     moveType: resolvedMove.type,
   });
 
-  const criticalBaseDamageBeforeWeather = calculateBaseDamage({
+  const criticalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
     movePower: resolvedMove.power,
     attackingStat: criticalAttackingStat,
     defendingStat: criticalDefendingStat,
+  });
+  // 急所時も範囲補正は急所補正より前に適用する
+  const criticalBaseDamageBeforeWeather = applySpreadDamageModifier({
+    damage: criticalBaseDamageBeforeSpread,
+    battleType: state.battleType,
+    isMultiTarget: state.move.isMultiTarget,
   });
   // 天候補正
   const criticalBaseDamageAfterWeather = applyWeatherDamageModifier({
@@ -156,15 +179,32 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     defenderTypes: defenderPokemonData.types,
   };
 
-  // 通常時と急所時それぞれの16段階のダメージを計算する
-  const normalDamages = calculateRandomDamageValues({
+  // 通常時と急所時それぞれの1hit分の乱数ダメージを計算する
+  // 連続技はKO分布側でhitごとに処理し、オボンのみなどの途中発動を扱う
+  const normalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: normalBaseDamage,
   });
+  const normalDamageSequences = applyAdditionalHitEffects({
+    damageSequences: createDamageSequences({
+      damageRolls: normalDamageRolls,
+      hitCount,
+    }),
+    move: state.move,
+    attackerAbilityEffects: state.attacker.ability?.effects ?? [],
+  });
 
-  const criticalDamages = calculateRandomDamageValues({
+  const criticalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: criticalBaseDamage,
+  });
+  const criticalDamageSequences = applyAdditionalHitEffects({
+    damageSequences: createDamageSequences({
+      damageRolls: criticalDamageRolls,
+      hitCount,
+    }),
+    move: state.move,
+    attackerAbilityEffects: state.attacker.ability?.effects ?? [],
   });
 
   const effectResolutionContext = {
@@ -191,7 +231,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     attackerStats,
     defenderStats,
     normal: createDamageSummary({
-      damages: normalDamages,
+      damageSequences: normalDamageSequences,
       defenderHp: defenderStats.hp,
       damageReductionEffects,
       recoveryEffects,
@@ -199,7 +239,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       badPoisonCounter,
     }),
     critical: createDamageSummary({
-      damages: criticalDamages,
+      damageSequences: criticalDamageSequences,
       defenderHp: defenderStats.hp,
       damageReductionEffects,
       recoveryEffects,
@@ -207,4 +247,85 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       badPoisonCounter,
     }),
   };
+}
+
+/** 乱数枠ごとに、この行動で発生するhit列を作る */
+function createDamageSequences({
+  damageRolls,
+  hitCount,
+}: {
+  /** 1hit分の乱数ダメージ */
+  damageRolls: readonly number[];
+
+  /** この行動で発生するhit数 */
+  hitCount: number;
+}): readonly (readonly number[])[] {
+  return damageRolls.map((damage) =>
+    Array.from({ length: hitCount }, () => damage),
+  );
+}
+
+/** おやこあいなど、特性による追加hitをダメージ列へ反映する */
+function applyAdditionalHitEffects({
+  damageSequences,
+  move,
+  attackerAbilityEffects,
+}: {
+  /** 乱数枠ごとのhit列 */
+  damageSequences: readonly (readonly number[])[];
+
+  /** 使用する攻撃技 */
+  move: DamagingMove;
+
+  /** 攻撃側の特性効果 */
+  attackerAbilityEffects: readonly AbilityEffect[];
+}): readonly (readonly number[])[] {
+  if (move.isMultiTarget || move.hitCount.kind !== "single") {
+    return damageSequences;
+  }
+
+  const additionalHitEffects = attackerAbilityEffects.filter(
+    (effect): effect is Extract<AbilityEffect, { effect: "additionalHit" }> =>
+      "side" in effect &&
+      effect.side === "attacker" &&
+      effect.effect === "additionalHit",
+  );
+
+  if (additionalHitEffects.length === 0) {
+    return damageSequences;
+  }
+
+  return damageSequences.map((damageSequence) => {
+    const additionalHits = additionalHitEffects.flatMap((effect) =>
+      damageSequence.flatMap((damage) =>
+        Array.from({ length: effect.hitCount }, () =>
+          roundHalfDown(damage * effect.damageMultiplier),
+        ),
+      ),
+    );
+
+    return [...damageSequence, ...additionalHits];
+  });
+}
+
+/** ダブルで複数対象に当たる技へ範囲補正を適用する */
+function applySpreadDamageModifier({
+  damage,
+  battleType,
+  isMultiTarget,
+}: {
+  /** 補正前のダメージ */
+  damage: number;
+
+  /** シングル・ダブルの対戦形式 */
+  battleType: DamageCalculationState["battleType"];
+
+  /** 複数対象に当たる攻撃技か */
+  isMultiTarget: boolean;
+}): number {
+  if (battleType !== "double" || !isMultiTarget) {
+    return damage;
+  }
+
+  return roundHalfDown(damage * SPREAD_DAMAGE_MULTIPLIER);
 }

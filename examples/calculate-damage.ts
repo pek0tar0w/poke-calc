@@ -1,7 +1,11 @@
 import type { StatBoosts } from "../packages/core/src/calculation/stat/index.js";
+import type { Ability } from "../packages/core/src/model/ability/index.js";
+import type { Item } from "../packages/core/src/model/item/index.js";
+import type { DamagingMove } from "../packages/core/src/model/move/index.js";
 import type { NatureKey } from "../packages/core/src/model/nature/index.js";
 import type {
   ChampionsBattlePokemon,
+  Pokemon,
   PokemonStats,
 } from "../packages/core/src/model/pokemon/index.js";
 
@@ -52,6 +56,226 @@ const mimikyuConfig: ChampionsBattlePokemon = {
   },
 };
 
+const toucannonConfig: ChampionsBattlePokemon = {
+  game: "champions",
+  pokemonKey: "toucannon",
+  natureKey: "hardy",
+  moveKeys: ["bulletSeed"],
+  statPoints: {
+    hp: 0,
+    attack: 0,
+    defense: 0,
+    specialAttack: 0,
+    specialDefense: 0,
+    speed: 0,
+  },
+};
+
+const megaKangaskhanConfig: ChampionsBattlePokemon = {
+  game: "champions",
+  pokemonKey: "mega-kangaskhan",
+  natureKey: "hardy",
+  moveKeys: ["thunderPunch"],
+  statPoints: {
+    hp: 0,
+    attack: 32,
+    defense: 0,
+    specialAttack: 0,
+    specialDefense: 0,
+    speed: 0,
+  },
+};
+
+const primarinaConfig: ChampionsBattlePokemon = {
+  game: "champions",
+  pokemonKey: "primarina",
+  natureKey: "hardy",
+  moveKeys: [],
+  statPoints: {
+    hp: 32,
+    attack: 0,
+    defense: 32,
+    specialAttack: 0,
+    specialDefense: 0,
+    speed: 0,
+  },
+};
+
+const toucannon: Pokemon = {
+  id: 733,
+  key: "toucannon",
+  names: {
+    ja: "ドデカバシ",
+    en: "Toucannon",
+  },
+  types: ["normal", "flying"],
+  baseStats: {
+    hp: 80,
+    attack: 120,
+    defense: 75,
+    specialAttack: 75,
+    specialDefense: 75,
+    speed: 60,
+  },
+};
+
+const megaKangaskhan: Pokemon = {
+  id: 115,
+  key: "mega-kangaskhan",
+  names: {
+    ja: "メガガルーラ",
+    en: "Mega Kangaskhan",
+  },
+  types: ["normal"],
+  baseStats: {
+    hp: 105,
+    attack: 125,
+    defense: 100,
+    specialAttack: 60,
+    specialDefense: 100,
+    speed: 100,
+  },
+};
+
+const primarina: Pokemon = {
+  id: 730,
+  key: "primarina",
+  names: {
+    ja: "アシレーヌ",
+    en: "Primarina",
+  },
+  types: ["water", "fairy"],
+  baseStats: {
+    hp: 80,
+    attack: 74,
+    defense: 74,
+    specialAttack: 126,
+    specialDefense: 116,
+    speed: 60,
+  },
+};
+
+const sitrusBerry: Item = {
+  id: 135,
+  key: "sitrus-berry",
+  names: {
+    ja: "オボンのみ",
+    en: "Sitrus Berry",
+  },
+  descriptions: {
+    ja: "HPが半分以下になると最大HPの1/4回復する。",
+    en: "Restores 1/4 of maximum HP when HP falls to half or less.",
+  },
+  effects: [
+    {
+      effect: "recovery",
+      activationTiming: "afterDamage",
+      recoveryDivisor: 4,
+      consumable: true,
+      requirements: [
+        {
+          requirement: "hpRatioAtOrBelow",
+          hpRatio: 0.5,
+        },
+      ],
+    },
+  ],
+};
+
+const parentalBond: Ability = {
+  id: 185,
+  key: "parentalBond",
+  names: {
+    ja: "おやこあい",
+    en: "Parental Bond",
+  },
+  descriptions: {
+    ja: "単体攻撃が2回当たり、2回目のダメージが下がる。",
+    en: "Makes single-target attacks hit twice, with reduced damage on the second hit.",
+  },
+  effects: [
+    {
+      side: "attacker",
+      effect: "additionalHit",
+      hitCount: 1,
+      damageMultiplier: 0.25,
+    },
+  ],
+};
+
+const skillLink: Ability = {
+  id: 92,
+  key: "skillLink",
+  names: {
+    ja: "スキルリンク",
+    en: "Skill Link",
+  },
+  descriptions: {
+    ja: "連続技が必ず最大回数命中する。",
+    en: "Makes multi-hit moves always hit the maximum number of times.",
+  },
+  effects: [
+    {
+      side: "attacker",
+      effect: "maximizeMoveHitCount",
+    },
+  ],
+};
+
+const bulletSeed: DamagingMove = {
+  id: 331,
+  key: "bulletSeed",
+  names: {
+    ja: "タネマシンガン",
+    en: "Bullet Seed",
+  },
+  descriptions: {
+    ja: "硬いタネを相手に発射して攻撃する。2～5回の間、連続でだす。",
+    en: "The user forcefully shoots seeds at the target two to five times in a row.",
+  },
+  type: "grass",
+  priority: 0,
+  accuracy: 100,
+  pp: 30,
+  isMultiTarget: false,
+  isProtectable: true,
+  makesContact: false,
+  moveTags: [],
+  category: "damaging",
+  damageClass: "physical",
+  power: 25,
+  hitCount: {
+    kind: "multiHit",
+    minimumHits: 2,
+    maximumHits: 5,
+  },
+};
+
+const thunderPunch: DamagingMove = {
+  id: 9,
+  key: "thunder-punch",
+  names: {
+    ja: "かみなりパンチ",
+    en: "Thunder Punch",
+  },
+  descriptions: {
+    ja: "電撃をこめたパンチで相手を攻撃する。",
+    en: "The target is punched with an electrified fist.",
+  },
+  type: "electric",
+  priority: 0,
+  accuracy: 100,
+  pp: 15,
+  isMultiTarget: false,
+  isProtectable: true,
+  makesContact: true,
+  moveTags: ["punch"],
+  category: "damaging",
+  damageClass: "physical",
+  power: 75,
+  hitCount: { kind: "single" },
+};
+
 const garchomp = championsData.pokemon[garchompConfig.pokemonKey];
 const mimikyu = championsData.pokemon[mimikyuConfig.pokemonKey];
 const earthquake = championsData.moves.earthquake;
@@ -66,6 +290,7 @@ if (!earthquake || earthquake.category !== "damaging") {
 
 const state: ChampionsDamageState = {
   game: "champions",
+  battleType: "single",
   attacker: {
     config: garchompConfig,
     pokemon: garchomp,
@@ -85,6 +310,60 @@ const state: ChampionsDamageState = {
 };
 
 printDamageResult("Champions（ばけのかわ無効・すなあらし・もうどく）", state);
+
+const parentalBondThunderPunchState: ChampionsDamageState = {
+  game: "champions",
+  battleType: "single",
+  attacker: {
+    config: megaKangaskhanConfig,
+    pokemon: megaKangaskhan,
+    ability: parentalBond,
+    boosts: neutralBoosts,
+  },
+  defender: {
+    config: primarinaConfig,
+    pokemon: primarina,
+    item: sitrusBerry,
+    boosts: neutralBoosts,
+  },
+  move: thunderPunch,
+  weather: null,
+};
+
+printDamageResult(
+  "Champions（おやこあい・メガガルーラのかみなりパンチ）",
+  parentalBondThunderPunchState,
+);
+
+const multiHitState: ChampionsDamageState = {
+  game: "champions",
+  battleType: "single",
+  attacker: {
+    config: toucannonConfig,
+    pokemon: toucannon,
+    ability: skillLink,
+    boosts: neutralBoosts,
+  },
+  defender: {
+    config: primarinaConfig,
+    pokemon: primarina,
+    item: sitrusBerry,
+    boosts: neutralBoosts,
+    status: "badPoison",
+    statusState: {
+      badPoisonCounter: 2,
+    },
+    volatiles: ["curse"],
+  },
+  move: bulletSeed,
+  selectedHitCount: 5,
+  weather: null,
+};
+
+printDamageResult(
+  "Champions（スキルリンク・タネマシンガン5回・オボンのみ・もうどく・のろい）",
+  multiHitState,
+);
 
 /** ダメージ計算結果をコンソールへ表示する */
 function printDamageResult(game: string, state: DamageCalculationState): void {
@@ -113,7 +392,11 @@ function printDamageResult(game: string, state: DamageCalculationState): void {
     formatDamageSummary("通常", result.normal),
     formatDamageSummary("急所", result.critical),
   ]);
-  printDamageBreakdown(result.normal, result.defenderStats.hp);
+  printDamageBreakdown({
+    summary: result.normal,
+    defenderHp: result.defenderStats.hp,
+    showMoveDamageSteps: hasAdditionalHitEffect(state),
+  });
 }
 
 /** ポケモンの実数値をコンソール表示用に整形する */
@@ -188,25 +471,42 @@ function formatKnockout(summary: DamageSummary): string {
 }
 
 /** HP変化内訳を画像の表示内容に合わせてテーブル出力する */
-function printDamageBreakdown(
-  summary: DamageSummary,
-  defenderHp: number,
-): void {
+function printDamageBreakdown({
+  summary,
+  defenderHp,
+  showMoveDamageSteps,
+}: {
+  summary: DamageSummary;
+  defenderHp: number;
+  showMoveDamageSteps: boolean;
+}): void {
   const firstTurn = summary.turns[0];
 
   if (firstTurn === undefined) {
     return;
   }
 
-  console.table(
-    firstTurn.steps
-      .filter((step) => step.timing !== "moveDamage")
-      .map((step) =>
-        formatDamageStep({
-          step,
-          defenderHp,
-        }),
-      ),
+  const visibleSteps = firstTurn.steps
+    .filter((step) => showMoveDamageSteps || step.timing !== "moveDamage")
+    .map((step) =>
+      formatDamageStep({
+        step,
+        defenderHp,
+      }),
+    );
+
+  if (visibleSteps.length === 0) {
+    return;
+  }
+
+  console.table(visibleSteps);
+}
+
+function hasAdditionalHitEffect(state: DamageCalculationState): boolean {
+  return (
+    state.attacker.ability?.effects.some(
+      (effect) => "side" in effect && effect.effect === "additionalHit",
+    ) ?? false
   );
 }
 
@@ -218,10 +518,11 @@ function formatDamageStep({
   defenderHp: number;
 }) {
   return {
-    発生元: formatBreakdownSource(step.source),
+    発生元: formatBreakdownSource(step),
     初期HP: formatRange(step.hpBefore.minimum, step.hpBefore.maximum),
     残りHP: formatRange(step.hpAfter.minimum, step.hpAfter.maximum),
     変化: formatStepAmount(step, defenderHp),
+    発動率: formatPercentage(step.activationProbability),
     累計: formatStepTotalDamage(step, defenderHp),
     判定: formatStepKnockout(step.knockout),
   };
@@ -292,14 +593,20 @@ function formatRatioRange({
 }
 
 function formatBreakdownSource(
-  source: DamageSummary["turns"][number]["steps"][number]["source"],
+  step: DamageSummary["turns"][number]["steps"][number],
 ): string {
+  if (step.timing === "moveDamage" && step.moveHit !== undefined) {
+    return `${step.moveHit.index}回目`;
+  }
+
   const sourceNames: Record<string, string> = {
     badPoison: "もうどく",
+    curse: "のろい",
     sandstorm: "すなあらし",
+    "sitrus-berry": "オボンのみ",
   };
 
-  return sourceNames[source.key] ?? source.key;
+  return sourceNames[step.source.key] ?? step.source.key;
 }
 
 function formatRange(minimum: number, maximum: number): string {

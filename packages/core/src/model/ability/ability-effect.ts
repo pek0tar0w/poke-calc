@@ -31,6 +31,18 @@ export type AbilityEffect =
       requirements?: EffectRequirement[];
     }
   | {
+      /** 連続技の攻撃回数を最大にする 例: スキルリンク */
+      side: "attacker";
+      effect: "maximizeMoveHitCount";
+    }
+  | {
+      /** 単体攻撃に追加hitを発生させる 例: おやこあい */
+      side: "attacker";
+      effect: "additionalHit";
+      hitCount: number;
+      damageMultiplier: number;
+    }
+  | {
       /** タイプ一致ボーナスを指定倍率に上書きする */
       side: "attacker";
       effect: "sameTypeAttackBonusOverride";

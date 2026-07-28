@@ -1,5 +1,6 @@
 export type {
   BattlePokemonState,
+  BattleType,
   ChampionsDamageState,
   DamageCalculationState,
   DamageResult,

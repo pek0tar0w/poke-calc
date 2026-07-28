@@ -48,11 +48,23 @@ export type DamageStepResult = {
   /** HP変化が発生するタイミング */
   timing: "moveDamage" | "afterDamage" | "turnEnd";
 
+  /** 同じ行動内で発生した攻撃hitの位置 */
+  moveHit?: {
+    /** 1始まりのhit番号 */
+    index: number;
+
+    /** この行動で発生する合計hit数 */
+    count: number;
+  };
+
   /** 適用前の残りHP幅 */
   hpBefore: DamageHpRange;
 
   /** HP変化量 */
   amount: DamageHpRange;
+
+  /** このHP変化が発生する確率（0〜1） */
+  activationProbability: number;
 
   /** 適用後の残りHP幅 */
   hpAfter: DamageHpRange;
@@ -78,7 +90,7 @@ export type DamageTurnResult = {
 
 /** 1種類のダメージ計算結果 */
 export type DamageSummary = {
-  /** 16段階の乱数ごとのダメージ */
+  /** 1回の行動で発生しうるダメージ候補 */
   damages: readonly number[];
 
   /** 最低ダメージ */
