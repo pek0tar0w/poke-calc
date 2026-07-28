@@ -290,6 +290,7 @@ if (!earthquake || earthquake.category !== "damaging") {
 
 const state: ChampionsDamageState = {
   game: "champions",
+  battleType: "single",
   attacker: {
     config: garchompConfig,
     pokemon: garchomp,
@@ -312,6 +313,7 @@ printDamageResult("Champions（ばけのかわ無効・すなあらし・もう�
 
 const parentalBondThunderPunchState: ChampionsDamageState = {
   game: "champions",
+  battleType: "single",
   attacker: {
     config: megaKangaskhanConfig,
     pokemon: megaKangaskhan,
@@ -335,6 +337,7 @@ printDamageResult(
 
 const multiHitState: ChampionsDamageState = {
   game: "champions",
+  battleType: "single",
   attacker: {
     config: toucannonConfig,
     pokemon: toucannon,

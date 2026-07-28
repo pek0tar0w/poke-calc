@@ -28,6 +28,9 @@ const CHAMPIONS_BATTLE_LEVEL = 50;
 /** 急所補正倍率 */
 const CRITICAL_HIT_MULTIPLIER = 1.5;
 
+/** ダブルで複数対象に当たる技の範囲補正倍率 */
+const SPREAD_DAMAGE_MULTIPLIER = 0.75;
+
 /**
  * 攻撃側、防御側、技の条件からダメージ計算結果を返す
  *
@@ -127,11 +130,17 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
   });
 
   // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
-  const normalBaseDamageBeforeWeather = calculateBaseDamage({
+  const normalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
     movePower: resolvedMove.power,
     attackingStat: normalAttackingStat,
     defendingStat: normalDefendingStat,
+  });
+  // ダブルで複数対象に当たる技だけ範囲補正を適用する
+  const normalBaseDamageBeforeWeather = applySpreadDamageModifier({
+    damage: normalBaseDamageBeforeSpread,
+    battleType: state.battleType,
+    isMultiTarget: state.move.isMultiTarget,
   });
   // 基本ダメージへ晴れ・雨のタイプ別補正を適用する
   const normalBaseDamage = applyWeatherDamageModifier({
@@ -140,11 +149,17 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     moveType: resolvedMove.type,
   });
 
-  const criticalBaseDamageBeforeWeather = calculateBaseDamage({
+  const criticalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
     movePower: resolvedMove.power,
     attackingStat: criticalAttackingStat,
     defendingStat: criticalDefendingStat,
+  });
+  // 急所時も範囲補正は急所補正より前に適用する
+  const criticalBaseDamageBeforeWeather = applySpreadDamageModifier({
+    damage: criticalBaseDamageBeforeSpread,
+    battleType: state.battleType,
+    isMultiTarget: state.move.isMultiTarget,
   });
   // 天候補正
   const criticalBaseDamageAfterWeather = applyWeatherDamageModifier({
@@ -291,4 +306,26 @@ function applyAdditionalHitEffects({
 
     return [...damageSequence, ...additionalHits];
   });
+}
+
+/** ダブルで複数対象に当たる技へ範囲補正を適用する */
+function applySpreadDamageModifier({
+  damage,
+  battleType,
+  isMultiTarget,
+}: {
+  /** 補正前のダメージ */
+  damage: number;
+
+  /** シングル・ダブルの対戦形式 */
+  battleType: DamageCalculationState["battleType"];
+
+  /** 複数対象に当たる攻撃技か */
+  isMultiTarget: boolean;
+}): number {
+  if (battleType !== "double" || !isMultiTarget) {
+    return damage;
+  }
+
+  return roundHalfDown(damage * SPREAD_DAMAGE_MULTIPLIER);
 }

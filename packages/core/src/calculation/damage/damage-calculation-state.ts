@@ -42,11 +42,17 @@ export type BattlePokemonState<TConfig extends BattlePokemon> = {
   volatiles?: readonly VolatileStatus[];
 };
 
+/** 対戦形式 */
+export type BattleType = "single" | "double";
+
 /** ダメージ計算時の対戦状態 */
 export type DamageCalculationState =
   ScarletVioletDamageState | ChampionsDamageState;
 
 type DamageStateBase<TConfig extends BattlePokemon> = {
+  /** シングル・ダブルの対戦形式 */
+  battleType: BattleType;
+
   /** 攻撃側 */
   attacker: BattlePokemonState<TConfig>;
 
