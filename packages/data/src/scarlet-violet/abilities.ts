@@ -3137,6 +3137,189 @@ export const scarletVioletAbilities = {
     effects: [],
   },
 
+  "battle-bond": {
+    id: 210,
+    key: "battle-bond",
+    names: {
+      ja: "きずなへんげ",
+      en: "Battle Bond",
+    },
+    descriptions: {
+      ja: "相手を 倒すと トレーナーとの キズナが 深まり サトシゲッコウガに 変化する。みずしゅりけんが 強くなる。",
+      en: "When the Pokémon knocks out a target, its bond with its Trainer is strengthened, and its Attack, Sp. Atk, and Speed stats are boosted.",
+    },
+    effects: [],
+  },
+  "curious-medicine": {
+    id: 261,
+    key: "curious-medicine",
+    names: {
+      ja: "きみょうなくすり",
+      en: "Curious Medicine",
+    },
+    descriptions: {
+      ja: "登場 したときに 貝がらから 薬を 振りまいて 味方の 能力変化を 元に戻す。",
+      en: "When the Pokémon enters a battle, it scatters medicine from its shell, which removes all stat changes from allies.",
+    },
+    effects: [],
+  },
+  "fur-coat": {
+    id: 169,
+    key: "fur-coat",
+    names: {
+      ja: "ファーコート",
+      en: "Fur Coat",
+    },
+    descriptions: {
+      ja: "相手から 受ける 物理技の ダメージが 半分に なる。",
+      en: "Halves the damage from physical moves.",
+    },
+    effects: [],
+  },
+  galvanize: {
+    id: 206,
+    key: "galvanize",
+    names: {
+      ja: "エレキスキン",
+      en: "Galvanize",
+    },
+    descriptions: {
+      ja: "ノーマルタイプの 技が でんきタイプになる。 威力が 少し 上がる。",
+      en: "Normal-type moves become Electric-type moves. The power of those moves is boosted a little.",
+    },
+    effects: [],
+  },
+  mimicry: {
+    id: 250,
+    key: "mimicry",
+    names: {
+      ja: "ぎたい",
+      en: "Mimicry",
+    },
+    descriptions: {
+      ja: "フィールドの 状態に あわせて ポケモンの タイプが 変わる。",
+      en: "Changes the Pokémon’s type depending on the terrain.",
+    },
+    effects: [],
+  },
+  "minds-eye": {
+    id: 299,
+    key: "minds-eye",
+    names: {
+      ja: "しんがん",
+      en: "Mind’s Eye",
+    },
+    descriptions: {
+      ja: "ノーマル かくとうタイプの技を ゴーストタイプに 当てることが できる。 相手の 回避率の 変化を 無視し 命中率も 下げられない。",
+      en: "The Pokémon ignores changes to opponents' evasiveness, its accuracy can't be lowered, and it can hit Ghost types with Normal-type and Fighting-type moves.",
+    },
+    effects: [],
+  },
+  "misty-surge": {
+    id: 228,
+    key: "misty-surge",
+    names: {
+      ja: "ミストメイカー",
+      en: "Misty Surge",
+    },
+    descriptions: {
+      ja: "登場 したときに ミストフィールドを はりめぐらせる。",
+      en: "Turns the ground into Misty Terrain when the Pokémon enters a battle.",
+    },
+    effects: [],
+  },
+  "power-of-alchemy": {
+    id: 223,
+    key: "power-of-alchemy",
+    names: {
+      ja: "かがくのちから",
+      en: "Power of Alchemy",
+    },
+    descriptions: {
+      ja: "倒された 味方の 特性を 受け継ぎ 同じ 特性に 変わる。",
+      en: "The Pokémon copies the Ability of a defeated ally.",
+    },
+    effects: [],
+  },
+  "quick-draw": {
+    id: 259,
+    key: "quick-draw",
+    names: {
+      ja: "クイックドロウ",
+      en: "Quick Draw",
+    },
+    descriptions: {
+      ja: "相手より 先に 行動できることが ある。",
+      en: "Enables the Pokémon to move first occasionally.",
+    },
+    effects: [],
+  },
+  "surge-surfer": {
+    id: 207,
+    key: "surge-surfer",
+    names: {
+      ja: "サーフテール",
+      en: "Surge Surfer",
+    },
+    descriptions: {
+      ja: "エレキフィールド のとき 素早さが ２倍に なる。",
+      en: "Doubles the Pokémon's Speed stat on Electric Terrain.",
+    },
+    effects: [],
+  },
+  "tangling-hair": {
+    id: 221,
+    key: "tangling-hair",
+    names: {
+      ja: "カーリーヘアー",
+      en: "Tangling Hair",
+    },
+    descriptions: {
+      ja: "攻撃で 自分に 触れた 相手の 素早さを 下げる。",
+      en: "Contact with the Pokémon lowers the attacker's Speed stat.",
+    },
+    effects: [],
+  },
+  "tera-shell": {
+    id: 305,
+    key: "tera-shell",
+    names: {
+      ja: "テラスシェル",
+      en: "Tera Shell",
+    },
+    descriptions: {
+      ja: "全タイプの力を 秘めた甲羅は HPが 満タンの ときに 受ける ダメージを すべて 今ひとつに する。",
+      en: "The Pokémon's shell contains the powers of each type. All damage-dealing moves that hit the Pokémon when its HP is full will not be very effective.",
+    },
+    effects: [],
+  },
+  "teraform-zero": {
+    id: 306,
+    key: "teraform-zero",
+    names: {
+      ja: "ゼロフォーミング",
+      en: "Teraform Zero",
+    },
+    descriptions: {
+      ja: "テラパゴスが ステラフォルムに なったとき 秘められた力で 天気と フィールドの 影響を すべて ゼロにする。",
+      en: "When Terapagos changes into its Stellar Form, it uses its hidden powers to eliminate all effects of weather and terrain, reducing them to zero.",
+    },
+    effects: [],
+  },
+  "tough-claws": {
+    id: 181,
+    key: "tough-claws",
+    names: {
+      ja: "かたいツメ",
+      en: "Tough Claws",
+    },
+    descriptions: {
+      ja: "相手に 接触する 技の 威力が 高くなる。",
+      en: "Powers up moves that make direct contact.",
+    },
+    effects: [],
+  },
+
   parentalBond: {
     id: 185,
     key: "parentalBond",

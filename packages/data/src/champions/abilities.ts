@@ -2611,6 +2611,59 @@ export const championsAbilities = {
     effects: [],
   },
 
+  "curious-medicine": {
+    id: 261,
+    key: "curious-medicine",
+    names: {
+      ja: "きみょうなくすり",
+      en: "Curious Medicine",
+    },
+    descriptions: {
+      ja: "登場 したときに 貝がらから 薬を 振りまいて 味方の 能力変化を 元に戻す。",
+      en: "When the Pokémon enters a battle, it scatters medicine from its shell, which removes all stat changes from allies.",
+    },
+    effects: [],
+  },
+  mimicry: {
+    id: 250,
+    key: "mimicry",
+    names: {
+      ja: "ぎたい",
+      en: "Mimicry",
+    },
+    descriptions: {
+      ja: "フィールドの 状態に あわせて ポケモンの タイプが 変わる。",
+      en: "Changes the Pokémon’s type depending on the terrain.",
+    },
+    effects: [],
+  },
+  "quick-draw": {
+    id: 259,
+    key: "quick-draw",
+    names: {
+      ja: "クイックドロウ",
+      en: "Quick Draw",
+    },
+    descriptions: {
+      ja: "相手より 先に 行動できることが ある。",
+      en: "Enables the Pokémon to move first occasionally.",
+    },
+    effects: [],
+  },
+  "surge-surfer": {
+    id: 207,
+    key: "surge-surfer",
+    names: {
+      ja: "サーフテール",
+      en: "Surge Surfer",
+    },
+    descriptions: {
+      ja: "エレキフィールド のとき 素早さが ２倍に なる。",
+      en: "Doubles the Pokémon's Speed stat on Electric Terrain.",
+    },
+    effects: [],
+  },
+
   parentalBond: {
     id: 185,
     key: "parentalBond",
