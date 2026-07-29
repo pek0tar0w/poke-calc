@@ -1,6 +1,5 @@
 import type { AbilityEffect } from "../../model/ability/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
-import type { BattlePokemon } from "../../model/pokemon/index.js";
 import type { BattlePokemonState } from "../damage/damage-calculation-state.js";
 
 /** coreで扱う連続技の最大hit数 */
@@ -21,7 +20,7 @@ export function resolveHitCount({
   move: DamagingMove;
 
   /** 攻撃側 */
-  attacker: BattlePokemonState<BattlePokemon>;
+  attacker: BattlePokemonState;
 
   /** ユーザーが選択したhit数 */
   selectedHitCount: number | undefined;

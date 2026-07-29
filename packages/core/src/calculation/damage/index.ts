@@ -1,8 +1,10 @@
 export type {
   BattlePokemonState,
+  ChampionsBattlePokemonState,
   BattleType,
   ChampionsDamageState,
   DamageCalculationState,
+  ScarletVioletBattlePokemonState,
   ScarletVioletDamageState,
 } from "./damage-calculation-state.js";
 export type { DamageResult, DamageSummary } from "./damage-result.js";

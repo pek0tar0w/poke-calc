@@ -1,5 +1,11 @@
 export { games } from "./games.js";
-export type { DataCollection } from "./accessor.js";
+export {
+  resolveChampionsDamageState,
+  resolveScarletVioletDamageState,
+  type ChampionsDamageStateInput,
+  type ScarletVioletDamageStateInput,
+} from "./damage-state.js";
+export type { GameDataAccessor } from "./accessor.js";
 export {
   championsAbilities,
   championsGameData,
