@@ -15,7 +15,7 @@ import {
   type DamageCalculationState,
   type DamageSummary,
 } from "../packages/core/src/calculation/damage/index.js";
-import { championsData } from "../packages/data/src/champions/index.js";
+import { games } from "../packages/data/src/index.js";
 import { natureNames } from "../packages/data/src/common/index.js";
 
 const neutralBoosts: StatBoosts = {
@@ -276,9 +276,9 @@ const thunderPunch: DamagingMove = {
   hitCount: { kind: "single" },
 };
 
-const garchomp = championsData.pokemon[garchompConfig.pokemonKey];
-const mimikyu = championsData.pokemon[mimikyuConfig.pokemonKey];
-const earthquake = championsData.moves.earthquake;
+const garchomp = games.champions.pokemon.get("garchomp");
+const mimikyu = games.champions.pokemon.get("mimikyu");
+const earthquake = games.champions.moves.get("earthquake");
 
 if (!garchomp || !mimikyu) {
   throw new Error("Champions Pokemon data not found");

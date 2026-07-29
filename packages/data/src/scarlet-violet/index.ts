@@ -1,22 +1,7 @@
-import type { GameData } from "../game-data.js";
-
-import { scarletVioletAbilities } from "./abilities.js";
-import { scarletVioletItems } from "./items.js";
-import { scarletVioletMoves } from "./moves.js";
-import { scarletVioletPokemon } from "./pokemon.js";
-
-/** Pokémon Scarlet/Violetの実データ */
-export const scarletVioletData: GameData = {
-  game: "scarletViolet",
-  pokemon: scarletVioletPokemon,
-  moves: scarletVioletMoves,
-  abilities: scarletVioletAbilities,
-  items: scarletVioletItems,
-};
-
-export {
-  scarletVioletAbilities,
-  scarletVioletItems,
-  scarletVioletMoves,
-  scarletVioletPokemon,
-};
+export { scarletVioletPokemon } from "./pokemon.js";
+export { scarletVioletMoves } from "./moves.js";
+export { scarletVioletAbilities } from "./abilities.js";
+export { scarletVioletItems } from "./items.js";
+export { scarletVioletLearnsets } from "./learnsets.js";
+export { scarletVioletPokemonAbilities } from "./pokemon-abilities.js";
+export { scarletVioletGameData } from "./game-data.js";

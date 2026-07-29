@@ -1,6 +1,8 @@
+export { games } from "./games.js";
+export type { DataCollection } from "./accessor.js";
 export {
   championsAbilities,
-  championsData,
+  championsGameData,
   championsItems,
   championsMoves,
   championsPokemon,
@@ -8,7 +10,7 @@ export {
 export { natureNames, typeNames, weatherNames } from "./common/index.js";
 export {
   scarletVioletAbilities,
-  scarletVioletData,
+  scarletVioletGameData,
   scarletVioletItems,
   scarletVioletMoves,
   scarletVioletPokemon,

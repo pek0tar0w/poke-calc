@@ -1,17 +1,7 @@
-import type { GameData } from "../game-data.js";
-
-import { championsAbilities } from "./abilities.js";
-import { championsItems } from "./items.js";
-import { championsMoves } from "./moves.js";
-import { championsPokemon } from "./pokemon.js";
-
-/** Pokémon Championsの実データ */
-export const championsData: GameData = {
-  game: "champions",
-  pokemon: championsPokemon,
-  moves: championsMoves,
-  abilities: championsAbilities,
-  items: championsItems,
-};
-
-export { championsAbilities, championsItems, championsMoves, championsPokemon };
+export { championsPokemon } from "./pokemon.js";
+export { championsMoves } from "./moves.js";
+export { championsAbilities } from "./abilities.js";
+export { championsItems } from "./items.js";
+export { championsLearnsets } from "./learnsets.js";
+export { championsPokemonAbilities } from "./pokemon-abilities.js";
+export { championsGameData } from "./game-data.js";

@@ -28,9 +28,6 @@ type MoveBase = {
   /** 複数対象へ命中する可能性があるか */
   isMultiTarget: boolean;
 
-  /** まもる などで防げるか */
-  isProtectable: boolean;
-
   /** 接触技か */
   makesContact: boolean;
 
