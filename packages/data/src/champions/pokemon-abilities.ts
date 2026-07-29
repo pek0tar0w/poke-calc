@@ -289,6 +289,7 @@ export const championsPokemonAbilities = {
   "tauros-paldea-aqua-breed": ["intimidate", "anger-point", "cud-chew"],
   "typhlosion-hisui": ["blaze", "frisk"],
   "slowking-galar": ["curious-medicine", "own-tempo", "regenerator"],
+  "qwilfish-hisui": ["poison-point", "swift-swim", "intimidate"],
   "castform-sunny": ["forecast"],
   "castform-rainy": ["forecast"],
   "castform-snowy": ["forecast"],
