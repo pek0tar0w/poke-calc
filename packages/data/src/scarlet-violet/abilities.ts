@@ -2954,6 +2954,19 @@ export const scarletVioletAbilities = {
     },
     effects: [],
   },
+  "unseen-fist": {
+    id: 260,
+    key: "unseen-fist",
+    names: {
+      ja: "ふかしのこぶし",
+      en: "Unseen Fist",
+    },
+    descriptions: {
+      ja: "あいてに　せっしょくする　わざなら まもりの　こうかを むしして　こうげき　することが　できる。",
+      en: "If the Pokémon uses moves that make direct contact, it can attack the target even if the target protects itself.",
+    },
+    effects: [],
+  },
   "vital-spirit": {
     id: 72,
     key: "vital-spirit",

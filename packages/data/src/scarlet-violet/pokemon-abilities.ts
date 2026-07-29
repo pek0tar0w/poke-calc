@@ -738,5 +738,8 @@ export const scarletVioletPokemonAbilities = {
   "decidueye-hisui": ["overgrow", "scrappy"],
   "terapagos-terastal": ["tera-shell"],
   "terapagos-stellar": ["teraform-zero"],
+  kubfu: ["inner-focus"],
+  "urshifu-single-strike": ["unseen-fist"],
+  "urshifu-rapid-strike": ["unseen-fist"],
   sneasler: ["pressure", "unburden", "poison-touch"],
 };
