@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tsx watch examples/calculate-damage.ts",
     "build": "pnpm --recursive build",
-    "test": "pnpm --filter @poke-calc/data test",
+    "test": "pnpm --filter @poke-calc/core test && pnpm --filter @poke-calc/data test",
     "typecheck": "pnpm --recursive typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
