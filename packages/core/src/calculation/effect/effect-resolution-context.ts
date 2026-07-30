@@ -1,6 +1,5 @@
 import type { GameId } from "../../common/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
-import type { BattlePokemon } from "../../model/pokemon/index.js";
 import type { WeatherKey } from "../../model/weather/index.js";
 import type { BattlePokemonState } from "../damage/damage-calculation-state.js";
 
@@ -10,10 +9,10 @@ export type EffectResolutionContext = {
   game: GameId;
 
   /** 攻撃側 */
-  attacker: BattlePokemonState<BattlePokemon>;
+  attacker: BattlePokemonState;
 
   /** 防御側 */
-  defender: BattlePokemonState<BattlePokemon>;
+  defender: BattlePokemonState;
 
   /** 使用する技 */
   move: DamagingMove;

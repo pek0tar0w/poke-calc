@@ -1,24 +1,20 @@
 import type { Ability } from "../../model/ability/index.js";
 import type { Item } from "../../model/item/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
-import type {
-  BattlePokemon,
-  ChampionsBattlePokemon,
-  Pokemon,
-  ScarletVioletBattlePokemon,
-} from "../../model/pokemon/index.js";
+import type { NatureKey } from "../../model/nature/index.js";
+import type { Pokemon } from "../../model/pokemon/index.js";
 import type { StatusConditionKey } from "../../model/status-condition/index.js";
 import type { VolatileStatus } from "../../model/volatile-status/index.js";
 import type { WeatherKey } from "../../model/weather/index.js";
-import type { StatBoosts } from "../stat/index.js";
+import type { PokemonStatConfig, StatBoosts } from "../stat/index.js";
 
 /** 実データを解決した計算時のポケモン */
-export type BattlePokemonState<TConfig extends BattlePokemon> = {
-  /** 保存可能な育成・選択設定 */
-  config: TConfig;
-
+type BattlePokemonStateBase = {
   /** ポケモンの実データ */
   pokemon: Pokemon;
+
+  /** 性格 */
+  natureKey: NatureKey;
 
   /** 選択された特性の実データ */
   ability?: Ability;
@@ -42,6 +38,14 @@ export type BattlePokemonState<TConfig extends BattlePokemon> = {
   volatiles?: readonly VolatileStatus[];
 };
 
+export type BattlePokemonState = BattlePokemonStateBase & PokemonStatConfig;
+
+export type ScarletVioletBattlePokemonState = BattlePokemonStateBase &
+  Extract<PokemonStatConfig, { game: "scarletViolet" }>;
+
+export type ChampionsBattlePokemonState = BattlePokemonStateBase &
+  Extract<PokemonStatConfig, { game: "champions" }>;
+
 /** 対戦形式 */
 export type BattleType = "single" | "double";
 
@@ -49,15 +53,15 @@ export type BattleType = "single" | "double";
 export type DamageCalculationState =
   ScarletVioletDamageState | ChampionsDamageState;
 
-type DamageStateBase<TConfig extends BattlePokemon> = {
+type DamageStateBase<TPokemonState extends BattlePokemonState> = {
   /** シングル・ダブルの対戦形式 */
   battleType: BattleType;
 
   /** 攻撃側 */
-  attacker: BattlePokemonState<TConfig>;
+  attacker: TPokemonState;
 
   /** 防御側 */
-  defender: BattlePokemonState<TConfig>;
+  defender: TPokemonState;
 
   /** 使用する技 */
   move: DamagingMove;
@@ -71,7 +75,7 @@ type DamageStateBase<TConfig extends BattlePokemon> = {
 
 /** Scarlet/Violetのダメージ計算状態 */
 export type ScarletVioletDamageState =
-  DamageStateBase<ScarletVioletBattlePokemon> & {
+  DamageStateBase<ScarletVioletBattlePokemonState> & {
     /** 作品 */
     game: "scarletViolet";
 
@@ -83,7 +87,8 @@ export type ScarletVioletDamageState =
   };
 
 /** Championsのダメージ計算状態 */
-export type ChampionsDamageState = DamageStateBase<ChampionsBattlePokemon> & {
-  /** 作品 */
-  game: "champions";
-};
+export type ChampionsDamageState =
+  DamageStateBase<ChampionsBattlePokemonState> & {
+    /** 作品 */
+    game: "champions";
+  };

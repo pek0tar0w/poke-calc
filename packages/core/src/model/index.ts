@@ -19,13 +19,7 @@ export type {
   StatusMove,
 } from "./move/index.js";
 export type { NatureEffect, NatureKey } from "./nature/index.js";
-export type {
-  BattlePokemon,
-  ChampionsBattlePokemon,
-  Pokemon,
-  PokemonStats,
-  ScarletVioletBattlePokemon,
-} from "./pokemon/index.js";
+export type { Pokemon, PokemonStats } from "./pokemon/index.js";
 export type {
   StatusCondition,
   StatusConditionKey,

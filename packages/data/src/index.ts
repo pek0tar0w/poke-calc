@@ -1,6 +1,14 @@
+export { games } from "./games.js";
+export {
+  resolveChampionsDamageState,
+  resolveScarletVioletDamageState,
+  type ChampionsDamageStateInput,
+  type ScarletVioletDamageStateInput,
+} from "./damage-state.js";
+export type { GameDataAccessor } from "./accessor.js";
 export {
   championsAbilities,
-  championsData,
+  championsGameData,
   championsItems,
   championsMoves,
   championsPokemon,
@@ -8,7 +16,7 @@ export {
 export { natureNames, typeNames, weatherNames } from "./common/index.js";
 export {
   scarletVioletAbilities,
-  scarletVioletData,
+  scarletVioletGameData,
   scarletVioletItems,
   scarletVioletMoves,
   scarletVioletPokemon,

@@ -44,21 +44,21 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
   // 種族値と育成値から性格補正前の実数値を計算する
   const attackerStatsBeforeNature = calculatePokemonStats({
     baseStats: attackerPokemonData.baseStats,
-    statConfig: state.attacker.config,
+    statConfig: state.attacker,
   });
   const defenderStatsBeforeNature = calculatePokemonStats({
     baseStats: defenderPokemonData.baseStats,
-    statConfig: state.defender.config,
+    statConfig: state.defender,
   });
 
   // 性格補正を適用し、ランク補正前の実数値を計算する
   const attackerStats = applyNatureModifiers({
     stats: attackerStatsBeforeNature,
-    natureKey: state.attacker.config.natureKey,
+    natureKey: state.attacker.natureKey,
   });
   const defenderStats = applyNatureModifiers({
     stats: defenderStatsBeforeNature,
-    natureKey: state.defender.config.natureKey,
+    natureKey: state.defender.natureKey,
   });
 
   // 技固有の威力・タイプ変更を反映する
@@ -119,9 +119,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
   });
 
   const attackerLevel =
-    state.game === "champions"
-      ? CHAMPIONS_BATTLE_LEVEL
-      : state.attacker.config.level;
+    state.game === "champions" ? CHAMPIONS_BATTLE_LEVEL : state.attacker.level;
 
   const hitCount = resolveHitCount({
     move: state.move,

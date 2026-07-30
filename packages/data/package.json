@@ -16,12 +16,14 @@
   ],
   "scripts": {
     "build": "tsc -p .",
+    "test": "vitest run",
     "typecheck": "tsc -p . --noEmit"
   },
   "dependencies": {
     "@poke-calc/core": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
   }
 }
