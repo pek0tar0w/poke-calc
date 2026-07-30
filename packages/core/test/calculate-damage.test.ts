@@ -101,6 +101,13 @@ const firePunch = createMove({
   power: 75,
 });
 
+const flamethrower = createMove({
+  key: "flamethrower",
+  type: "fire",
+  power: 90,
+  damageClass: "special",
+});
+
 const bulletSeed = createMove({
   key: "bullet-seed",
   type: "grass",
@@ -211,6 +218,76 @@ describe("calculateDamage", () => {
       result.normal.minimumDamage,
     );
     expect(result.normal.turns[0]?.steps[0]?.source.type).toBe("move");
+  });
+
+  // やけど状態では物理技だけ通常時、急所時ともにダメージが半減する
+  test("halves physical damage from a burned attacker", () => {
+    const physicalInput = createChampionsInput({
+      attacker: {
+        pokemon: garchomp,
+        statPoints: {
+          hp: 0,
+          attack: 32,
+          defense: 0,
+          specialAttack: 32,
+          specialDefense: 0,
+          speed: 0,
+        },
+      },
+      defender: {
+        pokemon: corviknight,
+        statPoints: {
+          hp: 32,
+          attack: 0,
+          defense: 32,
+          specialAttack: 0,
+          specialDefense: 32,
+          speed: 0,
+        },
+      },
+      move: firePunch,
+    });
+    const physicalResult = calculateDamage(physicalInput);
+    const burnedPhysicalResult = calculateDamage({
+      ...physicalInput,
+      attacker: {
+        ...physicalInput.attacker,
+        status: "burn",
+      },
+    });
+
+    expect(burnedPhysicalResult.normal.minimumDamage).toBe(
+      Math.floor(physicalResult.normal.minimumDamage / 2),
+    );
+    expect(burnedPhysicalResult.normal.maximumDamage).toBe(
+      Math.floor(physicalResult.normal.maximumDamage / 2),
+    );
+    expect(burnedPhysicalResult.critical.minimumDamage).toBe(
+      Math.floor(physicalResult.critical.minimumDamage / 2),
+    );
+    expect(burnedPhysicalResult.critical.maximumDamage).toBe(
+      Math.floor(physicalResult.critical.maximumDamage / 2),
+    );
+
+    const specialInput = {
+      ...physicalInput,
+      move: flamethrower,
+    };
+    const specialResult = calculateDamage(specialInput);
+    const burnedSpecialResult = calculateDamage({
+      ...specialInput,
+      attacker: {
+        ...specialInput.attacker,
+        status: "burn",
+      },
+    });
+
+    expect(burnedSpecialResult.normal.minimumDamage).toBe(
+      specialResult.normal.minimumDamage,
+    );
+    expect(burnedSpecialResult.normal.maximumDamage).toBe(
+      specialResult.normal.maximumDamage,
+    );
   });
 
   // ターン終了時の回復と定数ダメージをHP推移へ反映する
@@ -414,11 +491,13 @@ function createMove({
   type,
   power,
   hitCount = { kind: "single" },
+  damageClass = "physical",
 }: {
   key: string;
   type: TypeKey;
   power: number;
   hitCount?: DamagingMove["hitCount"];
+  damageClass?: DamagingMove["damageClass"];
 }): DamagingMove {
   return {
     id: 1,
@@ -440,7 +519,7 @@ function createMove({
     moveTags: [],
     hitCount,
     category: "damaging",
-    damageClass: "physical",
+    damageClass,
     power,
   };
 }

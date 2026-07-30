@@ -11,6 +11,7 @@ import {
   applyStatBoost,
   calculatePokemonStats,
 } from "../stat/index.js";
+import { applyBurnDamageModifier } from "../status/index.js";
 import { roundHalfDown } from "../utils/round-half-down.js";
 import {
   applyWeatherDamageModifier,
@@ -180,7 +181,13 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const normalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: normalBaseDamage,
-  });
+  }).map((damage) =>
+    applyBurnDamageModifier({
+      damage,
+      damageClass: input.move.damageClass,
+      attackerStatus: input.attacker.status,
+    }),
+  );
   const normalDamageSequences = applyAdditionalHitEffects({
     damageSequences: createDamageSequences({
       damageRolls: normalDamageRolls,
@@ -193,7 +200,13 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const criticalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: criticalBaseDamage,
-  });
+  }).map((damage) =>
+    applyBurnDamageModifier({
+      damage,
+      damageClass: input.move.damageClass,
+      attackerStatus: input.attacker.status,
+    }),
+  );
   const criticalDamageSequences = applyAdditionalHitEffects({
     damageSequences: createDamageSequences({
       damageRolls: criticalDamageRolls,
