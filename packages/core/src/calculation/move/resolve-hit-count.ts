@@ -1,6 +1,6 @@
 import type { AbilityEffect } from "../../model/ability/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
-import type { BattlePokemonState } from "../damage/damage-calculation-state.js";
+import type { BattlePokemonState } from "../damage/damage-calculation-input.js";
 
 /** coreで扱う連続技の最大hit数 */
 const MAX_MOVE_HIT_COUNT = 10;

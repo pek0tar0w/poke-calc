@@ -1,7 +1,7 @@
 import type { ActiveDamageEffect } from "../effect/damage/index.js";
 import type { ActiveDamageReductionEffect } from "../effect/damage-reduction/index.js";
 import type { ActiveRecoveryEffect } from "../effect/recovery/active-recovery-effect.js";
-import type { DamageSummary } from "./damage-result.js";
+import type { DamageOutcome } from "./damage-result.js";
 
 import { applyDamageReductionEffects } from "../effect/damage-reduction/index.js";
 import { calculateKnockoutResult } from "./knockout/calculate-knockout-result.js";
@@ -13,7 +13,7 @@ import { createInitialKoState } from "./knockout/ko-distribution.js";
  * 攻撃ダメージ自体の撃破回数は、追加効果を含めずに計算する
  * 回復や定数ダメージは、別枠のHP推移としてturnsに持たせる
  */
-export function createDamageSummary({
+export function createDamageOutcome({
   damageSequences,
   defenderHp,
   damageReductionEffects,
@@ -38,7 +38,7 @@ export function createDamageSummary({
 
   /** もうどくの現在カウンター */
   badPoisonCounter?: number;
-}): DamageSummary {
+}): DamageOutcome {
   // 1発目にだけ効く軽減効果を反映した、攻撃ダメージ分布を作る
   const initialState = createInitialKoState({
     currentHp: defenderHp,

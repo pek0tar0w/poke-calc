@@ -1,12 +1,12 @@
 import type {
   BattleType,
   ChampionsBattlePokemonState,
-  ChampionsDamageState,
+  ChampionsDamageInput,
   DamagingMove,
   NatureKey,
   PokemonStats,
   ScarletVioletBattlePokemonState,
-  ScarletVioletDamageState,
+  ScarletVioletDamageInput,
   StatBoosts,
   StatusConditionKey,
   VolatileStatus,
@@ -86,7 +86,7 @@ type ScarletVioletBattlePokemonStateInput = BattlePokemonStateInput<
   effortValues: PokemonStats;
 };
 
-export type ChampionsDamageStateInput = {
+export type ChampionsDamageConfig = {
   /** シングル・ダブルの対戦形式 */
   battleType: BattleType;
 
@@ -106,7 +106,7 @@ export type ChampionsDamageStateInput = {
   weather: WeatherKey | null;
 };
 
-export type ScarletVioletDamageStateInput = {
+export type ScarletVioletDamageConfig = {
   /** シングル・ダブルの対戦形式 */
   battleType: BattleType;
 
@@ -132,10 +132,10 @@ export type ScarletVioletDamageStateInput = {
   defenderTerastallized: boolean;
 };
 
-/** keyベースの入力からChampions用のダメージ計算状態を組み立てる */
-export function resolveChampionsDamageState(
-  input: ChampionsDamageStateInput,
-): ChampionsDamageState {
+/** keyベースの入力からChampions用のダメージ計算入力を組み立てる */
+export function resolveChampionsDamageInput(
+  input: ChampionsDamageConfig,
+): ChampionsDamageInput {
   return {
     game: "champions",
     battleType: input.battleType,
@@ -149,10 +149,10 @@ export function resolveChampionsDamageState(
   };
 }
 
-/** keyベースの入力からScarlet/Violet用のダメージ計算状態を組み立てる */
-export function resolveScarletVioletDamageState(
-  input: ScarletVioletDamageStateInput,
-): ScarletVioletDamageState {
+/** keyベースの入力からScarlet/Violet用のダメージ計算入力を組み立てる */
+export function resolveScarletVioletDamageInput(
+  input: ScarletVioletDamageConfig,
+): ScarletVioletDamageInput {
   return {
     game: "scarletViolet",
     battleType: input.battleType,

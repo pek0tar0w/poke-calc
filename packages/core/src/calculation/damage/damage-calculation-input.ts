@@ -38,22 +38,25 @@ type BattlePokemonStateBase = {
   volatiles?: readonly VolatileStatus[];
 };
 
+/** 実データと育成値を解決済みの、計算用ポケモン状態 */
 export type BattlePokemonState = BattlePokemonStateBase & PokemonStatConfig;
 
+/** Scarlet/Violet向けの計算用ポケモン状態 */
 export type ScarletVioletBattlePokemonState = BattlePokemonStateBase &
   Extract<PokemonStatConfig, { game: "scarletViolet" }>;
 
+/** Champions向けの計算用ポケモン状態 */
 export type ChampionsBattlePokemonState = BattlePokemonStateBase &
   Extract<PokemonStatConfig, { game: "champions" }>;
 
 /** 対戦形式 */
 export type BattleType = "single" | "double";
 
-/** ダメージ計算時の対戦状態 */
-export type DamageCalculationState =
-  ScarletVioletDamageState | ChampionsDamageState;
+/** calculateDamageへ渡す公開入力 */
+export type DamageCalculationInput =
+  ScarletVioletDamageInput | ChampionsDamageInput;
 
-type DamageStateBase<TPokemonState extends BattlePokemonState> = {
+type DamageInputBase<TPokemonState extends BattlePokemonState> = {
   /** シングル・ダブルの対戦形式 */
   battleType: BattleType;
 
@@ -73,9 +76,9 @@ type DamageStateBase<TPokemonState extends BattlePokemonState> = {
   weather: WeatherKey | null;
 };
 
-/** Scarlet/Violetのダメージ計算状態 */
-export type ScarletVioletDamageState =
-  DamageStateBase<ScarletVioletBattlePokemonState> & {
+/** Scarlet/Violetのダメージ計算入力 */
+export type ScarletVioletDamageInput =
+  DamageInputBase<ScarletVioletBattlePokemonState> & {
     /** 作品 */
     game: "scarletViolet";
 
@@ -86,9 +89,9 @@ export type ScarletVioletDamageState =
     defenderTerastallized: boolean;
   };
 
-/** Championsのダメージ計算状態 */
-export type ChampionsDamageState =
-  DamageStateBase<ChampionsBattlePokemonState> & {
+/** Championsのダメージ計算入力 */
+export type ChampionsDamageInput =
+  DamageInputBase<ChampionsBattlePokemonState> & {
     /** 作品 */
     game: "champions";
   };

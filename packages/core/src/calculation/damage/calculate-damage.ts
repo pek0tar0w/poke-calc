@@ -1,13 +1,11 @@
 import type { NonHpStatKey } from "../../common/index.js";
 import type { AbilityEffect } from "../../model/ability/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
-import type { DamageCalculationState } from "./damage-calculation-state.js";
+import type { DamageCalculationInput } from "./damage-calculation-input.js";
 import type { DamageResult } from "./damage-result.js";
 
-import { resolveActiveDamageEffects } from "../effect/damage/index.js";
-import { resolveActiveDamageReductionEffects } from "../effect/damage-reduction/index.js";
+import { resolveActiveEffects } from "../effect/index.js";
 import { resolveHitCount, resolveMove } from "../move/index.js";
-import { resolveActiveRecoveryEffects } from "../effect/recovery/index.js";
 import {
   applyNatureModifiers,
   applyStatBoost,
@@ -20,7 +18,7 @@ import {
 } from "../weather/index.js";
 import { calculateBaseDamage } from "./calculate-base-damage.js";
 import { calculateRandomDamageValues } from "./calculate-random-damage-values.js";
-import { createDamageSummary } from "./create-damage-summary.js";
+import { createDamageOutcome } from "./create-damage-outcome.js";
 
 /** Championsのバトルレベル */
 const CHAMPIONS_BATTLE_LEVEL = 50;
@@ -34,47 +32,47 @@ const SPREAD_DAMAGE_MULTIPLIER = 0.75;
 /**
  * 攻撃側、防御側、技の条件からダメージ計算結果を返す
  *
- * @param state - ダメージ計算時の対戦状態
+ * @param input - ダメージ計算に必要な入力
  */
-export function calculateDamage(state: DamageCalculationState): DamageResult {
-  // Stateから解決済みのポケモンデータを取得する
-  const attackerPokemonData = state.attacker.pokemon;
-  const defenderPokemonData = state.defender.pokemon;
+export function calculateDamage(input: DamageCalculationInput): DamageResult {
+  // 入力から解決済みのポケモンデータを取得する
+  const attackerPokemonData = input.attacker.pokemon;
+  const defenderPokemonData = input.defender.pokemon;
 
   // 種族値と育成値から性格補正前の実数値を計算する
   const attackerStatsBeforeNature = calculatePokemonStats({
     baseStats: attackerPokemonData.baseStats,
-    statConfig: state.attacker,
+    statConfig: input.attacker,
   });
   const defenderStatsBeforeNature = calculatePokemonStats({
     baseStats: defenderPokemonData.baseStats,
-    statConfig: state.defender,
+    statConfig: input.defender,
   });
 
   // 性格補正を適用し、ランク補正前の実数値を計算する
   const attackerStats = applyNatureModifiers({
     stats: attackerStatsBeforeNature,
-    natureKey: state.attacker.natureKey,
+    natureKey: input.attacker.natureKey,
   });
   const defenderStats = applyNatureModifiers({
     stats: defenderStatsBeforeNature,
-    natureKey: state.defender.natureKey,
+    natureKey: input.defender.natureKey,
   });
 
   // 技固有の威力・タイプ変更を反映する
   const resolvedMove = resolveMove({
-    move: state.move,
-    weather: state.weather,
+    move: input.move,
+    weather: input.weather,
   });
 
   // 技の分類に応じて攻撃と防御に使用する能力を決定する
   const attackingStatKey: NonHpStatKey =
-    state.move.damageClass === "physical" ? "attack" : "specialAttack";
+    input.move.damageClass === "physical" ? "attack" : "specialAttack";
   const defendingStatKey: NonHpStatKey =
-    state.move.damageClass === "physical" ? "defense" : "specialDefense";
+    input.move.damageClass === "physical" ? "defense" : "specialDefense";
 
-  const attackingStatBoost = state.attacker.boosts[attackingStatKey];
-  const defendingStatBoost = state.defender.boosts[defendingStatKey];
+  const attackingStatBoost = input.attacker.boosts[attackingStatKey];
+  const defendingStatBoost = input.defender.boosts[defendingStatKey];
 
   const unboostedAttackingStat = attackerStats[attackingStatKey];
   const unboostedDefendingStat = defenderStats[defendingStatKey];
@@ -93,7 +91,7 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     stat: normalDefendingStatBeforeWeather,
     statKey: defendingStatKey,
     defenderTypes: defenderPokemonData.types,
-    weather: state.weather,
+    weather: input.weather,
   });
 
   // 急所時に無視される下降ランクと上昇ランクを0へ置き換える
@@ -115,16 +113,16 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
     stat: criticalDefendingStatBeforeWeather,
     statKey: defendingStatKey,
     defenderTypes: defenderPokemonData.types,
-    weather: state.weather,
+    weather: input.weather,
   });
 
   const attackerLevel =
-    state.game === "champions" ? CHAMPIONS_BATTLE_LEVEL : state.attacker.level;
+    input.game === "champions" ? CHAMPIONS_BATTLE_LEVEL : input.attacker.level;
 
   const hitCount = resolveHitCount({
-    move: state.move,
-    attacker: state.attacker,
-    selectedHitCount: state.selectedHitCount,
+    move: input.move,
+    attacker: input.attacker,
+    selectedHitCount: input.selectedHitCount,
   });
 
   // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
@@ -137,13 +135,13 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
   // ダブルで複数対象に当たる技だけ範囲補正を適用する
   const normalBaseDamageBeforeWeather = applySpreadDamageModifier({
     damage: normalBaseDamageBeforeSpread,
-    battleType: state.battleType,
-    isMultiTarget: state.move.isMultiTarget,
+    battleType: input.battleType,
+    isMultiTarget: input.move.isMultiTarget,
   });
   // 基本ダメージへ晴れ・雨のタイプ別補正を適用する
   const normalBaseDamage = applyWeatherDamageModifier({
     damage: normalBaseDamageBeforeWeather,
-    weather: state.weather,
+    weather: input.weather,
     moveType: resolvedMove.type,
   });
 
@@ -156,13 +154,13 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
   // 急所時も範囲補正は急所補正より前に適用する
   const criticalBaseDamageBeforeWeather = applySpreadDamageModifier({
     damage: criticalBaseDamageBeforeSpread,
-    battleType: state.battleType,
-    isMultiTarget: state.move.isMultiTarget,
+    battleType: input.battleType,
+    isMultiTarget: input.move.isMultiTarget,
   });
   // 天候補正
   const criticalBaseDamageAfterWeather = applyWeatherDamageModifier({
     damage: criticalBaseDamageBeforeWeather,
-    weather: state.weather,
+    weather: input.weather,
     moveType: resolvedMove.type,
   });
 
@@ -188,8 +186,8 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       damageRolls: normalDamageRolls,
       hitCount,
     }),
-    move: state.move,
-    attackerAbilityEffects: state.attacker.ability?.effects ?? [],
+    move: input.move,
+    attackerAbilityEffects: input.attacker.ability?.effects ?? [],
   });
 
   const criticalDamageRolls = calculateRandomDamageValues({
@@ -201,47 +199,39 @@ export function calculateDamage(state: DamageCalculationState): DamageResult {
       damageRolls: criticalDamageRolls,
       hitCount,
     }),
-    move: state.move,
-    attackerAbilityEffects: state.attacker.ability?.effects ?? [],
+    move: input.move,
+    attackerAbilityEffects: input.attacker.ability?.effects ?? [],
   });
 
   const effectResolutionContext = {
-    game: state.game,
-    attacker: state.attacker,
-    defender: state.defender,
-    move: state.move,
-    weather: state.weather,
+    game: input.game,
+    attacker: input.attacker,
+    defender: input.defender,
+    move: input.move,
+    weather: input.weather,
   };
 
-  // 防御側の道具と特性から回復効果を解決する
-  const recoveryEffects = resolveActiveRecoveryEffects(effectResolutionContext);
-
-  // 防御側の道具、特性、状態異常、付加状態からHPダメージ効果を解決する
-  const damageEffects = resolveActiveDamageEffects(effectResolutionContext);
-
-  // 防御側の道具と特性からダメージ軽減効果を解決する
-  const damageReductionEffects = resolveActiveDamageReductionEffects(
-    effectResolutionContext,
-  );
-  const badPoisonCounter = state.defender.statusState?.badPoisonCounter ?? 1;
+  // 特性、道具、状態異常、付加状態、天候から計算に参加する効果を解決する
+  const activeEffects = resolveActiveEffects(effectResolutionContext);
+  const badPoisonCounter = input.defender.statusState?.badPoisonCounter ?? 1;
 
   return {
     attackerStats,
     defenderStats,
-    normal: createDamageSummary({
+    normal: createDamageOutcome({
       damageSequences: normalDamageSequences,
       defenderHp: defenderStats.hp,
-      damageReductionEffects,
-      recoveryEffects,
-      damageEffects,
+      damageReductionEffects: activeEffects.damageReduction,
+      recoveryEffects: activeEffects.recovery,
+      damageEffects: activeEffects.damage,
       badPoisonCounter,
     }),
-    critical: createDamageSummary({
+    critical: createDamageOutcome({
       damageSequences: criticalDamageSequences,
       defenderHp: defenderStats.hp,
-      damageReductionEffects,
-      recoveryEffects,
-      damageEffects,
+      damageReductionEffects: activeEffects.damageReduction,
+      recoveryEffects: activeEffects.recovery,
+      damageEffects: activeEffects.damage,
       badPoisonCounter,
     }),
   };
@@ -316,7 +306,7 @@ function applySpreadDamageModifier({
   damage: number;
 
   /** シングル・ダブルの対戦形式 */
-  battleType: DamageCalculationState["battleType"];
+  battleType: DamageCalculationInput["battleType"];
 
   /** 複数対象に当たる攻撃技か */
   isMultiTarget: boolean;

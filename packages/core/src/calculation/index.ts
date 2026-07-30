@@ -1,13 +1,14 @@
 export type {
   BattlePokemonState,
-  BattleType,
   ChampionsBattlePokemonState,
-  ChampionsDamageState,
-  DamageCalculationState,
+  BattleType,
+  ChampionsDamageInput,
+  DamageCalculationInput,
+  DamageOutcome,
   DamageResult,
-  DamageSummary,
+  DamageStepResult,
   ScarletVioletBattlePokemonState,
-  ScarletVioletDamageState,
+  ScarletVioletDamageInput,
 } from "./damage/index.js";
 export type { PokemonStatConfig, StatBoost, StatBoosts } from "./stat/index.js";
 

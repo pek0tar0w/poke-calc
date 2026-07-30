@@ -1,7 +1,7 @@
 import type { GameId } from "../../common/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
 import type { WeatherKey } from "../../model/weather/index.js";
-import type { BattlePokemonState } from "../damage/damage-calculation-state.js";
+import type { BattlePokemonState } from "../damage/damage-calculation-input.js";
 
 /** 計算状態から有効な効果を解決するための共通コンテキスト */
 export type EffectResolutionContext = {

@@ -2,14 +2,19 @@ export type {
   BattlePokemonState,
   ChampionsBattlePokemonState,
   BattleType,
-  ChampionsDamageState,
-  DamageCalculationState,
+  ChampionsDamageInput,
+  DamageCalculationInput,
   ScarletVioletBattlePokemonState,
-  ScarletVioletDamageState,
-} from "./damage-calculation-state.js";
-export type { DamageResult, DamageSummary } from "./damage-result.js";
+  ScarletVioletDamageInput,
+} from "./damage-calculation-input.js";
+export type {
+  DamageHpRange,
+  DamageOutcome,
+  DamageResult,
+  DamageStepKnockout,
+  DamageStepResult,
+  DamageStepSource,
+  DamageTurnResult,
+} from "./damage-result.js";
 
 export { calculateDamage } from "./calculate-damage.js";
-export { calculateBaseDamage } from "./calculate-base-damage.js";
-export { calculateRandomDamageValues } from "./calculate-random-damage-values.js";
-export { createDamageSummary } from "./create-damage-summary.js";
