@@ -26,9 +26,6 @@ importers:
       prettier:
         specifier: ^3.9.4
         version: 3.9.4
-      tsx:
-        specifier: ^4.22.4
-        version: 4.22.4
       typescript-eslint:
         specifier: ^8.62.1
         version: 8.62.1(eslint@10.6.0)(typescript@6.0.3)
@@ -1585,6 +1582,7 @@ snapshots:
       '@esbuild/win32-arm64': 0.28.1
       '@esbuild/win32-ia32': 0.28.1
       '@esbuild/win32-x64': 0.28.1
+    optional: true
 
   escape-string-regexp@4.0.0: {}
 
@@ -1971,6 +1969,7 @@ snapshots:
       esbuild: 0.28.1
     optionalDependencies:
       fsevents: 2.3.3
+    optional: true
 
   type-check@0.4.0:
     dependencies:
