@@ -1,6 +1,6 @@
 import {
   games,
-  resolveChampionsDamageState,
+  resolveChampionsDamageInput,
 } from "../packages/data/src/index.js";
 
 import { printDamageResult } from "./console-damage-report.js";
@@ -17,7 +17,7 @@ console.log({
   moves: garchompMoves.map((move) => move.names),
 });
 
-const state = resolveChampionsDamageState({
+const input = resolveChampionsDamageInput({
   battleType: "single",
   attacker: {
     pokemonKey: "garchomp",
@@ -66,4 +66,4 @@ const state = resolveChampionsDamageState({
   weather: "sandstorm",
 });
 
-printDamageResult("Champions（ばけのかわ有効・すなあらし・もうどく）", state);
+printDamageResult("Champions（ばけのかわ有効・すなあらし・もうどく）", input);

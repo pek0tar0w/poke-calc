@@ -1,6 +1,6 @@
 import type {
-  DamageCalculationState,
-  DamageSummary,
+  DamageCalculationInput,
+  DamageOutcome,
 } from "../packages/core/src/calculation/damage/index.js";
 import type { StatBoosts } from "../packages/core/src/calculation/stat/index.js";
 import type { NatureKey } from "../packages/core/src/model/nature/index.js";
@@ -12,37 +12,37 @@ import { natureNames } from "../packages/data/src/index.js";
 /** ダメージ計算結果をコンソールへ表示する */
 export function printDamageResult(
   game: string,
-  state: DamageCalculationState,
+  input: DamageCalculationInput,
 ): void {
-  const result = calculateDamage(state);
+  const result = calculateDamage(input);
 
   console.log(
-    `${game}: ${state.attacker.pokemon.names.ja}の${state.move.names.ja} → ${state.defender.pokemon.names.ja}`,
+    `${game}: ${input.attacker.pokemon.names.ja}の${input.move.names.ja} → ${input.defender.pokemon.names.ja}`,
   );
   console.table([
     formatPokemonStats({
       side: "攻",
-      name: state.attacker.pokemon.names.ja,
+      name: input.attacker.pokemon.names.ja,
       stats: result.attackerStats,
-      natureKey: state.attacker.natureKey,
-      boosts: state.attacker.boosts,
+      natureKey: input.attacker.natureKey,
+      boosts: input.attacker.boosts,
     }),
     formatPokemonStats({
       side: "防",
-      name: state.defender.pokemon.names.ja,
+      name: input.defender.pokemon.names.ja,
       stats: result.defenderStats,
-      natureKey: state.defender.natureKey,
-      boosts: state.defender.boosts,
+      natureKey: input.defender.natureKey,
+      boosts: input.defender.boosts,
     }),
   ]);
   console.table([
-    formatDamageSummary("通常", result.normal),
-    formatDamageSummary("急所", result.critical),
+    formatDamageOutcome("通常", result.normal),
+    formatDamageOutcome("急所", result.critical),
   ]);
   printDamageBreakdown({
     summary: result.normal,
     defenderHp: result.defenderStats.hp,
-    showMoveDamageSteps: hasAdditionalHitEffect(state),
+    showMoveDamageSteps: hasAdditionalHitEffect(input),
   });
 }
 
@@ -86,7 +86,7 @@ function formatStatBoosts(boosts: StatBoosts): string {
 }
 
 /** ダメージ計算結果をコンソール表示用に整形する */
-function formatDamageSummary(label: string, summary: DamageSummary) {
+function formatDamageOutcome(label: string, summary: DamageOutcome) {
   return {
     区分: label,
     ダメージ: `${summary.minimumDamage}〜${summary.maximumDamage}`,
@@ -103,7 +103,7 @@ function formatPercentage(ratio: number): string {
 }
 
 /** 攻撃回数と撃破確率を確定または乱数表記へ変換する */
-function formatKnockout(summary: DamageSummary): string {
+function formatKnockout(summary: DamageOutcome): string {
   if (summary.possibleHitCount === null) {
     return "倒せない";
   }
@@ -123,7 +123,7 @@ function printDamageBreakdown({
   defenderHp,
   showMoveDamageSteps,
 }: {
-  summary: DamageSummary;
+  summary: DamageOutcome;
   defenderHp: number;
   showMoveDamageSteps: boolean;
 }): void {
@@ -149,9 +149,9 @@ function printDamageBreakdown({
   console.table(visibleSteps);
 }
 
-function hasAdditionalHitEffect(state: DamageCalculationState): boolean {
+function hasAdditionalHitEffect(input: DamageCalculationInput): boolean {
   return (
-    state.attacker.ability?.effects.some(
+    input.attacker.ability?.effects.some(
       (effect) => "side" in effect && effect.effect === "additionalHit",
     ) ?? false
   );
@@ -161,7 +161,7 @@ function formatDamageStep({
   step,
   defenderHp,
 }: {
-  step: DamageSummary["turns"][number]["steps"][number];
+  step: DamageOutcome["turns"][number]["steps"][number];
   defenderHp: number;
 }) {
   return {
@@ -176,7 +176,7 @@ function formatDamageStep({
 }
 
 function formatStepAmount(
-  step: DamageSummary["turns"][number]["steps"][number],
+  step: DamageOutcome["turns"][number]["steps"][number],
   defenderHp: number,
 ): string {
   const label = step.kind === "recovery" ? "回復" : "ダメージ";
@@ -192,7 +192,7 @@ function formatStepAmount(
 }
 
 function formatStepTotalDamage(
-  step: DamageSummary["turns"][number]["steps"][number],
+  step: DamageOutcome["turns"][number]["steps"][number],
   defenderHp: number,
 ): string {
   const totalDamage = formatRange(
@@ -209,7 +209,7 @@ function formatStepTotalDamage(
 }
 
 function formatStepKnockout(
-  knockout: DamageSummary["turns"][number]["steps"][number]["knockout"],
+  knockout: DamageOutcome["turns"][number]["steps"][number]["knockout"],
 ): string {
   if (knockout.result === "survive") {
     return "耐え";
@@ -240,7 +240,7 @@ function formatRatioRange({
 }
 
 function formatBreakdownSource(
-  step: DamageSummary["turns"][number]["steps"][number],
+  step: DamageOutcome["turns"][number]["steps"][number],
 ): string {
   if (step.timing === "moveDamage" && step.moveHit !== undefined) {
     return `${step.moveHit.index}回目`;

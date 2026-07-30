@@ -39,7 +39,7 @@ type StepDistributionResult = {
 /**
  * 分布を攻撃1回分ずつ更新し、追加効果込みのHP推移を作る
  *
- * 攻撃ダメージ欄の撃破回数はcreateDamageSummary側で別計算する
+ * 攻撃ダメージ欄の撃破回数はcreateDamageOutcome側で別計算する
  * ここでは、すなあらしやもうどくなどの各行で倒れる確率を求める
  */
 export function calculateKnockoutResult({

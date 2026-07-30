@@ -5,3 +5,5 @@ export {
   areRuntimeEffectRequirementsMet,
   areStaticEffectRequirementsMet,
 } from "./effect-requirement.js";
+export type { ActiveEffects } from "./active-effects.js";
+export { resolveActiveEffects } from "./resolve-active-effects.js";

@@ -89,7 +89,7 @@ export type DamageTurnResult = {
 };
 
 /** 1種類のダメージ計算結果 */
-export type DamageSummary = {
+export type DamageOutcome = {
   /** 1回の行動で発生しうるダメージ候補 */
   damages: readonly number[];
 
@@ -118,7 +118,7 @@ export type DamageSummary = {
   turns: readonly DamageTurnResult[];
 };
 
-/** 通常時と急所時を含むダメージ計算結果 */
+/** 通常時と急所時を含む、UI表示に必要なダメージ計算結果 */
 export type DamageResult = {
   /** 攻撃側の性格補正適用後の実数値 */
   attackerStats: PokemonStats;
@@ -127,8 +127,8 @@ export type DamageResult = {
   defenderStats: PokemonStats;
 
   /** 通常時 */
-  normal: DamageSummary;
+  normal: DamageOutcome;
 
   /** 急所時 */
-  critical: DamageSummary;
+  critical: DamageOutcome;
 };

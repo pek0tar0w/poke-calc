@@ -1,10 +1,10 @@
 export { games } from "./games.js";
 export {
-  resolveChampionsDamageState,
-  resolveScarletVioletDamageState,
-  type ChampionsDamageStateInput,
-  type ScarletVioletDamageStateInput,
-} from "./damage-state.js";
+  resolveChampionsDamageInput,
+  resolveScarletVioletDamageInput,
+  type ChampionsDamageConfig,
+  type ScarletVioletDamageConfig,
+} from "./damage-input.js";
 export type { GameDataAccessor } from "./accessor.js";
 export {
   championsAbilities,
