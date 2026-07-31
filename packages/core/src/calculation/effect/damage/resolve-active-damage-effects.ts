@@ -42,7 +42,9 @@ type VolatileDamageEffectDefinition = {
 };
 
 /** 付加状態を計算用のHPダメージ効果へ変換する定義 */
-const VOLATILE_DAMAGE_EFFECT_DEFINITIONS = {
+const VOLATILE_DAMAGE_EFFECT_DEFINITIONS: Partial<
+  Record<VolatileStatus, VolatileDamageEffectDefinition>
+> = {
   bind: {
     activationTiming: "turnEnd",
     damageDivisor: 8,
@@ -69,7 +71,7 @@ const VOLATILE_DAMAGE_EFFECT_DEFINITIONS = {
       return 8;
     },
   },
-} satisfies Record<VolatileStatus, VolatileDamageEffectDefinition>;
+};
 
 /**
  * 道具、特性、状態から、現在の固定条件で有効なダメージ効果を取得する
@@ -147,17 +149,26 @@ function resolveVolatileDamageEffects(
 ): ActiveDamageEffect[] {
   const { volatiles } = context.defender;
 
-  return (volatiles ?? []).map((volatile) => ({
-    // しおづけなど、作品や防御側タイプで効果量が変わるものはここで解決する
-    effect: createVolatileDamageEffect({
-      definition: VOLATILE_DAMAGE_EFFECT_DEFINITIONS[volatile],
-      context,
-    }),
-    source: {
-      type: "volatile",
-      key: volatile,
-    },
-  }));
+  return (volatiles ?? []).flatMap((volatile) => {
+    const definition = VOLATILE_DAMAGE_EFFECT_DEFINITIONS[volatile];
+
+    // ねをはるなど、HPダメージを持たない付加状態は対象外にする
+    if (!definition) {
+      return [];
+    }
+
+    return {
+      // しおづけなど、作品や防御側タイプで効果量が変わるものはここで解決する
+      effect: createVolatileDamageEffect({
+        definition,
+        context,
+      }),
+      source: {
+        type: "volatile" as const,
+        key: volatile,
+      },
+    };
+  });
 }
 
 // 道具が持つHPダメージ効果を、現在の固定条件で有効なものだけ集める

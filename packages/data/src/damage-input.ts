@@ -10,6 +10,7 @@ import type {
   ScarletVioletDamageInput,
   StatBoosts,
   StatusConditionKey,
+  TerrainKey,
   VolatileStatus,
   WeatherKey,
 } from "@poke-calc/core";
@@ -61,6 +62,9 @@ type BattlePokemonStateInput<TPokemonKey, TAbilityKey, TItemKey> = {
 
   /** 通常の状態異常とは別枠で付与される状態 */
   volatiles?: readonly VolatileStatus[];
+
+  /** 通常の接地判定を上書きする特殊状態、通常は指定しない */
+  groundedOverride?: boolean;
 };
 
 type ChampionsBattlePokemonStateInput = BattlePokemonStateInput<
@@ -106,6 +110,9 @@ export type ChampionsDamageConfig = {
   /** 現在の天候 */
   weather: WeatherKey | null;
 
+  /** 現在のフィールド、展開されていなければ省略 */
+  terrain?: TerrainKey;
+
   /** 防御側の場に展開されている壁 */
   defenderScreens?: readonly ScreenKey[];
 };
@@ -128,6 +135,9 @@ export type ScarletVioletDamageConfig = {
 
   /** 現在の天候 */
   weather: WeatherKey | null;
+
+  /** 現在のフィールド、展開されていなければ省略 */
+  terrain?: TerrainKey;
 
   /** 防御側の場に展開されている壁 */
   defenderScreens?: readonly ScreenKey[];
@@ -153,6 +163,7 @@ export function resolveChampionsDamageInput(
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
     weather: input.weather,
+    ...(input.terrain === undefined ? {} : { terrain: input.terrain }),
     ...(input.defenderScreens === undefined
       ? {}
       : { defenderScreens: input.defenderScreens }),
@@ -173,6 +184,7 @@ export function resolveScarletVioletDamageInput(
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
     weather: input.weather,
+    ...(input.terrain === undefined ? {} : { terrain: input.terrain }),
     ...(input.defenderScreens === undefined
       ? {}
       : { defenderScreens: input.defenderScreens }),
@@ -224,6 +236,9 @@ function resolveChampionsOptionalBattlePokemonState(
       ? {}
       : { statusState: input.statusState }),
     ...(input.volatiles === undefined ? {} : { volatiles: input.volatiles }),
+    ...(input.groundedOverride === undefined
+      ? {}
+      : { groundedOverride: input.groundedOverride }),
   };
 }
 
@@ -242,6 +257,9 @@ function resolveScarletVioletOptionalBattlePokemonState(
       ? {}
       : { statusState: input.statusState }),
     ...(input.volatiles === undefined ? {} : { volatiles: input.volatiles }),
+    ...(input.groundedOverride === undefined
+      ? {}
+      : { groundedOverride: input.groundedOverride }),
   };
 }
 

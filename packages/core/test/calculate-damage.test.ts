@@ -451,6 +451,84 @@ describe("calculateDamage", () => {
     expect(recoverySteps?.[0]?.source.key).toBe("sitrus-berry");
   });
 
+  // 接地した防御側はグラスフィールドでターン終了時に回復する
+  test("recovers grounded defenders in Grassy Terrain", () => {
+    const result = calculateDamage(
+      createChampionsInput({
+        attacker: {
+          pokemon: garchomp,
+          statPoints: {
+            hp: 0,
+            attack: 32,
+            defense: 0,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        defender: {
+          pokemon: primarina,
+          statPoints: {
+            hp: 32,
+            attack: 0,
+            defense: 32,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        move: firePunch,
+        terrain: "grassy",
+      }),
+    );
+
+    const recoveryStep = result.normal.turns[0]?.steps.find(
+      (step) => step.source.type === "terrain",
+    );
+
+    expect(recoveryStep?.kind).toBe("recovery");
+    expect(recoveryStep?.source.key).toBe("grassy");
+  });
+
+  // ねをはる状態ではターン終了時に回復する
+  test("recovers defenders affected by Ingrain", () => {
+    const result = calculateDamage(
+      createChampionsInput({
+        attacker: {
+          pokemon: garchomp,
+          statPoints: {
+            hp: 0,
+            attack: 32,
+            defense: 0,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        defender: {
+          pokemon: corviknight,
+          volatiles: ["ingrain"],
+          statPoints: {
+            hp: 32,
+            attack: 0,
+            defense: 32,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        move: firePunch,
+      }),
+    );
+
+    const recoveryStep = result.normal.turns[0]?.steps.find(
+      (step) => step.source.type === "volatile",
+    );
+
+    expect(recoveryStep?.kind).toBe("recovery");
+    expect(recoveryStep?.source.key).toBe("ingrain");
+  });
+
   // 単発技におやこあいの追加攻撃を適用する
   test("adds Parental Bond second hit to single-hit moves", () => {
     const result = calculateDamage(
@@ -507,6 +585,7 @@ function createChampionsInput({
   move,
   battleType = "single",
   weather = null,
+  terrain,
   defenderScreens,
 }: {
   attacker: ChampionsPokemonInput;
@@ -514,6 +593,7 @@ function createChampionsInput({
   move: DamagingMove;
   battleType?: ChampionsDamageInput["battleType"];
   weather?: ChampionsDamageInput["weather"];
+  terrain?: ChampionsDamageInput["terrain"];
   defenderScreens?: ChampionsDamageInput["defenderScreens"];
 }): ChampionsDamageInput {
   return {
@@ -533,6 +613,7 @@ function createChampionsInput({
     },
     move,
     weather,
+    ...(terrain === undefined ? {} : { terrain }),
     ...(defenderScreens === undefined ? {} : { defenderScreens }),
   };
 }

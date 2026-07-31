@@ -16,6 +16,7 @@ export {
 export {
   natureNames,
   screenNames,
+  terrainNames,
   typeNames,
   weatherNames,
 } from "./common/index.js";

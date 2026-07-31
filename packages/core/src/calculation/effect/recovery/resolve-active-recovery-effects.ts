@@ -4,12 +4,13 @@ import type { ActiveRecoveryEffect } from "./active-recovery-effect.js";
 import { areStaticEffectRequirementsMet } from "../index.js";
 
 /**
- * 道具と特性から、現在の固定条件で有効な回復効果を取得する
+ * 道具、特性、フィールド、付加状態から、現在の固定条件で有効な回復効果を取得する
  *
  * 天候など計算中に変化しない条件はここで判定する
  */
 export function resolveActiveRecoveryEffects({
   defender,
+  terrain,
   weather,
 }: EffectResolutionContext): ActiveRecoveryEffect[] {
   const { item, ability } = defender;
@@ -63,6 +64,36 @@ export function resolveActiveRecoveryEffects({
         },
       });
     }
+  }
+
+  // ねをはる状態ではターン終了時に最大HPの1/16を回復する
+  if (defender.volatiles?.includes("ingrain")) {
+    effects.push({
+      effect: {
+        effect: "recovery",
+        activationTiming: "turnEnd",
+        recoveryDivisor: 16,
+      },
+      source: {
+        type: "volatile",
+        key: "ingrain",
+      },
+    });
+  }
+
+  // グラスフィールドでは接地している防御側がターン終了時に回復する
+  if (terrain?.key === "grassy" && terrain.defenderGrounded) {
+    effects.push({
+      effect: {
+        effect: "recovery",
+        activationTiming: "turnEnd",
+        recoveryDivisor: 16,
+      },
+      source: {
+        type: "terrain",
+        key: terrain.key,
+      },
+    });
   }
 
   return effects;

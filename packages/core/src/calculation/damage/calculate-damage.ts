@@ -13,6 +13,10 @@ import {
   calculatePokemonStats,
 } from "../stat/index.js";
 import { applyBurnDamageModifier } from "../status/index.js";
+import {
+  applyTerrainPowerModifier,
+  resolveTerrainState,
+} from "../terrain/index.js";
 import { roundHalfDown } from "../utils/round-half-down.js";
 import {
   applyWeatherDamageModifier,
@@ -65,6 +69,17 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const resolvedMove = resolveMove({
     move: input.move,
     weather: input.weather,
+  });
+  const terrainState = resolveTerrainState({
+    terrain: input.terrain,
+    attacker: input.attacker,
+    defender: input.defender,
+  });
+  const resolvedMovePower = applyTerrainPowerModifier({
+    power: resolvedMove.power,
+    moveKey: input.move.key,
+    moveType: resolvedMove.type,
+    ...(terrainState === undefined ? {} : { terrain: terrainState }),
   });
 
   // 技の分類に応じて攻撃と防御に使用する能力を決定する
@@ -130,7 +145,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
   const normalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
-    movePower: resolvedMove.power,
+    movePower: resolvedMovePower,
     attackingStat: normalAttackingStat,
     defendingStat: normalDefendingStat,
   });
@@ -149,7 +164,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
 
   const criticalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
-    movePower: resolvedMove.power,
+    movePower: resolvedMovePower,
     attackingStat: criticalAttackingStat,
     defendingStat: criticalDefendingStat,
   });
@@ -232,9 +247,10 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
     defender: input.defender,
     move: input.move,
     weather: input.weather,
+    ...(terrainState === undefined ? {} : { terrain: terrainState }),
   };
 
-  // 特性、道具、状態異常、付加状態、天候から計算に参加する効果を解決する
+  // 特性、道具、状態異常、付加状態、天候、フィールドから計算に参加する効果を解決する
   const activeEffects = resolveActiveEffects(effectResolutionContext);
   const badPoisonCounter = input.defender.statusState?.badPoisonCounter ?? 1;
 
