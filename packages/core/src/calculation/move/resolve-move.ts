@@ -32,10 +32,10 @@ export function resolveMove({
   move: DamagingMove;
 
   /** 現在の天候 */
-  weather: WeatherKey | null;
+  weather: WeatherKey | undefined;
 }): ResolvedMove {
   // 天候なしの場合は元のノーマルタイプ・威力を使用する
-  if (move.key === "weatherBall" && weather !== null) {
+  if (move.key === "weatherBall" && weather !== undefined) {
     return {
       power: move.power * 2,
       type: WEATHER_BALL_TYPES[weather],
@@ -45,7 +45,7 @@ export function resolveMove({
   // 晴れでは溜めターンのみ省略され、威力は変更されない
   const isSolarMove = move.key === "solarBeam" || move.key === "solarBlade";
   const isSolarMoveWeakened =
-    isSolarMove && weather !== null && weather !== "sun";
+    isSolarMove && weather !== undefined && weather !== "sun";
 
   if (isSolarMoveWeakened) {
     return {

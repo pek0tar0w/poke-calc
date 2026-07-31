@@ -77,8 +77,8 @@ type DamageInputBase<TPokemonState extends BattlePokemonState> = {
   /** 連続技のhit数を手動指定する場合の回数 */
   selectedHitCount?: number;
 
-  /** 現在の天候 */
-  weather: WeatherKey | null;
+  /** 現在の天候、天候がなければ省略 */
+  weather?: WeatherKey;
 
   /** 現在のフィールド、展開されていなければ省略 */
   terrain?: TerrainKey;

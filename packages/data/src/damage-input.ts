@@ -107,8 +107,8 @@ export type ChampionsDamageConfig = {
   /** 連続技のhit数を手動指定する場合の回数 */
   selectedHitCount?: number;
 
-  /** 現在の天候 */
-  weather: WeatherKey | null;
+  /** 現在の天候、天候がなければ省略 */
+  weather?: WeatherKey;
 
   /** 現在のフィールド、展開されていなければ省略 */
   terrain?: TerrainKey;
@@ -133,8 +133,8 @@ export type ScarletVioletDamageConfig = {
   /** 連続技のhit数を手動指定する場合の回数 */
   selectedHitCount?: number;
 
-  /** 現在の天候 */
-  weather: WeatherKey | null;
+  /** 現在の天候、天候がなければ省略 */
+  weather?: WeatherKey;
 
   /** 現在のフィールド、展開されていなければ省略 */
   terrain?: TerrainKey;
@@ -162,7 +162,7 @@ export function resolveChampionsDamageInput(
     ...(input.selectedHitCount === undefined
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
-    weather: input.weather,
+    ...(input.weather === undefined ? {} : { weather: input.weather }),
     ...(input.terrain === undefined ? {} : { terrain: input.terrain }),
     ...(input.defenderScreens === undefined
       ? {}
@@ -183,7 +183,7 @@ export function resolveScarletVioletDamageInput(
     ...(input.selectedHitCount === undefined
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
-    weather: input.weather,
+    ...(input.weather === undefined ? {} : { weather: input.weather }),
     ...(input.terrain === undefined ? {} : { terrain: input.terrain }),
     ...(input.defenderScreens === undefined
       ? {}

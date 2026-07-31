@@ -584,7 +584,7 @@ function createChampionsInput({
   defender,
   move,
   battleType = "single",
-  weather = null,
+  weather,
   terrain,
   defenderScreens,
 }: {
@@ -612,7 +612,7 @@ function createChampionsInput({
       ...defender,
     },
     move,
-    weather,
+    ...(weather === undefined ? {} : { weather }),
     ...(terrain === undefined ? {} : { terrain }),
     ...(defenderScreens === undefined ? {} : { defenderScreens }),
   };

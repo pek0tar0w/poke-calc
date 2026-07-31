@@ -27,7 +27,7 @@ export function applyWeatherDefenseModifier({
   defenderTypes: readonly TypeKey[];
 
   /** 現在の天候 */
-  weather: WeatherKey | null;
+  weather: WeatherKey | undefined;
 }): number {
   // 砂嵐はいわタイプへ特防補正を適用する
   const isRockSpecialDefenseBoost =

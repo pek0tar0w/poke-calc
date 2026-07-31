@@ -19,7 +19,7 @@ export type EffectResolutionContext = {
   move: DamagingMove;
 
   /** 現在の天候 */
-  weather: WeatherKey | null;
+  weather: WeatherKey | undefined;
 
   /** 現在のフィールドと接地状態 */
   terrain?: TerrainState;

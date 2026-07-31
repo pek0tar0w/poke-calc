@@ -9,7 +9,7 @@ export function areStaticEffectRequirementsMet({
   requirements?: readonly EffectRequirement[] | undefined;
 
   /** 現在の天候 */
-  weather: WeatherKey | null;
+  weather: WeatherKey | undefined;
 }): boolean {
   return (requirements ?? []).every((requirement) => {
     switch (requirement.requirement) {
