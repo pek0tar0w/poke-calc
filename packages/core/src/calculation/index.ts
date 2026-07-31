@@ -13,3 +13,4 @@ export type {
 export type { PokemonStatConfig, StatBoost, StatBoosts } from "./stat/index.js";
 
 export { calculateDamage } from "./damage/index.js";
+export type { TerrainState } from "./terrain/index.js";

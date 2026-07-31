@@ -18,4 +18,18 @@ export type ActiveRecoveryEffect =
 
       /** 効果の発生元 */
       source: Extract<ActiveEffectSource, { type: "ability" }>;
+    }
+  | {
+      /** フィールドが持つ回復効果 */
+      effect: RecoveryEffect;
+
+      /** 効果の発生元 */
+      source: Extract<ActiveEffectSource, { type: "terrain" }>;
+    }
+  | {
+      /** 付加状態が持つ回復効果 */
+      effect: RecoveryEffect;
+
+      /** 効果の発生元 */
+      source: Extract<ActiveEffectSource, { type: "volatile" }>;
     };

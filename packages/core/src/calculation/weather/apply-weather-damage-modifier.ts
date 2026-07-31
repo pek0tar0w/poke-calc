@@ -19,7 +19,7 @@ export function applyWeatherDamageModifier({
   damage: number;
 
   /** 現在の天候 */
-  weather: WeatherKey | null;
+  weather: WeatherKey | undefined;
 
   /** 使用する技のタイプ */
   moveType: TypeKey;

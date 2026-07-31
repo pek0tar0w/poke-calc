@@ -101,6 +101,13 @@ const firePunch = createMove({
   power: 75,
 });
 
+const flamethrower = createMove({
+  key: "flamethrower",
+  type: "fire",
+  power: 90,
+  damageClass: "special",
+});
+
 const bulletSeed = createMove({
   key: "bullet-seed",
   type: "grass",
@@ -213,6 +220,143 @@ describe("calculateDamage", () => {
     expect(result.normal.turns[0]?.steps[0]?.source.type).toBe("move");
   });
 
+  // やけど状態では物理技だけ通常時、急所時ともにダメージが半減する
+  test("halves physical damage from a burned attacker", () => {
+    const physicalInput = createChampionsInput({
+      attacker: {
+        pokemon: garchomp,
+        statPoints: {
+          hp: 0,
+          attack: 32,
+          defense: 0,
+          specialAttack: 32,
+          specialDefense: 0,
+          speed: 0,
+        },
+      },
+      defender: {
+        pokemon: corviknight,
+        statPoints: {
+          hp: 32,
+          attack: 0,
+          defense: 32,
+          specialAttack: 0,
+          specialDefense: 32,
+          speed: 0,
+        },
+      },
+      move: firePunch,
+    });
+    const physicalResult = calculateDamage(physicalInput);
+    const burnedPhysicalResult = calculateDamage({
+      ...physicalInput,
+      attacker: {
+        ...physicalInput.attacker,
+        status: "burn",
+      },
+    });
+
+    expect(burnedPhysicalResult.normal.minimumDamage).toBe(
+      Math.floor(physicalResult.normal.minimumDamage / 2),
+    );
+    expect(burnedPhysicalResult.normal.maximumDamage).toBe(
+      Math.floor(physicalResult.normal.maximumDamage / 2),
+    );
+    expect(burnedPhysicalResult.critical.minimumDamage).toBe(
+      Math.floor(physicalResult.critical.minimumDamage / 2),
+    );
+    expect(burnedPhysicalResult.critical.maximumDamage).toBe(
+      Math.floor(physicalResult.critical.maximumDamage / 2),
+    );
+
+    const specialInput = {
+      ...physicalInput,
+      move: flamethrower,
+    };
+    const specialResult = calculateDamage(specialInput);
+    const burnedSpecialResult = calculateDamage({
+      ...specialInput,
+      attacker: {
+        ...specialInput.attacker,
+        status: "burn",
+      },
+    });
+
+    expect(burnedSpecialResult.normal.minimumDamage).toBe(
+      specialResult.normal.minimumDamage,
+    );
+    expect(burnedSpecialResult.normal.maximumDamage).toBe(
+      specialResult.normal.maximumDamage,
+    );
+  });
+
+  // シングルでは対応する壁の補正を1回だけ適用し、急所では無視する
+  test("applies matching screens once in single battles", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutScreen = calculateDamage(input);
+    const resultWithReflect = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect"],
+    });
+    const resultWithReflectAndAuroraVeil = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect", "auroraVeil"],
+    });
+
+    expect(resultWithReflect.normal.minimumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.minimumDamage / 2),
+    );
+    expect(resultWithReflect.normal.maximumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.maximumDamage / 2),
+    );
+    expect(resultWithReflectAndAuroraVeil.normal).toEqual(
+      resultWithReflect.normal,
+    );
+    expect(resultWithReflect.critical).toEqual(resultWithoutScreen.critical);
+  });
+
+  // ひかりのかべは特殊技だけを軽減し、リフレクターは特殊技へ影響しない
+  test("applies screens only to their matching damage class", () => {
+    const input = createScreenTestInput({ move: flamethrower });
+    const resultWithoutScreen = calculateDamage(input);
+    const resultWithLightScreen = calculateDamage({
+      ...input,
+      defenderScreens: ["lightScreen"],
+    });
+    const resultWithReflect = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect"],
+    });
+
+    expect(resultWithLightScreen.normal.minimumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.minimumDamage / 2),
+    );
+    expect(resultWithLightScreen.normal.maximumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.maximumDamage / 2),
+    );
+    expect(resultWithReflect.normal).toEqual(resultWithoutScreen.normal);
+  });
+
+  // ダブルでは壁によるダメージ補正を2/3倍にする
+  test("uses the double battle screen multiplier", () => {
+    const input = createScreenTestInput({
+      move: firePunch,
+      battleType: "double",
+    });
+    const resultWithoutScreen = calculateDamage(input);
+    const resultWithReflect = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect"],
+    });
+
+    expect(resultWithReflect.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutScreen.normal.minimumDamage * (2 / 3)),
+    );
+    expect(resultWithReflect.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutScreen.normal.maximumDamage * (2 / 3)),
+    );
+  });
+
   // ターン終了時の回復と定数ダメージをHP推移へ反映する
   test("includes turn-end recovery and damage effects in turns", () => {
     const result = calculateDamage(
@@ -307,6 +451,84 @@ describe("calculateDamage", () => {
     expect(recoverySteps?.[0]?.source.key).toBe("sitrus-berry");
   });
 
+  // 接地した防御側はグラスフィールドでターン終了時に回復する
+  test("recovers grounded defenders in Grassy Terrain", () => {
+    const result = calculateDamage(
+      createChampionsInput({
+        attacker: {
+          pokemon: garchomp,
+          statPoints: {
+            hp: 0,
+            attack: 32,
+            defense: 0,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        defender: {
+          pokemon: primarina,
+          statPoints: {
+            hp: 32,
+            attack: 0,
+            defense: 32,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        move: firePunch,
+        terrain: "grassy",
+      }),
+    );
+
+    const recoveryStep = result.normal.turns[0]?.steps.find(
+      (step) => step.source.type === "terrain",
+    );
+
+    expect(recoveryStep?.kind).toBe("recovery");
+    expect(recoveryStep?.source.key).toBe("grassy");
+  });
+
+  // ねをはる状態ではターン終了時に回復する
+  test("recovers defenders affected by Ingrain", () => {
+    const result = calculateDamage(
+      createChampionsInput({
+        attacker: {
+          pokemon: garchomp,
+          statPoints: {
+            hp: 0,
+            attack: 32,
+            defense: 0,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        defender: {
+          pokemon: corviknight,
+          volatiles: ["ingrain"],
+          statPoints: {
+            hp: 32,
+            attack: 0,
+            defense: 32,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 0,
+          },
+        },
+        move: firePunch,
+      }),
+    );
+
+    const recoveryStep = result.normal.turns[0]?.steps.find(
+      (step) => step.source.type === "volatile",
+    );
+
+    expect(recoveryStep?.kind).toBe("recovery");
+    expect(recoveryStep?.source.key).toBe("ingrain");
+  });
+
   // 単発技におやこあいの追加攻撃を適用する
   test("adds Parental Bond second hit to single-hit moves", () => {
     const result = calculateDamage(
@@ -361,16 +583,22 @@ function createChampionsInput({
   attacker,
   defender,
   move,
-  weather = null,
+  battleType = "single",
+  weather,
+  terrain,
+  defenderScreens,
 }: {
   attacker: ChampionsPokemonInput;
   defender: ChampionsPokemonInput;
   move: DamagingMove;
+  battleType?: ChampionsDamageInput["battleType"];
   weather?: ChampionsDamageInput["weather"];
+  terrain?: ChampionsDamageInput["terrain"];
+  defenderScreens?: ChampionsDamageInput["defenderScreens"];
 }): ChampionsDamageInput {
   return {
     game: "champions",
-    battleType: "single",
+    battleType,
     attacker: {
       game: "champions",
       natureKey: "serious",
@@ -384,7 +612,9 @@ function createChampionsInput({
       ...defender,
     },
     move,
-    weather,
+    ...(weather === undefined ? {} : { weather }),
+    ...(terrain === undefined ? {} : { terrain }),
+    ...(defenderScreens === undefined ? {} : { defenderScreens }),
   };
 }
 
@@ -414,11 +644,13 @@ function createMove({
   type,
   power,
   hitCount = { kind: "single" },
+  damageClass = "physical",
 }: {
   key: string;
   type: TypeKey;
   power: number;
   hitCount?: DamagingMove["hitCount"];
+  damageClass?: DamagingMove["damageClass"];
 }): DamagingMove {
   return {
     id: 1,
@@ -440,7 +672,7 @@ function createMove({
     moveTags: [],
     hitCount,
     category: "damaging",
-    damageClass: "physical",
+    damageClass,
     power,
   };
 }
@@ -488,4 +720,45 @@ function createItem({
     effects,
     flingPower: null,
   };
+}
+
+/** 壁補正テスト用の共通入力を作る */
+function createScreenTestInput({
+  move,
+  battleType = "single",
+}: {
+  move: DamagingMove;
+  battleType?: ChampionsDamageInput["battleType"];
+}): ChampionsDamageInput {
+  return createChampionsInput({
+    attacker: {
+      pokemon: garchomp,
+      statPoints: {
+        hp: 0,
+        attack: 32,
+        defense: 0,
+        specialAttack: 32,
+        specialDefense: 0,
+        speed: 0,
+      },
+    },
+    defender: {
+      pokemon: corviknight,
+      statPoints: {
+        hp: 32,
+        attack: 0,
+        defense: 32,
+        specialAttack: 0,
+        specialDefense: 32,
+        speed: 0,
+      },
+    },
+    move,
+    battleType,
+  });
+}
+
+/** 五捨五超入をテスト側で再現する */
+function roundHalfDownForTest(value: number): number {
+  return Math.ceil(value - 0.5);
 }

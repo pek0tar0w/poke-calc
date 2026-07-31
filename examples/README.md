@@ -38,7 +38,6 @@ const input = resolveChampionsDamageInput({
     boosts: zeroBoosts,
   },
   moveKey: "fire-punch",
-  weather: null,
 });
 
 const result = calculateDamage(input);

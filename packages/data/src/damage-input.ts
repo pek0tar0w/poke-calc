@@ -5,10 +5,12 @@ import type {
   DamagingMove,
   NatureKey,
   PokemonStats,
+  ScreenKey,
   ScarletVioletBattlePokemonState,
   ScarletVioletDamageInput,
   StatBoosts,
   StatusConditionKey,
+  TerrainKey,
   VolatileStatus,
   WeatherKey,
 } from "@poke-calc/core";
@@ -60,6 +62,9 @@ type BattlePokemonStateInput<TPokemonKey, TAbilityKey, TItemKey> = {
 
   /** 通常の状態異常とは別枠で付与される状態 */
   volatiles?: readonly VolatileStatus[];
+
+  /** 通常の接地判定を上書きする特殊状態、通常は指定しない */
+  groundedOverride?: boolean;
 };
 
 type ChampionsBattlePokemonStateInput = BattlePokemonStateInput<
@@ -102,8 +107,14 @@ export type ChampionsDamageConfig = {
   /** 連続技のhit数を手動指定する場合の回数 */
   selectedHitCount?: number;
 
-  /** 現在の天候 */
-  weather: WeatherKey | null;
+  /** 現在の天候、天候がなければ省略 */
+  weather?: WeatherKey;
+
+  /** 現在のフィールド、展開されていなければ省略 */
+  terrain?: TerrainKey;
+
+  /** 防御側の場に展開されている壁 */
+  defenderScreens?: readonly ScreenKey[];
 };
 
 export type ScarletVioletDamageConfig = {
@@ -122,8 +133,14 @@ export type ScarletVioletDamageConfig = {
   /** 連続技のhit数を手動指定する場合の回数 */
   selectedHitCount?: number;
 
-  /** 現在の天候 */
-  weather: WeatherKey | null;
+  /** 現在の天候、天候がなければ省略 */
+  weather?: WeatherKey;
+
+  /** 現在のフィールド、展開されていなければ省略 */
+  terrain?: TerrainKey;
+
+  /** 防御側の場に展開されている壁 */
+  defenderScreens?: readonly ScreenKey[];
 
   /** 攻撃側がテラスタルしているか */
   attackerTerastallized: boolean;
@@ -145,7 +162,11 @@ export function resolveChampionsDamageInput(
     ...(input.selectedHitCount === undefined
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
-    weather: input.weather,
+    ...(input.weather === undefined ? {} : { weather: input.weather }),
+    ...(input.terrain === undefined ? {} : { terrain: input.terrain }),
+    ...(input.defenderScreens === undefined
+      ? {}
+      : { defenderScreens: input.defenderScreens }),
   };
 }
 
@@ -162,7 +183,11 @@ export function resolveScarletVioletDamageInput(
     ...(input.selectedHitCount === undefined
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
-    weather: input.weather,
+    ...(input.weather === undefined ? {} : { weather: input.weather }),
+    ...(input.terrain === undefined ? {} : { terrain: input.terrain }),
+    ...(input.defenderScreens === undefined
+      ? {}
+      : { defenderScreens: input.defenderScreens }),
     attackerTerastallized: input.attackerTerastallized,
     defenderTerastallized: input.defenderTerastallized,
   };
@@ -211,6 +236,9 @@ function resolveChampionsOptionalBattlePokemonState(
       ? {}
       : { statusState: input.statusState }),
     ...(input.volatiles === undefined ? {} : { volatiles: input.volatiles }),
+    ...(input.groundedOverride === undefined
+      ? {}
+      : { groundedOverride: input.groundedOverride }),
   };
 }
 
@@ -229,6 +257,9 @@ function resolveScarletVioletOptionalBattlePokemonState(
       ? {}
       : { statusState: input.statusState }),
     ...(input.volatiles === undefined ? {} : { volatiles: input.volatiles }),
+    ...(input.groundedOverride === undefined
+      ? {}
+      : { groundedOverride: input.groundedOverride }),
   };
 }
 

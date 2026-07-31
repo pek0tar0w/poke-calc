@@ -1,5 +1,6 @@
 import type {
   StatusConditionKey,
+  TerrainKey,
   VolatileStatus,
   WeatherKey,
 } from "../../model/index.js";
@@ -20,6 +21,11 @@ export type ActiveEffectSource =
       /** 天候由来の効果 */
       type: "weather";
       key: WeatherKey;
+    }
+  | {
+      /** フィールド由来の効果 */
+      type: "terrain";
+      key: TerrainKey;
     }
   | {
       /** 状態異常由来の効果 */

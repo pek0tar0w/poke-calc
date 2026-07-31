@@ -3,7 +3,9 @@ import type { Item } from "../../model/item/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
 import type { NatureKey } from "../../model/nature/index.js";
 import type { Pokemon } from "../../model/pokemon/index.js";
+import type { ScreenKey } from "../../model/screen/index.js";
 import type { StatusConditionKey } from "../../model/status-condition/index.js";
+import type { TerrainKey } from "../../model/terrain/index.js";
 import type { VolatileStatus } from "../../model/volatile-status/index.js";
 import type { WeatherKey } from "../../model/weather/index.js";
 import type { PokemonStatConfig, StatBoosts } from "../stat/index.js";
@@ -36,6 +38,9 @@ type BattlePokemonStateBase = {
 
   /** やどりぎ、のろいなど、通常の状態異常とは別枠で付与される状態 */
   volatiles?: readonly VolatileStatus[];
+
+  /** 通常の接地判定を上書きする特殊状態、通常は指定しない */
+  groundedOverride?: boolean;
 };
 
 /** 実データと育成値を解決済みの、計算用ポケモン状態 */
@@ -72,8 +77,14 @@ type DamageInputBase<TPokemonState extends BattlePokemonState> = {
   /** 連続技のhit数を手動指定する場合の回数 */
   selectedHitCount?: number;
 
-  /** 現在の天候 */
-  weather: WeatherKey | null;
+  /** 現在の天候、天候がなければ省略 */
+  weather?: WeatherKey;
+
+  /** 現在のフィールド、展開されていなければ省略 */
+  terrain?: TerrainKey;
+
+  /** 防御側の場に展開されている壁 */
+  defenderScreens?: readonly ScreenKey[];
 };
 
 /** Scarlet/Violetのダメージ計算入力 */
