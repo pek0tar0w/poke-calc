@@ -6,6 +6,7 @@ import type { DamageResult } from "./damage-result.js";
 
 import { resolveActiveEffects } from "../effect/index.js";
 import { resolveHitCount, resolveMove } from "../move/index.js";
+import { applyScreenDamageModifier } from "../screen/index.js";
 import {
   applyNatureModifiers,
   applyStatBoost,
@@ -181,13 +182,22 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const normalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: normalBaseDamage,
-  }).map((damage) =>
-    applyBurnDamageModifier({
-      damage,
-      damageClass: input.move.damageClass,
-      attackerStatus: input.attacker.status,
-    }),
-  );
+  })
+    .map((damage) =>
+      applyBurnDamageModifier({
+        damage,
+        damageClass: input.move.damageClass,
+        attackerStatus: input.attacker.status,
+      }),
+    )
+    .map((damage) =>
+      applyScreenDamageModifier({
+        damage,
+        damageClass: input.move.damageClass,
+        battleType: input.battleType,
+        defenderScreens: input.defenderScreens ?? [],
+      }),
+    );
   const normalDamageSequences = applyAdditionalHitEffects({
     damageSequences: createDamageSequences({
       damageRolls: normalDamageRolls,

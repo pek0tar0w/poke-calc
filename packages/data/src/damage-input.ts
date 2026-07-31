@@ -5,6 +5,7 @@ import type {
   DamagingMove,
   NatureKey,
   PokemonStats,
+  ScreenKey,
   ScarletVioletBattlePokemonState,
   ScarletVioletDamageInput,
   StatBoosts,
@@ -104,6 +105,9 @@ export type ChampionsDamageConfig = {
 
   /** 現在の天候 */
   weather: WeatherKey | null;
+
+  /** 防御側の場に展開されている壁 */
+  defenderScreens?: readonly ScreenKey[];
 };
 
 export type ScarletVioletDamageConfig = {
@@ -124,6 +128,9 @@ export type ScarletVioletDamageConfig = {
 
   /** 現在の天候 */
   weather: WeatherKey | null;
+
+  /** 防御側の場に展開されている壁 */
+  defenderScreens?: readonly ScreenKey[];
 
   /** 攻撃側がテラスタルしているか */
   attackerTerastallized: boolean;
@@ -146,6 +153,9 @@ export function resolveChampionsDamageInput(
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
     weather: input.weather,
+    ...(input.defenderScreens === undefined
+      ? {}
+      : { defenderScreens: input.defenderScreens }),
   };
 }
 
@@ -163,6 +173,9 @@ export function resolveScarletVioletDamageInput(
       ? {}
       : { selectedHitCount: input.selectedHitCount }),
     weather: input.weather,
+    ...(input.defenderScreens === undefined
+      ? {}
+      : { defenderScreens: input.defenderScreens }),
     attackerTerastallized: input.attackerTerastallized,
     defenderTerastallized: input.defenderTerastallized,
   };

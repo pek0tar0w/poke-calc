@@ -13,7 +13,12 @@ export {
   championsMoves,
   championsPokemon,
 } from "./champions/index.js";
-export { natureNames, typeNames, weatherNames } from "./common/index.js";
+export {
+  natureNames,
+  screenNames,
+  typeNames,
+  weatherNames,
+} from "./common/index.js";
 export {
   scarletVioletAbilities,
   scarletVioletGameData,

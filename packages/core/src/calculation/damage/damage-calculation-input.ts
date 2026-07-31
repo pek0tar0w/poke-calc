@@ -3,6 +3,7 @@ import type { Item } from "../../model/item/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
 import type { NatureKey } from "../../model/nature/index.js";
 import type { Pokemon } from "../../model/pokemon/index.js";
+import type { ScreenKey } from "../../model/screen/index.js";
 import type { StatusConditionKey } from "../../model/status-condition/index.js";
 import type { VolatileStatus } from "../../model/volatile-status/index.js";
 import type { WeatherKey } from "../../model/weather/index.js";
@@ -74,6 +75,9 @@ type DamageInputBase<TPokemonState extends BattlePokemonState> = {
 
   /** 現在の天候 */
   weather: WeatherKey | null;
+
+  /** 防御側の場に展開されている壁 */
+  defenderScreens?: readonly ScreenKey[];
 };
 
 /** Scarlet/Violetのダメージ計算入力 */

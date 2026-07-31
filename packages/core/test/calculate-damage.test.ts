@@ -290,6 +290,73 @@ describe("calculateDamage", () => {
     );
   });
 
+  // シングルでは対応する壁の補正を1回だけ適用し、急所では無視する
+  test("applies matching screens once in single battles", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutScreen = calculateDamage(input);
+    const resultWithReflect = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect"],
+    });
+    const resultWithReflectAndAuroraVeil = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect", "auroraVeil"],
+    });
+
+    expect(resultWithReflect.normal.minimumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.minimumDamage / 2),
+    );
+    expect(resultWithReflect.normal.maximumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.maximumDamage / 2),
+    );
+    expect(resultWithReflectAndAuroraVeil.normal).toEqual(
+      resultWithReflect.normal,
+    );
+    expect(resultWithReflect.critical).toEqual(resultWithoutScreen.critical);
+  });
+
+  // ひかりのかべは特殊技だけを軽減し、リフレクターは特殊技へ影響しない
+  test("applies screens only to their matching damage class", () => {
+    const input = createScreenTestInput({ move: flamethrower });
+    const resultWithoutScreen = calculateDamage(input);
+    const resultWithLightScreen = calculateDamage({
+      ...input,
+      defenderScreens: ["lightScreen"],
+    });
+    const resultWithReflect = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect"],
+    });
+
+    expect(resultWithLightScreen.normal.minimumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.minimumDamage / 2),
+    );
+    expect(resultWithLightScreen.normal.maximumDamage).toBe(
+      Math.floor(resultWithoutScreen.normal.maximumDamage / 2),
+    );
+    expect(resultWithReflect.normal).toEqual(resultWithoutScreen.normal);
+  });
+
+  // ダブルでは壁によるダメージ補正を2/3倍にする
+  test("uses the double battle screen multiplier", () => {
+    const input = createScreenTestInput({
+      move: firePunch,
+      battleType: "double",
+    });
+    const resultWithoutScreen = calculateDamage(input);
+    const resultWithReflect = calculateDamage({
+      ...input,
+      defenderScreens: ["reflect"],
+    });
+
+    expect(resultWithReflect.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutScreen.normal.minimumDamage * (2 / 3)),
+    );
+    expect(resultWithReflect.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutScreen.normal.maximumDamage * (2 / 3)),
+    );
+  });
+
   // ターン終了時の回復と定数ダメージをHP推移へ反映する
   test("includes turn-end recovery and damage effects in turns", () => {
     const result = calculateDamage(
@@ -438,16 +505,20 @@ function createChampionsInput({
   attacker,
   defender,
   move,
+  battleType = "single",
   weather = null,
+  defenderScreens,
 }: {
   attacker: ChampionsPokemonInput;
   defender: ChampionsPokemonInput;
   move: DamagingMove;
+  battleType?: ChampionsDamageInput["battleType"];
   weather?: ChampionsDamageInput["weather"];
+  defenderScreens?: ChampionsDamageInput["defenderScreens"];
 }): ChampionsDamageInput {
   return {
     game: "champions",
-    battleType: "single",
+    battleType,
     attacker: {
       game: "champions",
       natureKey: "serious",
@@ -462,6 +533,7 @@ function createChampionsInput({
     },
     move,
     weather,
+    ...(defenderScreens === undefined ? {} : { defenderScreens }),
   };
 }
 
@@ -567,4 +639,45 @@ function createItem({
     effects,
     flingPower: null,
   };
+}
+
+/** 壁補正テスト用の共通入力を作る */
+function createScreenTestInput({
+  move,
+  battleType = "single",
+}: {
+  move: DamagingMove;
+  battleType?: ChampionsDamageInput["battleType"];
+}): ChampionsDamageInput {
+  return createChampionsInput({
+    attacker: {
+      pokemon: garchomp,
+      statPoints: {
+        hp: 0,
+        attack: 32,
+        defense: 0,
+        specialAttack: 32,
+        specialDefense: 0,
+        speed: 0,
+      },
+    },
+    defender: {
+      pokemon: corviknight,
+      statPoints: {
+        hp: 32,
+        attack: 0,
+        defense: 32,
+        specialAttack: 0,
+        specialDefense: 32,
+        speed: 0,
+      },
+    },
+    move,
+    battleType,
+  });
+}
+
+/** 五捨五超入をテスト側で再現する */
+function roundHalfDownForTest(value: number): number {
+  return Math.ceil(value - 0.5);
 }
