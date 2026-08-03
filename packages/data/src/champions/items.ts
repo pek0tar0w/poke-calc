@@ -772,14 +772,7 @@ export const championsItems = {
       ja: "もたせると　すばやさが　さがる。 ひこうタイプや　ふゆう　ポケモンは じめんわざが　あたって　しまう。",
       en: "A Pokémon hold item that cuts Speed. It makes Flying-type and levitating holders susceptible to Ground moves.",
     },
-    effects: [
-      {
-        effect: "statMultiplier",
-        stat: "speed",
-        multiplier: 0.5,
-        consumable: false,
-      },
-    ],
+    effects: [],
     flingPower: 130,
   },
   "icy-rock": {
@@ -849,14 +842,7 @@ export const championsItems = {
       ja: "ちょっと　こだわった　スカーフ。 もたせると　すばやさは　あがるが おなじ　わざしか　だせなくなる。",
       en: "An item to be held by a Pokémon. This scarf boosts Speed, but allows the use of only one kind of move.",
     },
-    effects: [
-      {
-        effect: "statMultiplier",
-        stat: "speed",
-        multiplier: 1.5,
-        consumable: false,
-      },
-    ],
+    effects: [],
     flingPower: 10,
   },
   "shed-shell": {

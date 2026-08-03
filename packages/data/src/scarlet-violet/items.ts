@@ -423,14 +423,7 @@ export const scarletVioletItems = {
       ja: "ちょっと　こだわった　スカーフ。 もたせると　すばやさは　あがるが おなじ　わざしか　だせなくなる。",
       en: "An item to be held by a Pokémon. This scarf boosts Speed, but allows the use of only one kind of move.",
     },
-    effects: [
-      {
-        effect: "statMultiplier",
-        stat: "speed",
-        multiplier: 1.5,
-        consumable: false,
-      },
-    ],
+    effects: [],
     flingPower: 10,
   },
   "choice-band": {
