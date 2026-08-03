@@ -155,6 +155,17 @@ const sitrusBerry = createItem({
   ],
 });
 
+const lifeOrb = createItem({
+  key: "life-orb",
+  effects: [
+    {
+      effect: "damageMultiplier",
+      multiplier: 1.3,
+      consumable: false,
+    },
+  ],
+});
+
 const parentalBond = createAbility({
   key: "parental-bond",
   effects: [
@@ -181,6 +192,29 @@ const skillLink = createAbility({
 // UIはnormal/critical、KO結果、turnsのHP推移に依存する
 
 describe("calculateDamage", () => {
+  // 道具の与ダメージ倍率が計算結果まで接続されていることを確認する
+  test("applies attacker item damage multipliers", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithLifeOrb = calculateDamage({
+      ...input,
+      attacker: {
+        ...input.attacker,
+        item: lifeOrb,
+      },
+    });
+
+    expect(resultWithLifeOrb.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.minimumDamage * 1.3),
+    );
+    expect(resultWithLifeOrb.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.maximumDamage * 1.3),
+    );
+    expect(resultWithLifeOrb.critical.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.critical.minimumDamage * 1.3),
+    );
+  });
+
   // 通常時と急所時のダメージ結果を取得できる
   test("returns stable normal and critical outcomes", () => {
     const result = calculateDamage(

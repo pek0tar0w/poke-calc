@@ -4,7 +4,10 @@ import type { DamagingMove } from "../../model/move/index.js";
 import type { DamageCalculationInput } from "./damage-calculation-input.js";
 import type { DamageResult } from "./damage-result.js";
 
-import { resolveActiveEffects } from "../effect/index.js";
+import {
+  applyItemDamageMultiplier,
+  resolveActiveEffects,
+} from "../effect/index.js";
 import { resolveHitCount, resolveMove } from "../move/index.js";
 import { applyScreenDamageModifier } from "../screen/index.js";
 import {
@@ -212,6 +215,15 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
         battleType: input.battleType,
         defenderScreens: input.defenderScreens ?? [],
       }),
+    )
+    .map((damage) =>
+      applyItemDamageMultiplier({
+        damage,
+        effects: input.attacker.item?.effects ?? [],
+        move: input.move,
+        moveType: resolvedMove.type,
+        defenderTypes: defenderPokemonData.types,
+      }),
     );
   const normalDamageSequences = applyAdditionalHitEffects({
     damageSequences: createDamageSequences({
@@ -225,13 +237,23 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const criticalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: criticalBaseDamage,
-  }).map((damage) =>
-    applyBurnDamageModifier({
-      damage,
-      damageClass: input.move.damageClass,
-      attackerStatus: input.attacker.status,
-    }),
-  );
+  })
+    .map((damage) =>
+      applyBurnDamageModifier({
+        damage,
+        damageClass: input.move.damageClass,
+        attackerStatus: input.attacker.status,
+      }),
+    )
+    .map((damage) =>
+      applyItemDamageMultiplier({
+        damage,
+        effects: input.attacker.item?.effects ?? [],
+        move: input.move,
+        moveType: resolvedMove.type,
+        defenderTypes: defenderPokemonData.types,
+      }),
+    );
   const criticalDamageSequences = applyAdditionalHitEffects({
     damageSequences: createDamageSequences({
       damageRolls: criticalDamageRolls,

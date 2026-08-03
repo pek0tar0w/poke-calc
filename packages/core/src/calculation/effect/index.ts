@@ -1,5 +1,6 @@
 export type { EffectResolutionContext } from "./effect-resolution-context.js";
 export type { ActiveEffectSource } from "./active-effect-source.js";
+export { applyItemDamageMultiplier } from "./apply-item-damage-multiplier.js";
 export { createActiveEffectKey } from "./active-effect-key.js";
 export {
   areRuntimeEffectRequirementsMet,
