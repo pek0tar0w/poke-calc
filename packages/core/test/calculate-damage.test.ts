@@ -166,6 +166,43 @@ const lifeOrb = createItem({
   ],
 });
 
+const occaBerry = createItem({
+  key: "occa-berry",
+  effects: [
+    {
+      effect: "damageReduction",
+      multiplier: 0.5,
+      consumable: true,
+      requirements: [
+        {
+          requirement: "moveType",
+          moveType: "fire",
+        },
+        {
+          requirement: "superEffective",
+        },
+      ],
+    },
+  ],
+});
+
+const chilanBerry = createItem({
+  key: "chilan-berry",
+  effects: [
+    {
+      effect: "damageReduction",
+      multiplier: 0.5,
+      consumable: true,
+      requirements: [
+        {
+          requirement: "moveType",
+          moveType: "normal",
+        },
+      ],
+    },
+  ],
+});
+
 const parentalBond = createAbility({
   key: "parental-bond",
   effects: [
@@ -212,6 +249,81 @@ describe("calculateDamage", () => {
     );
     expect(resultWithLifeOrb.critical.minimumDamage).toBe(
       roundHalfDownForTest(resultWithoutItem.critical.minimumDamage * 1.3),
+    );
+  });
+
+  // 半減実は一致する効果ばつぐんの技を1度だけ半減する
+  test("consumes a type-resist Berry after reducing one super-effective hit", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithOccaBerry = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: occaBerry,
+      },
+    });
+
+    expect(resultWithOccaBerry.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.minimumDamage * 0.5),
+    );
+    expect(resultWithOccaBerry.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.maximumDamage * 0.5),
+    );
+
+    const firstMoveStep = resultWithOccaBerry.normal.turns[0]?.steps.find(
+      (step) => step.source.type === "move",
+    );
+    const secondMoveStep = resultWithOccaBerry.normal.turns[1]?.steps.find(
+      (step) => step.source.type === "move",
+    );
+
+    expect(secondMoveStep?.amount.minimum).toBeGreaterThan(
+      firstMoveStep?.amount.minimum ?? 0,
+    );
+  });
+
+  // タイプが一致しても効果ばつぐんでなければ半減実は発動しない
+  test("does not consume a type-resist Berry against neutral damage", () => {
+    const baseInput = createScreenTestInput({ move: firePunch });
+    const input = {
+      ...baseInput,
+      defender: {
+        ...baseInput.defender,
+        pokemon: primarina,
+      },
+    };
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithOccaBerry = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: occaBerry,
+      },
+    });
+
+    expect(resultWithOccaBerry.normal.damages).toEqual(
+      resultWithoutItem.normal.damages,
+    );
+  });
+
+  // ホズのみは効果ばつぐんでなくてもノーマル技を半減する
+  test("reduces Normal-type damage with Chilan Berry", () => {
+    const input = createScreenTestInput({ move: dizzyPunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithChilanBerry = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: chilanBerry,
+      },
+    });
+
+    expect(resultWithChilanBerry.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.minimumDamage * 0.5),
+    );
+    expect(resultWithChilanBerry.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.maximumDamage * 0.5),
     );
   });
 

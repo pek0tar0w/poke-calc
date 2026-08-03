@@ -73,11 +73,21 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
     move: input.move,
     weather: input.weather,
   });
+
+  // タイプと威力の変更を元の技データへ反映する
+  const resolvedDamagingMove: DamagingMove = {
+    ...input.move,
+    ...resolvedMove,
+  };
+
+  // 攻撃側と防御側のタイプや付加状態から接地状態を解決する
   const terrainState = resolveTerrainState({
     terrain: input.terrain,
     attacker: input.attacker,
     defender: input.defender,
   });
+
+  // フィールドと接地状態に応じた技の威力補正を適用する
   const resolvedMovePower = applyTerrainPowerModifier({
     power: resolvedMove.power,
     moveKey: input.move.key,
@@ -220,9 +230,9 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
       applyItemDamageMultiplier({
         damage,
         effects: input.attacker.item?.effects ?? [],
-        move: input.move,
-        moveType: resolvedMove.type,
+        move: resolvedDamagingMove,
         defenderTypes: defenderPokemonData.types,
+        weather: input.weather,
       }),
     );
   const normalDamageSequences = applyAdditionalHitEffects({
@@ -249,9 +259,9 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
       applyItemDamageMultiplier({
         damage,
         effects: input.attacker.item?.effects ?? [],
-        move: input.move,
-        moveType: resolvedMove.type,
+        move: resolvedDamagingMove,
         defenderTypes: defenderPokemonData.types,
+        weather: input.weather,
       }),
     );
   const criticalDamageSequences = applyAdditionalHitEffects({
@@ -267,7 +277,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
     game: input.game,
     attacker: input.attacker,
     defender: input.defender,
-    move: input.move,
+    move: resolvedDamagingMove,
     weather: input.weather,
     ...(terrainState === undefined ? {} : { terrain: terrainState }),
   };

@@ -1,3 +1,4 @@
+import type { DamageClass } from "../../common/index.js";
 import type { MoveTag } from "../move/index.js";
 import type { TypeKey } from "../type/index.js";
 import type { WeatherKey } from "../weather/index.js";
@@ -13,6 +14,15 @@ export type EffectRequirement =
       /** 指定した分類タグを持つ技で発動する */
       requirement: "moveTag";
       tag: MoveTag;
+    }
+  | {
+      /** 指定したダメージ分類の技で発動する */
+      requirement: "damageClass";
+      damageClass: DamageClass;
+    }
+  | {
+      /** 技のタイプ相性が効果ばつぐんのときに発動する */
+      requirement: "superEffective";
     }
   | {
       /** 残りHPが指定割合以下のときに発動する */

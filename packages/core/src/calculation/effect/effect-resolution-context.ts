@@ -15,7 +15,7 @@ export type EffectResolutionContext = {
   /** 防御側 */
   defender: BattlePokemonState;
 
-  /** 使用する技 */
+  /** 威力とタイプの変更を反映した使用技 */
   move: DamagingMove;
 
   /** 現在の天候 */

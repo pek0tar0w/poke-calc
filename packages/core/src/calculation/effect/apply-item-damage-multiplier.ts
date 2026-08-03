@@ -1,8 +1,9 @@
 import type { ItemEffect } from "../../model/item/index.js";
 import type { DamagingMove } from "../../model/move/index.js";
 import type { TypeKey } from "../../model/type/index.js";
+import type { WeatherKey } from "../../model/weather/index.js";
 
-import { calcTypeEffectiveness } from "../type/calculate-type-effectiveness.js";
+import { areStaticEffectRequirementsMet } from "./effect-requirement.js";
 import { roundHalfDown } from "../utils/round-half-down.js";
 
 /**
@@ -15,8 +16,8 @@ export function applyItemDamageMultiplier({
   damage,
   effects,
   move,
-  moveType,
   defenderTypes,
+  weather,
 }: {
   /** 補正前のダメージ */
   damage: number;
@@ -27,20 +28,20 @@ export function applyItemDamageMultiplier({
   /** 使用する技 */
   move: DamagingMove;
 
-  /** タイプ変更を反映した技タイプ */
-  moveType: TypeKey;
-
   /** 防御側のタイプ */
   defenderTypes: readonly TypeKey[];
+
+  /** 現在の天候 */
+  weather: WeatherKey | undefined;
 }): number {
   return effects.reduce((adjustedDamage, effect) => {
     if (
       effect.effect !== "damageMultiplier" ||
-      !areDamageMultiplierRequirementsMet({
+      !areStaticEffectRequirementsMet({
         requirements: effect.requirements,
         move,
-        moveType,
         defenderTypes,
+        weather,
       })
     ) {
       return adjustedDamage;
@@ -48,50 +49,4 @@ export function applyItemDamageMultiplier({
 
     return roundHalfDown(adjustedDamage * effect.multiplier);
   }, damage);
-}
-
-/** 与ダメージ倍率の発動条件を満たしているか判定する */
-function areDamageMultiplierRequirementsMet({
-  requirements,
-  move,
-  moveType,
-  defenderTypes,
-}: {
-  /** 発動条件 */
-  requirements:
-    | Extract<ItemEffect, { effect: "damageMultiplier" }>["requirements"]
-    | undefined;
-
-  /** 使用する技 */
-  move: DamagingMove;
-
-  /** タイプ変更を反映した技タイプ */
-  moveType: TypeKey;
-
-  /** 防御側のタイプ */
-  defenderTypes: readonly TypeKey[];
-}): boolean {
-  return (requirements ?? []).every((requirement) => {
-    switch (requirement.requirement) {
-      case "moveType":
-        return moveType === requirement.moveType;
-
-      case "damageClass":
-        return move.damageClass === requirement.damageClass;
-
-      case "superEffective":
-        return calcTypeEffectiveness(moveType, defenderTypes) > 1;
-
-      case "movePowerAtOrBelow":
-        return move.power <= requirement.power;
-
-      case "moveTag":
-        return move.moveTags.includes(requirement.tag);
-
-      case "hpRatioAtFull":
-      case "hpRatioAtOrBelow":
-      case "weather":
-        return true;
-    }
-  });
 }

@@ -89,9 +89,12 @@ function applyMultiplier({
   return applyItemDamageMultiplier({
     damage: 100,
     effects,
-    move,
-    moveType,
+    move: {
+      ...move,
+      type: moveType,
+    },
     defenderTypes,
+    weather: undefined,
   });
 }
 

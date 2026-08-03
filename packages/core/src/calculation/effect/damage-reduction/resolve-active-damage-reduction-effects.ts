@@ -4,10 +4,10 @@ import type { ActiveDamageReductionEffect } from "./active-damage-reduction-effe
 import { areStaticEffectRequirementsMet } from "../index.js";
 
 /** 防御側の道具と特性から、現在の静的条件で候補になるダメージ軽減効果を集める */
-export function resolveActiveDamageReductionEffects({
-  defender,
-  weather,
-}: EffectResolutionContext): ActiveDamageReductionEffect[] {
+export function resolveActiveDamageReductionEffects(
+  context: EffectResolutionContext,
+): ActiveDamageReductionEffect[] {
+  const { defender } = context;
   const { item, ability } = defender;
   const effects: ActiveDamageReductionEffect[] = [];
 
@@ -20,7 +20,9 @@ export function resolveActiveDamageReductionEffects({
       if (
         !areStaticEffectRequirementsMet({
           requirements: effect.requirements,
-          weather,
+          move: context.move,
+          defenderTypes: context.defender.pokemon.types,
+          weather: context.weather,
         })
       ) {
         continue;
@@ -45,7 +47,9 @@ export function resolveActiveDamageReductionEffects({
       if (
         !areStaticEffectRequirementsMet({
           requirements: effect.requirements,
-          weather,
+          move: context.move,
+          defenderTypes: context.defender.pokemon.types,
+          weather: context.weather,
         })
       ) {
         continue;
