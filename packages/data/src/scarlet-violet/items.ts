@@ -1,6 +1,9 @@
 import type { Item } from "@poke-calc/core";
 
+import { typeResistBerries } from "../common/type-resist-berries.js";
+
 export const scarletVioletItems = {
+  ...typeResistBerries,
   "covert-cloak": {
     id: 1701,
     key: "covert-cloak",
