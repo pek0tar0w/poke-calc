@@ -19,6 +19,7 @@ export function calculateRandomDamageValues({
   moveType,
   attackerTypes,
   defenderTypes,
+  sameTypeAttackBonus,
 }: {
   /** 基本ダメージ */
   baseDamage: number;
@@ -31,6 +32,9 @@ export function calculateRandomDamageValues({
 
   /** 防御側のタイプ */
   defenderTypes: readonly TypeKey[];
+
+  /** タイプ一致時に適用する補正倍率 */
+  sameTypeAttackBonus: number;
 }): number[] {
   return DAMAGE_RANDOM_PERCENTAGES.map((randomPercentage) =>
     calculateDamageAtRandomPercentage({
@@ -38,6 +42,7 @@ export function calculateRandomDamageValues({
       moveType,
       attackerTypes,
       defenderTypes,
+      sameTypeAttackBonus,
       randomPercentage,
     }),
   );
@@ -52,6 +57,7 @@ function calculateDamageAtRandomPercentage({
   moveType,
   attackerTypes,
   defenderTypes,
+  sameTypeAttackBonus,
 }: {
   /** 基本ダメージ */
   baseDamage: number;
@@ -65,6 +71,9 @@ function calculateDamageAtRandomPercentage({
   /** 防御側のタイプ */
   defenderTypes: readonly TypeKey[];
 
+  /** タイプ一致時に適用する補正倍率 */
+  sameTypeAttackBonus: number;
+
   /** 乱数補正の百分率 */
   randomPercentage: number;
 }): number {
@@ -74,9 +83,11 @@ function calculateDamageAtRandomPercentage({
   );
 
   // 攻撃側に技と同じタイプが含まれる場合はタイプ一致補正を適用する
-  const sameTypeAttackBonus = attackerTypes.includes(moveType) ? 1.5 : 1;
+  const appliedSameTypeAttackBonus = attackerTypes.includes(moveType)
+    ? sameTypeAttackBonus
+    : 1;
   const sameTypeAdjustedDamage = roundHalfDown(
-    randomAdjustedDamage * sameTypeAttackBonus,
+    randomAdjustedDamage * appliedSameTypeAttackBonus,
   );
 
   // 防御側のタイプに応じた相性補正を適用する

@@ -1,5 +1,13 @@
 import type { Ability } from "@poke-calc/core";
 
+import {
+  adaptabilityEffects,
+  analyticEffects,
+  strongJawEffects,
+  technicianEffects,
+  toughClawsEffects,
+} from "../common/ability-effects.js";
+
 export const championsAbilities = {
   adaptability: {
     id: 91,
@@ -12,7 +20,7 @@ export const championsAbilities = {
       ja: "タイプが　おなじ　わざの いりょくが　あがる。",
       en: "Powers up moves of the same type.",
     },
-    effects: [],
+    effects: adaptabilityEffects,
   },
   aerilate: {
     id: 184,
@@ -51,7 +59,7 @@ export const championsAbilities = {
       ja: "いちばん　さいごに わざをだすと　つよくなる。",
       en: "Boosts move power when the Pokémon moves last.",
     },
-    effects: [],
+    effects: analyticEffects,
   },
   "anger-point": {
     id: 83,
@@ -2207,7 +2215,7 @@ export const championsAbilities = {
       ja: "あごが　がんじょうで かむ　ちからが　つよい。",
       en: "The Pokémon’s strong jaw gives it tremendous biting power.",
     },
-    effects: [],
+    effects: strongJawEffects,
   },
   sturdy: {
     id: 5,
@@ -2374,7 +2382,7 @@ export const championsAbilities = {
       ja: "よわい　わざの いりょくが　あがる。",
       en: "Powers up the Pokémon’s weaker moves.",
     },
-    effects: [],
+    effects: technicianEffects,
   },
   telepathy: {
     id: 140,
@@ -2426,7 +2434,7 @@ export const championsAbilities = {
       ja: "せっしょくする　わざの いりょくが　あがる。",
       en: "Powers up moves that make direct contact.",
     },
-    effects: [],
+    effects: toughClawsEffects,
   },
   "toxic-debris": {
     id: 295,

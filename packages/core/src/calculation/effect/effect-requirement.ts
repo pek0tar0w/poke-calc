@@ -37,6 +37,9 @@ export function areStaticEffectRequirementsMet({
       case "moveTag":
         return move.moveTags.includes(requirement.tag);
 
+      case "makesContact":
+        return move.makesContact;
+
       case "movePowerAtOrBelow":
         return move.power <= requirement.power;
 
@@ -78,6 +81,7 @@ export function areRuntimeEffectRequirementsMet({
 
       case "movePowerAtOrBelow":
       case "moveTag":
+      case "makesContact":
       case "moveType":
       case "damageClass":
       case "superEffective":

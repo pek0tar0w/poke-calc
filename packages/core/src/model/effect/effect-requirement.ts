@@ -16,6 +16,10 @@ export type EffectRequirement =
       tag: MoveTag;
     }
   | {
+      /** 接触技で発動する */
+      requirement: "makesContact";
+    }
+  | {
       /** 指定したダメージ分類の技で発動する */
       requirement: "damageClass";
       damageClass: DamageClass;
