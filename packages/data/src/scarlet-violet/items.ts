@@ -1,9 +1,274 @@
 import type { Item } from "@poke-calc/core";
 
-import { typeResistBerries } from "../common/type-resist-berries.js";
+import {
+  assaultVestEffects,
+  chilanBerryEffects,
+  choiceBandEffects,
+  choiceSpecsEffects,
+  createSuperEffectiveTypeResistBerryEffects,
+  createTypeBoostEffects,
+  evioliteEffects,
+  expertBeltEffects,
+  focusSashEffects,
+  leftoversEffects,
+  lifeOrbEffects,
+  muscleBandEffects,
+  wiseGlassesEffects,
+} from "../common/item-effects/index.js";
 
 export const scarletVioletItems = {
-  ...typeResistBerries,
+  "occa-berry": {
+    id: 161,
+    key: "occa-berry",
+    names: {
+      ja: "オッカのみ",
+      en: "Occa Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　ほのお　わざを うけたとき　いりょくが　よわまる。",
+      en: "Weakens a supereffective Fire-type attack against the holding Pokémon.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("fire"),
+    flingPower: 10,
+  },
+  "passho-berry": {
+    id: 162,
+    key: "passho-berry",
+    names: {
+      ja: "イトケのみ",
+      en: "Passho Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　みず　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Water-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("water"),
+    flingPower: 10,
+  },
+  "wacan-berry": {
+    id: 163,
+    key: "wacan-berry",
+    names: {
+      ja: "ソクノのみ",
+      en: "Wacan Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　でんき　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Electric-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("electric"),
+    flingPower: 10,
+  },
+  "rindo-berry": {
+    id: 164,
+    key: "rindo-berry",
+    names: {
+      ja: "リンドのみ",
+      en: "Rindo Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　くさ　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Grass-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("grass"),
+    flingPower: 10,
+  },
+  "yache-berry": {
+    id: 165,
+    key: "yache-berry",
+    names: {
+      ja: "ヤチェのみ",
+      en: "Yache Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　こおり　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Ice-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("ice"),
+    flingPower: 10,
+  },
+  "chople-berry": {
+    id: 166,
+    key: "chople-berry",
+    names: {
+      ja: "ヨプのみ",
+      en: "Chople Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　かくとう　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Fighting-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("fighting"),
+    flingPower: 10,
+  },
+  "kebia-berry": {
+    id: 167,
+    key: "kebia-berry",
+    names: {
+      ja: "ビアーのみ",
+      en: "Kebia Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　どく　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Poison-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("poison"),
+    flingPower: 10,
+  },
+  "shuca-berry": {
+    id: 168,
+    key: "shuca-berry",
+    names: {
+      ja: "シュカのみ",
+      en: "Shuca Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　じめん　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Ground-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("ground"),
+    flingPower: 10,
+  },
+  "coba-berry": {
+    id: 169,
+    key: "coba-berry",
+    names: {
+      ja: "バコウのみ",
+      en: "Coba Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　ひこう　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Flying-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("flying"),
+    flingPower: 10,
+  },
+  "payapa-berry": {
+    id: 170,
+    key: "payapa-berry",
+    names: {
+      ja: "ウタンのみ",
+      en: "Payapa Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　エスパー　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Psychic-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("psychic"),
+    flingPower: 10,
+  },
+  "tanga-berry": {
+    id: 171,
+    key: "tanga-berry",
+    names: {
+      ja: "タンガのみ",
+      en: "Tanga Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　むし　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Bug-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("bug"),
+    flingPower: 10,
+  },
+  "charti-berry": {
+    id: 172,
+    key: "charti-berry",
+    names: {
+      ja: "ヨロギのみ",
+      en: "Charti Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　いわ　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Rock-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("rock"),
+    flingPower: 10,
+  },
+  "kasib-berry": {
+    id: 173,
+    key: "kasib-berry",
+    names: {
+      ja: "カシブのみ",
+      en: "Kasib Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　ゴースト　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Ghost-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("ghost"),
+    flingPower: 10,
+  },
+  "haban-berry": {
+    id: 174,
+    key: "haban-berry",
+    names: {
+      ja: "ハバンのみ",
+      en: "Haban Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　ドラゴン　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Dragon-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("dragon"),
+    flingPower: 10,
+  },
+  "colbur-berry": {
+    id: 175,
+    key: "colbur-berry",
+    names: {
+      ja: "ナモのみ",
+      en: "Colbur Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　あく　わざを うけたとき　いりょくが　よわまる。",
+      en: "Weakens a supereffective Dark-type attack against the holding Pokémon.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("dark"),
+    flingPower: 10,
+  },
+  "babiri-berry": {
+    id: 176,
+    key: "babiri-berry",
+    names: {
+      ja: "リリバのみ",
+      en: "Babiri Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　はがね　わざを うけたとき　いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Steel-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("steel"),
+    flingPower: 10,
+  },
+  "roseli-berry": {
+    id: 723,
+    key: "roseli-berry",
+    names: {
+      ja: "ロゼルのみ",
+      en: "Roseli Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると こうかばつぐんの　フェアリー　わざを うけたとき　いりょくが　よわまる。",
+      en: "If held by a Pokémon, this Berry will lessen the damage taken from one supereffective Fairy-type attack.",
+    },
+    effects: createSuperEffectiveTypeResistBerryEffects("fairy"),
+    flingPower: 10,
+  },
+  "chilan-berry": {
+    id: 177,
+    key: "chilan-berry",
+    names: {
+      ja: "ホズのみ",
+      en: "Chilan Berry",
+    },
+    descriptions: {
+      ja: "ポケモンに　もたせると ノーマル　わざを　うけたとき いりょくが　よわまる。",
+      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s Normal-type attack.",
+    },
+    effects: chilanBerryEffects,
+    flingPower: 10,
+  },
   "covert-cloak": {
     id: 1701,
     key: "covert-cloak",
@@ -113,19 +378,7 @@ export const scarletVioletItems = {
       ja: "",
       en: "",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fairy",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("fairy"),
     flingPower: null,
   },
   "miracle-seed": {
@@ -139,19 +392,7 @@ export const scarletVioletItems = {
       ja: "せいめいが　やどる　タネ。 もたせると　くさタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of GRASS-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "grass",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("grass"),
     flingPower: 30,
   },
   charcoal: {
@@ -165,19 +406,7 @@ export const scarletVioletItems = {
       ja: "ものを　もやす　ねんりょう。 もたせると　ほのおタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of FIRE-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fire",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("fire"),
     flingPower: 30,
   },
   "mystic-water": {
@@ -191,19 +420,7 @@ export const scarletVioletItems = {
       ja: "しずくの　かたちの　ほうせき。 もたせると　みずタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of WATER-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "water",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("water"),
     flingPower: 30,
   },
   "silk-scarf": {
@@ -217,19 +434,7 @@ export const scarletVioletItems = {
       ja: "はだざわりの　よい　スカーフ。 もたせると　ノーマルタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of NORMAL-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "normal",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("normal"),
     flingPower: 10,
   },
   "sharp-beak": {
@@ -243,19 +448,7 @@ export const scarletVioletItems = {
       ja: "ながく　とがった　くちばし。 もたせると　ひこうタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of FLYING-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "flying",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("flying"),
     flingPower: 50,
   },
   "silver-powder": {
@@ -269,19 +462,7 @@ export const scarletVioletItems = {
       ja: "ぎんいろに　かがやく　こな。 もたせると　むしタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of BUG-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "bug",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("bug"),
     flingPower: 10,
   },
   "muscle-band": {
@@ -295,19 +476,7 @@ export const scarletVioletItems = {
       ja: "ちからが　わいてくる　ハチマキ。 もたせると　ぶつりわざの いりょくが　すこし　あがる。",
       en: "An item to be held by a Pokémon. It is a headband that slightly boosts the power of physical moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.1,
-        requirements: [
-          {
-            requirement: "damageClass",
-            damageClass: "physical",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: muscleBandEffects,
     flingPower: 10,
   },
   "wise-glasses": {
@@ -321,19 +490,7 @@ export const scarletVioletItems = {
       ja: "ぶあつい　レンズの　ついた　メガネ。 もたせると　とくしゅわざの いりょくが　すこし　あがる。",
       en: "An item to be held by a Pokémon. It is a thick pair of glasses that slightly boosts the power of special moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.1,
-        requirements: [
-          {
-            requirement: "damageClass",
-            damageClass: "special",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: wiseGlassesEffects,
     flingPower: 10,
   },
   "focus-band": {
@@ -375,18 +532,7 @@ export const scarletVioletItems = {
       ja: "つかいこまれた　くろい　おび。 もたせると　こうかばつぐんの　とき わざの　いりょくが　すこし　あがる。",
       en: "An item to be held by a Pokémon. It is a well-worn belt that slightly boosts the power of supereffective moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: expertBeltEffects,
     flingPower: 10,
   },
   "focus-sash": {
@@ -400,19 +546,7 @@ export const scarletVioletItems = {
       ja: "もたせると　ＨＰが　まんたんのとき ひんしになりそうな　わざを　うけても ＨＰ１で　いちどだけ　たえる。",
       en: "An item to be held by a Pokémon. If it has full HP, the holder will endure one potential KO attack, leaving 1 HP.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 0,
-        requirements: [
-          {
-            requirement: "hpRatioAtFull",
-          },
-        ],
-        minimumRemainingHp: 1,
-        consumable: true,
-      },
-    ],
+    effects: focusSashEffects,
     flingPower: 10,
   },
   "choice-scarf": {
@@ -440,7 +574,7 @@ export const scarletVioletItems = {
       ja: "ちょっと　こだわった　ハチマキ。 もたせると　こうげきは　あがるが おなじ　わざしか　だせなくなる。",
       en: "Raises a move’s power, but permits only that move.",
     },
-    effects: [],
+    effects: choiceBandEffects,
     flingPower: 10,
   },
   "choice-specs": {
@@ -454,7 +588,7 @@ export const scarletVioletItems = {
       ja: "ちょっと　こだわった　メガネ。 もたせると　とくこうは　あがるが おなじ　わざしか　だせなくなる。",
       en: "An item to be held by a Pokémon. These distinctive glasses boost Sp. Atk, but allow only one kind of move to be used.",
     },
-    effects: [],
+    effects: choiceSpecsEffects,
     flingPower: 10,
   },
   "rocky-helmet": {
@@ -552,19 +686,7 @@ export const scarletVioletItems = {
       ja: "もたせると　こうげきする　たびに ＨＰが　すこし　へってしまうが わざの　いりょくが　あがる。",
       en: "An item to be held by a Pokémon. It boosts the power of moves, but at the cost of some HP on each hit.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.3,
-        consumable: false,
-      },
-      {
-        effect: "damage",
-        activationTiming: "afterDamage",
-        damageDivisor: 10,
-        consumable: false,
-      },
-    ],
+    effects: lifeOrbEffects,
     flingPower: 30,
   },
   eviolite: {
@@ -578,7 +700,7 @@ export const scarletVioletItems = {
       ja: "しんかの　ふしぎな　かたまり。 もたせると　しんかまえ　ポケモンの ぼうぎょと　とくぼうが　あがる。",
       en: "A mysterious evolutionary lump. When held, it raises the Defense and Sp. Def of a Pokémon that can still evolve.",
     },
-    effects: [],
+    effects: evioliteEffects,
     flingPower: 40,
   },
   "assault-vest": {
@@ -592,7 +714,7 @@ export const scarletVioletItems = {
       ja: "こうげきてきに　なる　チョッキ。 もたせると　とくぼうが　あがるが へんかわざを　だせなくなる。",
       en: "An item to be held by a Pokémon. This offensive vest raises Sp. Def but prevents the use of status moves.",
     },
-    effects: [],
+    effects: assaultVestEffects,
     flingPower: 80,
   },
   "weakness-policy": {
@@ -634,19 +756,7 @@ export const scarletVioletItems = {
       ja: "さわると　サラサラする　すな。 もたせると　じめんタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of GROUND-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ground",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("ground"),
     flingPower: 10,
   },
   "black-glasses": {
@@ -660,19 +770,7 @@ export const scarletVioletItems = {
       ja: "あやしく　みえる　メガネ。 もたせると　あくタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of DARK-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "dark",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("dark"),
     flingPower: 30,
   },
   "black-belt": {
@@ -686,19 +784,7 @@ export const scarletVioletItems = {
       ja: "きが　ひきしまる　おび。 もたせると　かくとうタイプの わざの　いりょくが　あがる。",
       en: "A hold item that boosts FIGHTING- type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fighting",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("fighting"),
     flingPower: 30,
   },
   "never-melt-ice": {
@@ -712,19 +798,7 @@ export const scarletVioletItems = {
       ja: "ねつを　よせつけない　こおり。 もたせると　こおりタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of ICE-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ice",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("ice"),
     flingPower: 30,
   },
   "twisted-spoon": {
@@ -738,19 +812,7 @@ export const scarletVioletItems = {
       ja: "ねんりきを　こめた　スプーン。 もたせると　エスパータイプの わざの　いりょくが　あがる。",
       en: "A hold item that boosts PSYCHIC- type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "psychic",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("psychic"),
     flingPower: 30,
   },
   "metal-coat": {
@@ -764,19 +826,7 @@ export const scarletVioletItems = {
       ja: "とくしゅな　きんぞくの　まく。 もたせると　はがねタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of STEEL-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "steel",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("steel"),
     flingPower: 30,
   },
   "shell-bell": {
@@ -1070,19 +1120,7 @@ export const scarletVioletItems = {
       ja: "きょうりょくな　じしゃく。 もたせると　でんきタイプの わざの　いりょくが　あがる。",
       en: "A hold item that boosts ELECTRIC- type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "electric",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("electric"),
     flingPower: 30,
   },
   "hard-stone": {
@@ -1096,19 +1134,7 @@ export const scarletVioletItems = {
       ja: "ぜったいに　われない　いし。 もたせると　いわタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of ROCK-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "rock",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("rock"),
     flingPower: 100,
   },
   "poison-barb": {
@@ -1122,19 +1148,7 @@ export const scarletVioletItems = {
       ja: "どくのある　ちいさな　ハリ。 もたせると　どくタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of POISON-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "poison",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("poison"),
     flingPower: 70,
   },
   "spell-tag": {
@@ -1148,19 +1162,7 @@ export const scarletVioletItems = {
       ja: "あやしくて　ぶきみな　おふだ。 もたせると　ゴーストタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of GHOST-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ghost",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("ghost"),
     flingPower: 30,
   },
   "dragon-fang": {
@@ -1174,19 +1176,7 @@ export const scarletVioletItems = {
       ja: "かたくて　するどい　キバ。 もたせると　ドラゴンタイプの わざの　いりょくが　あがる。",
       en: "A hold item that raises the power of DRAGON-type moves.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "dragon",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("dragon"),
     flingPower: 70,
   },
   "normal-gem": {
@@ -1214,14 +1204,7 @@ export const scarletVioletItems = {
       ja: "もたせると　ポケモンの　ＨＰが せんとうの　あいだ　すこしずつ かいふくする。",
       en: "A hold item that gradually restores HP in battle.",
     },
-    effects: [
-      {
-        effect: "recovery",
-        activationTiming: "turnEnd",
-        recoveryDivisor: 16,
-        consumable: false,
-      },
-    ],
+    effects: leftoversEffects,
     flingPower: 10,
   },
   "big-root": {
