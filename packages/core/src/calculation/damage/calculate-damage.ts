@@ -6,6 +6,7 @@ import type { DamageResult } from "./damage-result.js";
 
 import {
   applyItemDamageMultiplier,
+  applyItemStatMultiplier,
   resolveActiveEffects,
 } from "../effect/index.js";
 import { resolveHitCount, resolveMove } from "../move/index.js";
@@ -47,6 +48,8 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   // 入力から解決済みのポケモンデータを取得する
   const attackerPokemonData = input.attacker.pokemon;
   const defenderPokemonData = input.defender.pokemon;
+  const attackerItemEffects = input.attacker.item?.effects ?? [];
+  const defenderItemEffects = input.defender.item?.effects ?? [];
 
   // 種族値と育成値から性格補正前の実数値を計算する
   const attackerStatsBeforeNature = calculatePokemonStats({
@@ -108,14 +111,22 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const unboostedDefendingStat = defenderStats[defendingStatKey];
 
   // 通常時は攻撃側と防御側のランクをそのまま適用する
-  const normalAttackingStat = applyStatBoost({
-    stat: unboostedAttackingStat,
-    boost: attackingStatBoost,
+  const normalAttackingStat = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedAttackingStat,
+      boost: attackingStatBoost,
+    }),
+    statKey: attackingStatKey,
+    effects: attackerItemEffects,
   });
-  // 防御側はランク補正後に砂嵐・雪の能力補正を適用する
-  const normalDefendingStatBeforeWeather = applyStatBoost({
-    stat: unboostedDefendingStat,
-    boost: defendingStatBoost,
+  // 防御側はランク補正と道具補正の後に砂嵐・雪の能力補正を適用する
+  const normalDefendingStatBeforeWeather = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedDefendingStat,
+      boost: defendingStatBoost,
+    }),
+    statKey: defendingStatKey,
+    effects: defenderItemEffects,
   });
   const normalDefendingStat = applyWeatherDefenseModifier({
     stat: normalDefendingStatBeforeWeather,
@@ -130,14 +141,23 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const criticalDefendingStatBoost =
     defendingStatBoost > 0 ? 0 : defendingStatBoost;
 
-  const criticalAttackingStat = applyStatBoost({
-    stat: unboostedAttackingStat,
-    boost: criticalAttackingStatBoost,
+  // 急所でも道具による能力値補正は無視しない
+  const criticalAttackingStat = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedAttackingStat,
+      boost: criticalAttackingStatBoost,
+    }),
+    statKey: attackingStatKey,
+    effects: attackerItemEffects,
   });
   // 急所でも砂嵐・雪の能力補正は無視しない
-  const criticalDefendingStatBeforeWeather = applyStatBoost({
-    stat: unboostedDefendingStat,
-    boost: criticalDefendingStatBoost,
+  const criticalDefendingStatBeforeWeather = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedDefendingStat,
+      boost: criticalDefendingStatBoost,
+    }),
+    statKey: defendingStatKey,
+    effects: defenderItemEffects,
   });
   const criticalDefendingStat = applyWeatherDefenseModifier({
     stat: criticalDefendingStatBeforeWeather,
@@ -229,7 +249,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
     .map((damage) =>
       applyItemDamageMultiplier({
         damage,
-        effects: input.attacker.item?.effects ?? [],
+        effects: attackerItemEffects,
         move: resolvedDamagingMove,
         defenderTypes: defenderPokemonData.types,
         weather: input.weather,
@@ -258,7 +278,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
     .map((damage) =>
       applyItemDamageMultiplier({
         damage,
-        effects: input.attacker.item?.effects ?? [],
+        effects: attackerItemEffects,
         move: resolvedDamagingMove,
         defenderTypes: defenderPokemonData.types,
         weather: input.weather,

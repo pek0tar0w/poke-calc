@@ -166,6 +166,30 @@ const lifeOrb = createItem({
   ],
 });
 
+const choiceBand = createItem({
+  key: "choice-band",
+  effects: [
+    {
+      effect: "statMultiplier",
+      stat: "attack",
+      multiplier: 1.5,
+      consumable: false,
+    },
+  ],
+});
+
+const assaultVest = createItem({
+  key: "assault-vest",
+  effects: [
+    {
+      effect: "statMultiplier",
+      stat: "specialDefense",
+      multiplier: 1.5,
+      consumable: false,
+    },
+  ],
+});
+
 const occaBerry = createItem({
   key: "occa-berry",
   effects: [
@@ -229,6 +253,46 @@ const skillLink = createAbility({
 // UIはnormal/critical、KO結果、turnsのHP推移に依存する
 
 describe("calculateDamage", () => {
+  // 攻撃側の能力値補正道具を通常時と急所時の両方へ適用する
+  test("applies attacker item stat multipliers", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithChoiceBand = calculateDamage({
+      ...input,
+      attacker: {
+        ...input.attacker,
+        item: choiceBand,
+      },
+    });
+
+    expect(resultWithChoiceBand.normal.minimumDamage).toBeGreaterThan(
+      resultWithoutItem.normal.minimumDamage,
+    );
+    expect(resultWithChoiceBand.critical.minimumDamage).toBeGreaterThan(
+      resultWithoutItem.critical.minimumDamage,
+    );
+  });
+
+  // 防御側の能力値補正道具を通常時と急所時の両方へ適用する
+  test("applies defender item stat multipliers", () => {
+    const input = createScreenTestInput({ move: flamethrower });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithAssaultVest = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: assaultVest,
+      },
+    });
+
+    expect(resultWithAssaultVest.normal.maximumDamage).toBeLessThan(
+      resultWithoutItem.normal.maximumDamage,
+    );
+    expect(resultWithAssaultVest.critical.maximumDamage).toBeLessThan(
+      resultWithoutItem.critical.maximumDamage,
+    );
+  });
+
   // 道具の与ダメージ倍率が計算結果まで接続されていることを確認する
   test("applies attacker item damage multipliers", () => {
     const input = createScreenTestInput({ move: firePunch });
