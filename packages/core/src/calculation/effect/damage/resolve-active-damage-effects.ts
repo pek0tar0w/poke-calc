@@ -190,6 +190,8 @@ function resolveItemDamageEffects(
     if (
       !areStaticEffectRequirementsMet({
         requirements: effect.requirements,
+        move: context.move,
+        defenderTypes: context.defender.pokemon.types,
         weather: context.weather,
       })
     ) {
@@ -227,6 +229,8 @@ function resolveAbilityDamageEffects(
     if (
       !areStaticEffectRequirementsMet({
         requirements: effect.requirements,
+        move: context.move,
+        defenderTypes: context.defender.pokemon.types,
         weather: context.weather,
       })
     ) {

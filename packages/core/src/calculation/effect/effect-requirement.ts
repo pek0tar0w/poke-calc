@@ -1,12 +1,27 @@
-import type { EffectRequirement, WeatherKey } from "../../model/index.js";
+import type {
+  DamagingMove,
+  EffectRequirement,
+  TypeKey,
+  WeatherKey,
+} from "../../model/index.js";
+
+import { calcTypeEffectiveness } from "../type/calculate-type-effectiveness.js";
 
 /** 計算中に変化しない条件を満たしているか判定する */
 export function areStaticEffectRequirementsMet({
   requirements,
+  move,
+  defenderTypes,
   weather,
 }: {
   /** 発動条件 */
   requirements?: readonly EffectRequirement[] | undefined;
+
+  /** 威力とタイプの変更を反映した使用技 */
+  move: DamagingMove;
+
+  /** 防御側のタイプ */
+  defenderTypes: readonly TypeKey[];
 
   /** 現在の天候 */
   weather: WeatherKey | undefined;
@@ -16,11 +31,26 @@ export function areStaticEffectRequirementsMet({
       case "weather":
         return weather === requirement.weather;
 
+      case "moveType":
+        return move.type === requirement.moveType;
+
+      case "moveTag":
+        return move.moveTags.includes(requirement.tag);
+
+      case "makesContact":
+        return move.makesContact;
+
+      case "movePowerAtOrBelow":
+        return move.power <= requirement.power;
+
+      case "damageClass":
+        return move.damageClass === requirement.damageClass;
+
+      case "superEffective":
+        return calcTypeEffectiveness(move.type, defenderTypes) > 1;
+
       case "hpRatioAtFull":
       case "hpRatioAtOrBelow":
-      case "movePowerAtOrBelow":
-      case "moveTag":
-      case "moveType":
         return true;
     }
   });
@@ -51,7 +81,10 @@ export function areRuntimeEffectRequirementsMet({
 
       case "movePowerAtOrBelow":
       case "moveTag":
+      case "makesContact":
       case "moveType":
+      case "damageClass":
+      case "superEffective":
       case "weather":
         return true;
     }

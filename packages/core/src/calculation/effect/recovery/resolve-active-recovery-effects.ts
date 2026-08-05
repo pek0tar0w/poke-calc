@@ -8,11 +8,10 @@ import { areStaticEffectRequirementsMet } from "../index.js";
  *
  * 天候など計算中に変化しない条件はここで判定する
  */
-export function resolveActiveRecoveryEffects({
-  defender,
-  terrain,
-  weather,
-}: EffectResolutionContext): ActiveRecoveryEffect[] {
+export function resolveActiveRecoveryEffects(
+  context: EffectResolutionContext,
+): ActiveRecoveryEffect[] {
+  const { defender, terrain } = context;
   const { item, ability } = defender;
   const effects: ActiveRecoveryEffect[] = [];
 
@@ -25,7 +24,9 @@ export function resolveActiveRecoveryEffects({
       if (
         !areStaticEffectRequirementsMet({
           requirements: effect.requirements,
-          weather,
+          move: context.move,
+          defenderTypes: context.defender.pokemon.types,
+          weather: context.weather,
         })
       ) {
         continue;
@@ -50,7 +51,9 @@ export function resolveActiveRecoveryEffects({
       if (
         !areStaticEffectRequirementsMet({
           requirements: effect.requirements,
-          weather,
+          move: context.move,
+          defenderTypes: context.defender.pokemon.types,
+          weather: context.weather,
         })
       ) {
         continue;

@@ -1,5 +1,13 @@
 import type { Ability } from "@poke-calc/core";
 
+import {
+  adaptabilityEffects,
+  analyticEffects,
+  strongJawEffects,
+  technicianEffects,
+  toughClawsEffects,
+} from "../common/ability-effects.js";
+
 export const scarletVioletAbilities = {
   adaptability: {
     id: 91,
@@ -12,7 +20,7 @@ export const scarletVioletAbilities = {
       ja: "タイプが　おなじ　わざの いりょくが　あがる。",
       en: "Powers up moves of the same type as the Pokémon.",
     },
-    effects: [],
+    effects: adaptabilityEffects,
   },
   aftermath: {
     id: 106,
@@ -38,7 +46,7 @@ export const scarletVioletAbilities = {
       ja: "いちばん　さいごに わざをだすと　つよくなる。",
       en: "Boosts the power of the Pokémon's move if it is the last to act that turn.",
     },
-    effects: [],
+    effects: analyticEffects,
   },
   "anger-point": {
     id: 83,
@@ -2551,7 +2559,7 @@ export const scarletVioletAbilities = {
       ja: "あごが　がんじょうで かむ　ちからが　つよい。",
       en: "The Pokémon's strong jaw boosts the power of its biting moves.",
     },
-    effects: [],
+    effects: strongJawEffects,
   },
   sturdy: {
     id: 5,
@@ -2744,7 +2752,7 @@ export const scarletVioletAbilities = {
       ja: "よわい　わざの いりょくが　あがる。",
       en: "Powers up weak moves so the Pokémon can deal more damage with them.",
     },
-    effects: [],
+    effects: technicianEffects,
   },
   telepathy: {
     id: 140,
@@ -3317,7 +3325,7 @@ export const scarletVioletAbilities = {
       ja: "相手に 接触する 技の 威力が 高くなる。",
       en: "Powers up moves that make direct contact.",
     },
-    effects: [],
+    effects: toughClawsEffects,
   },
 
   parentalBond: {

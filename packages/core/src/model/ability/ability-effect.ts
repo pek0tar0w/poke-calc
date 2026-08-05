@@ -24,9 +24,9 @@ export type AbilityEffect =
       requirements?: EffectRequirement[];
     }
   | {
-      /** ダメージ倍率を変更する */
+      /** 技の威力に補正をかける */
       side: "attacker";
-      effect: "damageMultiplier";
+      effect: "movePowerMultiplier";
       multiplier: number;
       requirements?: EffectRequirement[];
     }

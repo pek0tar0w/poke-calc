@@ -15,6 +15,7 @@ export const typeChart: Record<
     bug: 2,
     rock: 0.5,
     dragon: 0.5,
+    steel: 2,
   },
   water: { fire: 2, water: 0.5, grass: 0.5, ground: 2, rock: 2, dragon: 0.5 },
   electric: {

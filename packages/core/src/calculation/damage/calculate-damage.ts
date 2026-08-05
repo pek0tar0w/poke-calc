@@ -4,7 +4,13 @@ import type { DamagingMove } from "../../model/move/index.js";
 import type { DamageCalculationInput } from "./damage-calculation-input.js";
 import type { DamageResult } from "./damage-result.js";
 
-import { resolveActiveEffects } from "../effect/index.js";
+import {
+  applyAbilityMovePowerMultiplier,
+  applyItemDamageMultiplier,
+  applyItemStatMultiplier,
+  resolveActiveEffects,
+  resolveSameTypeAttackBonus,
+} from "../effect/index.js";
 import { resolveHitCount, resolveMove } from "../move/index.js";
 import { applyScreenDamageModifier } from "../screen/index.js";
 import {
@@ -44,6 +50,9 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   // 入力から解決済みのポケモンデータを取得する
   const attackerPokemonData = input.attacker.pokemon;
   const defenderPokemonData = input.defender.pokemon;
+  const attackerAbilityEffects = input.attacker.ability?.effects ?? [];
+  const attackerItemEffects = input.attacker.item?.effects ?? [];
+  const defenderItemEffects = input.defender.item?.effects ?? [];
 
   // 種族値と育成値から性格補正前の実数値を計算する
   const attackerStatsBeforeNature = calculatePokemonStats({
@@ -70,16 +79,35 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
     move: input.move,
     weather: input.weather,
   });
+
+  // タイプと威力の変更を元の技データへ反映する
+  const resolvedDamagingMove: DamagingMove = {
+    ...input.move,
+    ...resolvedMove,
+  };
+
+  // 攻撃側と防御側のタイプや付加状態から接地状態を解決する
   const terrainState = resolveTerrainState({
     terrain: input.terrain,
     attacker: input.attacker,
     defender: input.defender,
   });
+
+  // フィールドと接地状態に応じた技の威力補正を適用する
   const resolvedMovePower = applyTerrainPowerModifier({
     power: resolvedMove.power,
     moveKey: input.move.key,
     moveType: resolvedMove.type,
     ...(terrainState === undefined ? {} : { terrain: terrainState }),
+  });
+
+  // テクニシャンなど、攻撃側の特性による技の威力補正を適用する
+  const movePower = applyAbilityMovePowerMultiplier({
+    power: resolvedMovePower,
+    effects: attackerAbilityEffects,
+    move: resolvedDamagingMove,
+    defenderTypes: defenderPokemonData.types,
+    weather: input.weather,
   });
 
   // 技の分類に応じて攻撃と防御に使用する能力を決定する
@@ -95,14 +123,22 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const unboostedDefendingStat = defenderStats[defendingStatKey];
 
   // 通常時は攻撃側と防御側のランクをそのまま適用する
-  const normalAttackingStat = applyStatBoost({
-    stat: unboostedAttackingStat,
-    boost: attackingStatBoost,
+  const normalAttackingStat = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedAttackingStat,
+      boost: attackingStatBoost,
+    }),
+    statKey: attackingStatKey,
+    effects: attackerItemEffects,
   });
-  // 防御側はランク補正後に砂嵐・雪の能力補正を適用する
-  const normalDefendingStatBeforeWeather = applyStatBoost({
-    stat: unboostedDefendingStat,
-    boost: defendingStatBoost,
+  // 防御側はランク補正と道具補正の後に砂嵐・雪の能力補正を適用する
+  const normalDefendingStatBeforeWeather = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedDefendingStat,
+      boost: defendingStatBoost,
+    }),
+    statKey: defendingStatKey,
+    effects: defenderItemEffects,
   });
   const normalDefendingStat = applyWeatherDefenseModifier({
     stat: normalDefendingStatBeforeWeather,
@@ -117,14 +153,23 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   const criticalDefendingStatBoost =
     defendingStatBoost > 0 ? 0 : defendingStatBoost;
 
-  const criticalAttackingStat = applyStatBoost({
-    stat: unboostedAttackingStat,
-    boost: criticalAttackingStatBoost,
+  // 急所でも道具による能力値補正は無視しない
+  const criticalAttackingStat = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedAttackingStat,
+      boost: criticalAttackingStatBoost,
+    }),
+    statKey: attackingStatKey,
+    effects: attackerItemEffects,
   });
   // 急所でも砂嵐・雪の能力補正は無視しない
-  const criticalDefendingStatBeforeWeather = applyStatBoost({
-    stat: unboostedDefendingStat,
-    boost: criticalDefendingStatBoost,
+  const criticalDefendingStatBeforeWeather = applyItemStatMultiplier({
+    stat: applyStatBoost({
+      stat: unboostedDefendingStat,
+      boost: criticalDefendingStatBoost,
+    }),
+    statKey: defendingStatKey,
+    effects: defenderItemEffects,
   });
   const criticalDefendingStat = applyWeatherDefenseModifier({
     stat: criticalDefendingStatBeforeWeather,
@@ -145,7 +190,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
   // レベル、威力、攻撃、防御から各種補正前の基本ダメージを計算する
   const normalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
-    movePower: resolvedMovePower,
+    movePower,
     attackingStat: normalAttackingStat,
     defendingStat: normalDefendingStat,
   });
@@ -164,7 +209,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
 
   const criticalBaseDamageBeforeSpread = calculateBaseDamage({
     attackerLevel,
-    movePower: resolvedMovePower,
+    movePower,
     attackingStat: criticalAttackingStat,
     defendingStat: criticalDefendingStat,
   });
@@ -190,6 +235,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
     moveType: resolvedMove.type,
     attackerTypes: attackerPokemonData.types,
     defenderTypes: defenderPokemonData.types,
+    sameTypeAttackBonus: resolveSameTypeAttackBonus(attackerAbilityEffects),
   };
 
   // 通常時と急所時それぞれの1hit分の乱数ダメージを計算する
@@ -212,6 +258,15 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
         battleType: input.battleType,
         defenderScreens: input.defenderScreens ?? [],
       }),
+    )
+    .map((damage) =>
+      applyItemDamageMultiplier({
+        damage,
+        effects: attackerItemEffects,
+        move: resolvedDamagingMove,
+        defenderTypes: defenderPokemonData.types,
+        weather: input.weather,
+      }),
     );
   const normalDamageSequences = applyAdditionalHitEffects({
     damageSequences: createDamageSequences({
@@ -219,33 +274,43 @@ export function calculateDamage(input: DamageCalculationInput): DamageResult {
       hitCount,
     }),
     move: input.move,
-    attackerAbilityEffects: input.attacker.ability?.effects ?? [],
+    attackerAbilityEffects,
   });
 
   const criticalDamageRolls = calculateRandomDamageValues({
     ...commonDamageParams,
     baseDamage: criticalBaseDamage,
-  }).map((damage) =>
-    applyBurnDamageModifier({
-      damage,
-      damageClass: input.move.damageClass,
-      attackerStatus: input.attacker.status,
-    }),
-  );
+  })
+    .map((damage) =>
+      applyBurnDamageModifier({
+        damage,
+        damageClass: input.move.damageClass,
+        attackerStatus: input.attacker.status,
+      }),
+    )
+    .map((damage) =>
+      applyItemDamageMultiplier({
+        damage,
+        effects: attackerItemEffects,
+        move: resolvedDamagingMove,
+        defenderTypes: defenderPokemonData.types,
+        weather: input.weather,
+      }),
+    );
   const criticalDamageSequences = applyAdditionalHitEffects({
     damageSequences: createDamageSequences({
       damageRolls: criticalDamageRolls,
       hitCount,
     }),
     move: input.move,
-    attackerAbilityEffects: input.attacker.ability?.effects ?? [],
+    attackerAbilityEffects,
   });
 
   const effectResolutionContext = {
     game: input.game,
     attacker: input.attacker,
     defender: input.defender,
-    move: input.move,
+    move: resolvedDamagingMove,
     weather: input.weather,
     ...(terrainState === undefined ? {} : { terrain: terrainState }),
   };

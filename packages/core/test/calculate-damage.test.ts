@@ -155,6 +155,78 @@ const sitrusBerry = createItem({
   ],
 });
 
+const lifeOrb = createItem({
+  key: "life-orb",
+  effects: [
+    {
+      effect: "damageMultiplier",
+      multiplier: 1.3,
+      consumable: false,
+    },
+  ],
+});
+
+const choiceBand = createItem({
+  key: "choice-band",
+  effects: [
+    {
+      effect: "statMultiplier",
+      stat: "attack",
+      multiplier: 1.5,
+      consumable: false,
+    },
+  ],
+});
+
+const assaultVest = createItem({
+  key: "assault-vest",
+  effects: [
+    {
+      effect: "statMultiplier",
+      stat: "specialDefense",
+      multiplier: 1.5,
+      consumable: false,
+    },
+  ],
+});
+
+const occaBerry = createItem({
+  key: "occa-berry",
+  effects: [
+    {
+      effect: "damageReduction",
+      multiplier: 0.5,
+      consumable: true,
+      requirements: [
+        {
+          requirement: "moveType",
+          moveType: "fire",
+        },
+        {
+          requirement: "superEffective",
+        },
+      ],
+    },
+  ],
+});
+
+const chilanBerry = createItem({
+  key: "chilan-berry",
+  effects: [
+    {
+      effect: "damageReduction",
+      multiplier: 0.5,
+      consumable: true,
+      requirements: [
+        {
+          requirement: "moveType",
+          moveType: "normal",
+        },
+      ],
+    },
+  ],
+});
+
 const parentalBond = createAbility({
   key: "parental-bond",
   effects: [
@@ -177,10 +249,297 @@ const skillLink = createAbility({
   ],
 });
 
+const adaptability = createAbility({
+  key: "adaptability",
+  effects: [
+    {
+      side: "attacker",
+      effect: "sameTypeAttackBonusOverride",
+      multiplier: 2,
+    },
+  ],
+});
+
+const analytic = createAbility({
+  key: "analytic",
+  effects: [
+    {
+      side: "attacker",
+      effect: "movePowerMultiplier",
+      multiplier: 1.3,
+    },
+  ],
+});
+
+const technician = createAbility({
+  key: "technician",
+  effects: [
+    {
+      side: "attacker",
+      effect: "movePowerMultiplier",
+      multiplier: 1.5,
+      requirements: [
+        {
+          requirement: "movePowerAtOrBelow",
+          power: 60,
+        },
+      ],
+    },
+  ],
+});
+
+const toughClaws = createAbility({
+  key: "tough-claws",
+  effects: [
+    {
+      side: "attacker",
+      effect: "movePowerMultiplier",
+      multiplier: 1.3,
+      requirements: [{ requirement: "makesContact" }],
+    },
+  ],
+});
+
+const strongJaw = createAbility({
+  key: "strong-jaw",
+  effects: [
+    {
+      side: "attacker",
+      effect: "movePowerMultiplier",
+      multiplier: 1.5,
+      requirements: [{ requirement: "moveTag", tag: "bite" }],
+    },
+  ],
+});
+
 // 公開APIの代表的な返り値を固定する
 // UIはnormal/critical、KO結果、turnsのHP推移に依存する
 
 describe("calculateDamage", () => {
+  // アナライズは暫定的に行動順を判定せず常に威力補正を適用する
+  test("applies Analytic without comparing turn order", () => {
+    expectAbilityIncreasesDamage({
+      ability: analytic,
+      move: flamethrower,
+    });
+  });
+
+  // テクニシャンは元の威力が60以下の技だけを強化する
+  test("applies Technician only to moves with 60 power or less", () => {
+    const power60Move = createMove({
+      key: "power-60-move",
+      type: "dragon",
+      power: 60,
+    });
+    const power61Move = createMove({
+      key: "power-61-move",
+      type: "dragon",
+      power: 61,
+    });
+
+    expectAbilityIncreasesDamage({ ability: technician, move: power60Move });
+    expectAbilityDoesNotChangeDamage({
+      ability: technician,
+      move: power61Move,
+    });
+  });
+
+  // かたいツメは接触技だけを強化する
+  test("applies Tough Claws only to contact moves", () => {
+    const contactMove = createMove({
+      key: "contact-move",
+      type: "dragon",
+      power: 80,
+      makesContact: true,
+    });
+    const nonContactMove = createMove({
+      key: "non-contact-move",
+      type: "dragon",
+      power: 80,
+      makesContact: false,
+    });
+
+    expectAbilityIncreasesDamage({ ability: toughClaws, move: contactMove });
+    expectAbilityDoesNotChangeDamage({
+      ability: toughClaws,
+      move: nonContactMove,
+    });
+  });
+
+  // がんじょうあごはかみつき技だけを強化する
+  test("applies Strong Jaw only to biting moves", () => {
+    const bitingMove = createMove({
+      key: "biting-move",
+      type: "dragon",
+      power: 80,
+      moveTags: ["bite"],
+    });
+    const untaggedMove = createMove({
+      key: "untagged-move",
+      type: "dragon",
+      power: 80,
+    });
+
+    expectAbilityIncreasesDamage({ ability: strongJaw, move: bitingMove });
+    expectAbilityDoesNotChangeDamage({
+      ability: strongJaw,
+      move: untaggedMove,
+    });
+  });
+
+  // てきおうりょくはタイプ一致補正だけを1.5倍から2倍へ変更する
+  test("overrides only the same-type attack bonus with Adaptability", () => {
+    const sameTypeMove = createMove({
+      key: "same-type-move",
+      type: "dragon",
+      power: 80,
+    });
+
+    expectAbilityIncreasesDamage({ ability: adaptability, move: sameTypeMove });
+    expectAbilityDoesNotChangeDamage({
+      ability: adaptability,
+      move: firePunch,
+    });
+  });
+
+  // 攻撃側の能力値補正道具を通常時と急所時の両方へ適用する
+  test("applies attacker item stat multipliers", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithChoiceBand = calculateDamage({
+      ...input,
+      attacker: {
+        ...input.attacker,
+        item: choiceBand,
+      },
+    });
+
+    expect(resultWithChoiceBand.normal.minimumDamage).toBeGreaterThan(
+      resultWithoutItem.normal.minimumDamage,
+    );
+    expect(resultWithChoiceBand.critical.minimumDamage).toBeGreaterThan(
+      resultWithoutItem.critical.minimumDamage,
+    );
+  });
+
+  // 防御側の能力値補正道具を通常時と急所時の両方へ適用する
+  test("applies defender item stat multipliers", () => {
+    const input = createScreenTestInput({ move: flamethrower });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithAssaultVest = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: assaultVest,
+      },
+    });
+
+    expect(resultWithAssaultVest.normal.maximumDamage).toBeLessThan(
+      resultWithoutItem.normal.maximumDamage,
+    );
+    expect(resultWithAssaultVest.critical.maximumDamage).toBeLessThan(
+      resultWithoutItem.critical.maximumDamage,
+    );
+  });
+
+  // 道具の与ダメージ倍率が計算結果まで接続されていることを確認する
+  test("applies attacker item damage multipliers", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithLifeOrb = calculateDamage({
+      ...input,
+      attacker: {
+        ...input.attacker,
+        item: lifeOrb,
+      },
+    });
+
+    expect(resultWithLifeOrb.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.minimumDamage * 1.3),
+    );
+    expect(resultWithLifeOrb.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.maximumDamage * 1.3),
+    );
+    expect(resultWithLifeOrb.critical.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.critical.minimumDamage * 1.3),
+    );
+  });
+
+  // 半減実は一致する効果ばつぐんの技を1度だけ半減する
+  test("consumes a type-resist Berry after reducing one super-effective hit", () => {
+    const input = createScreenTestInput({ move: firePunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithOccaBerry = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: occaBerry,
+      },
+    });
+
+    expect(resultWithOccaBerry.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.minimumDamage * 0.5),
+    );
+    expect(resultWithOccaBerry.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.maximumDamage * 0.5),
+    );
+
+    const firstMoveStep = resultWithOccaBerry.normal.turns[0]?.steps.find(
+      (step) => step.source.type === "move",
+    );
+    const secondMoveStep = resultWithOccaBerry.normal.turns[1]?.steps.find(
+      (step) => step.source.type === "move",
+    );
+
+    expect(secondMoveStep?.amount.minimum).toBeGreaterThan(
+      firstMoveStep?.amount.minimum ?? 0,
+    );
+  });
+
+  // タイプが一致しても効果ばつぐんでなければ半減実は発動しない
+  test("does not consume a type-resist Berry against neutral damage", () => {
+    const baseInput = createScreenTestInput({ move: firePunch });
+    const input = {
+      ...baseInput,
+      defender: {
+        ...baseInput.defender,
+        pokemon: primarina,
+      },
+    };
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithOccaBerry = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: occaBerry,
+      },
+    });
+
+    expect(resultWithOccaBerry.normal.damages).toEqual(
+      resultWithoutItem.normal.damages,
+    );
+  });
+
+  // ホズのみは効果ばつぐんでなくてもノーマル技を半減する
+  test("reduces Normal-type damage with Chilan Berry", () => {
+    const input = createScreenTestInput({ move: dizzyPunch });
+    const resultWithoutItem = calculateDamage(input);
+    const resultWithChilanBerry = calculateDamage({
+      ...input,
+      defender: {
+        ...input.defender,
+        item: chilanBerry,
+      },
+    });
+
+    expect(resultWithChilanBerry.normal.minimumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.minimumDamage * 0.5),
+    );
+    expect(resultWithChilanBerry.normal.maximumDamage).toBe(
+      roundHalfDownForTest(resultWithoutItem.normal.maximumDamage * 0.5),
+    );
+  });
+
   // 通常時と急所時のダメージ結果を取得できる
   test("returns stable normal and critical outcomes", () => {
     const result = calculateDamage(
@@ -645,12 +1004,16 @@ function createMove({
   power,
   hitCount = { kind: "single" },
   damageClass = "physical",
+  makesContact = true,
+  moveTags = [],
 }: {
   key: string;
   type: TypeKey;
   power: number;
   hitCount?: DamagingMove["hitCount"];
   damageClass?: DamagingMove["damageClass"];
+  makesContact?: boolean;
+  moveTags?: DamagingMove["moveTags"];
 }): DamagingMove {
   return {
     id: 1,
@@ -668,13 +1031,58 @@ function createMove({
     accuracy: 100,
     pp: 10,
     isMultiTarget: false,
-    makesContact: true,
-    moveTags: [],
+    makesContact,
+    moveTags,
     hitCount,
     category: "damaging",
     damageClass,
     power,
   };
+}
+
+/** 指定した攻撃側特性を設定してダメージを計算する */
+function calculateWithAttackerAbility(move: DamagingMove, ability: Ability) {
+  const input = createScreenTestInput({ move });
+
+  return calculateDamage({
+    ...input,
+    attacker: {
+      ...input.attacker,
+      ability,
+    },
+  });
+}
+
+/** 特性を設定するとダメージが増えることを確認する */
+function expectAbilityIncreasesDamage({
+  ability,
+  move,
+}: {
+  ability: Ability;
+  move: DamagingMove;
+}) {
+  const resultWithoutAbility = calculateDamage(createScreenTestInput({ move }));
+  const resultWithAbility = calculateWithAttackerAbility(move, ability);
+
+  expect(resultWithAbility.normal.minimumDamage).toBeGreaterThan(
+    resultWithoutAbility.normal.minimumDamage,
+  );
+}
+
+/** 条件を満たさない特性がダメージを変えないことを確認する */
+function expectAbilityDoesNotChangeDamage({
+  ability,
+  move,
+}: {
+  ability: Ability;
+  move: DamagingMove;
+}) {
+  const resultWithoutAbility = calculateDamage(createScreenTestInput({ move }));
+  const resultWithAbility = calculateWithAttackerAbility(move, ability);
+
+  expect(resultWithAbility.normal.damages).toEqual(
+    resultWithoutAbility.normal.damages,
+  );
 }
 
 function createAbility({

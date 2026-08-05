@@ -1,5 +1,18 @@
 import type { Item } from "@poke-calc/core";
 
+import {
+  chilanBerryEffects,
+  createSuperEffectiveTypeResistBerryEffects,
+  createTypeBoostEffects,
+  expertBeltEffects,
+  focusSashEffects,
+  leftoversEffects,
+  lifeOrbEffects,
+  muscleBandEffects,
+  sitrusBerryEffects,
+  wiseGlassesEffects,
+} from "../common/item-effects/index.js";
+
 export const championsItems = {
   "bright-powder": {
     id: 190,
@@ -9,8 +22,8 @@ export const championsItems = {
       en: "Bright Powder",
     },
     descriptions: {
-      ja: "キラキラ　ひかるこな。　もたせると ひかりが　あいてを　まどわして わざが　めいちゅう　しにくくなる。",
-      en: "A hold item that casts a glare to reduce accuracy.",
+      ja: "自分に対し相手の使う技の命中率が0.9倍になる。",
+      en: "Lowers the accuracy of moves used by opponents against the holder by 10%.",
     },
     effects: [],
     flingPower: 10,
@@ -23,8 +36,8 @@ export const championsItems = {
       en: "White Herb",
     },
     descriptions: {
-      ja: "もたせた　ポケモンの　のうりょくが さがったとき　いちどだけ　もとの じょうたいに　もどす。",
-      en: "A hold item that restores any lowered stat.",
+      ja: "能力が下がった時に元に戻す。1度使うとその対戦中は無くなる。",
+      en: "Restores the holder’s stats to their usual value when they are lowered. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -37,8 +50,8 @@ export const championsItems = {
       en: "Quick Claw",
     },
     descriptions: {
-      ja: "かるくて　するどい　ツメ。 もたせると　あいてより　さきに こうどう　できることが　ある。",
-      en: "A hold item that occasionally allows the first strike.",
+      ja: "20%の確率で、同じ優先度の技の中で最初に行動する。",
+      en: "Gives the holder’s moves a 20% chance of going first among moves of the same priority.",
     },
     effects: [],
     flingPower: 80,
@@ -51,8 +64,8 @@ export const championsItems = {
       en: "Mental Herb",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　じゆうに わざを　だせなくなったときに いちどだけ　かいふくする。",
-      en: "A hold item that snaps POKéMON out of infatuation.",
+      ja: "メロメロ状態・ちょうはつ状態・連続不可状態・わざふうじ状態・かいふくふうじ状態・アンコール状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures the holder of the Infatuated, Taunted, Unable to Repeat, Move Disabled, Healing Prevented, and Encore statuses. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -65,8 +78,8 @@ export const championsItems = {
       en: "King’s Rock",
     },
     descriptions: {
-      ja: "もたせると　こうげきして ダメージを　あたえたときに あいてを　ひるませることが　ある。",
-      en: "A hold item that may cause flinching when the foe is hit.",
+      ja: "技でダメージを与えた時、10%の確率で相手をひるませる。",
+      en: "When the holder deals damage with its moves, there is a 10% chance that targets will flinch.",
     },
     effects: [],
     flingPower: 30,
@@ -79,22 +92,10 @@ export const championsItems = {
       en: "Silver Powder",
     },
     descriptions: {
-      ja: "ぎんいろに　かがやく　こな。 もたせると　むしタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of BUG-type moves.",
+      ja: "むしタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Bug-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "bug",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("bug"),
     flingPower: 10,
   },
   "focus-band": {
@@ -105,8 +106,8 @@ export const championsItems = {
       en: "Focus Band",
     },
     descriptions: {
-      ja: "もたせると　ひんしに　なりそうな わざを　うけても　ＨＰを　１だけ のこして　たえることが　ある。",
-      en: "A hold item that occasionally prevents fainting.",
+      ja: "ひんしになる技のダメージを受けると10%の確率でHPを1残して耐える。",
+      en: "If the holder takes damage from a move that would knock it out, there’s a 10% chance the holder will endure the hit with 1 HP.",
     },
     effects: [],
     flingPower: 10,
@@ -119,8 +120,8 @@ export const championsItems = {
       en: "Scope Lens",
     },
     descriptions: {
-      ja: "じゃくてんが　みえる　レンズ。 もたせた　ポケモンの　わざが きゅうしょに　あたりやすくなる。",
-      en: "A hold item that raises the critical- hit rate.",
+      ja: "きゅうしょアップ+1になる。",
+      en: "Gives the holder a 1-stage Critical-Hit Ratio Boost.",
     },
     effects: [],
     flingPower: 30,
@@ -133,22 +134,10 @@ export const championsItems = {
       en: "Metal Coat",
     },
     descriptions: {
-      ja: "とくしゅな　きんぞくの　まく。 もたせると　はがねタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of STEEL-type moves.",
+      ja: "はがねタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Steel-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "steel",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("steel"),
     flingPower: 30,
   },
   leftovers: {
@@ -159,17 +148,10 @@ export const championsItems = {
       en: "Leftovers",
     },
     descriptions: {
-      ja: "もたせると　ポケモンの　ＨＰが せんとうの　あいだ　すこしずつ かいふくする。",
-      en: "A hold item that gradually restores HP in battle.",
+      ja: "ターン終わりに最大HPの1/16回復する。",
+      en: "Restores 1/16 of the holder’s max HP at the end of every turn.",
     },
-    effects: [
-      {
-        effect: "recovery",
-        activationTiming: "turnEnd",
-        recoveryDivisor: 16,
-        consumable: false,
-      },
-    ],
+    effects: leftoversEffects,
     flingPower: 10,
   },
   "soft-sand": {
@@ -180,22 +162,10 @@ export const championsItems = {
       en: "Soft Sand",
     },
     descriptions: {
-      ja: "さわると　サラサラする　すな。 もたせると　じめんタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of GROUND-type moves.",
+      ja: "じめんタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Ground-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ground",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("ground"),
     flingPower: 10,
   },
   "hard-stone": {
@@ -206,22 +176,10 @@ export const championsItems = {
       en: "Hard Stone",
     },
     descriptions: {
-      ja: "ぜったいに　われない　いし。 もたせると　いわタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of ROCK-type moves.",
+      ja: "いわタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Rock-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "rock",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("rock"),
     flingPower: 100,
   },
   "miracle-seed": {
@@ -232,22 +190,10 @@ export const championsItems = {
       en: "Miracle Seed",
     },
     descriptions: {
-      ja: "せいめいが　やどる　タネ。 もたせると　くさタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of GRASS-type moves.",
+      ja: "くさタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Grass-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "grass",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("grass"),
     flingPower: 30,
   },
   "black-glasses": {
@@ -258,22 +204,10 @@ export const championsItems = {
       en: "Black Glasses",
     },
     descriptions: {
-      ja: "あやしく　みえる　メガネ。 もたせると　あくタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of DARK-type moves.",
+      ja: "あくタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Dark-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "dark",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("dark"),
     flingPower: 30,
   },
   "black-belt": {
@@ -284,22 +218,10 @@ export const championsItems = {
       en: "Black Belt",
     },
     descriptions: {
-      ja: "きが　ひきしまる　おび。 もたせると　かくとうタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that boosts FIGHTING- type moves.",
+      ja: "かくとうタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Fighting-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fighting",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("fighting"),
     flingPower: 30,
   },
   magnet: {
@@ -310,22 +232,10 @@ export const championsItems = {
       en: "Magnet",
     },
     descriptions: {
-      ja: "きょうりょくな　じしゃく。 もたせると　でんきタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that boosts ELECTRIC- type moves.",
+      ja: "でんきタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Electric-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "electric",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("electric"),
     flingPower: 30,
   },
   "mystic-water": {
@@ -336,22 +246,10 @@ export const championsItems = {
       en: "Mystic Water",
     },
     descriptions: {
-      ja: "しずくの　かたちの　ほうせき。 もたせると　みずタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of WATER-type moves.",
+      ja: "みずタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Water-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "water",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("water"),
     flingPower: 30,
   },
   "sharp-beak": {
@@ -362,22 +260,10 @@ export const championsItems = {
       en: "Sharp Beak",
     },
     descriptions: {
-      ja: "ながく　とがった　くちばし。 もたせると　ひこうタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of FLYING-type moves.",
+      ja: "ひこうタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Flying-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "flying",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("flying"),
     flingPower: 50,
   },
   "poison-barb": {
@@ -388,22 +274,10 @@ export const championsItems = {
       en: "Poison Barb",
     },
     descriptions: {
-      ja: "どくのある　ちいさな　ハリ。 もたせると　どくタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of POISON-type moves.",
+      ja: "どくタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Poison-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "poison",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("poison"),
     flingPower: 70,
   },
   "never-melt-ice": {
@@ -414,22 +288,10 @@ export const championsItems = {
       en: "Never-Melt Ice",
     },
     descriptions: {
-      ja: "ねつを　よせつけない　こおり。 もたせると　こおりタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of ICE-type moves.",
+      ja: "こおりタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Ice-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ice",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("ice"),
     flingPower: 30,
   },
   "spell-tag": {
@@ -440,22 +302,10 @@ export const championsItems = {
       en: "Spell Tag",
     },
     descriptions: {
-      ja: "あやしくて　ぶきみな　おふだ。 もたせると　ゴーストタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of GHOST-type moves.",
+      ja: "ゴーストタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Ghost-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ghost",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("ghost"),
     flingPower: 30,
   },
   "twisted-spoon": {
@@ -466,22 +316,10 @@ export const championsItems = {
       en: "Twisted Spoon",
     },
     descriptions: {
-      ja: "ねんりきを　こめた　スプーン。 もたせると　エスパータイプの わざの　いりょくが　あがる。",
-      en: "A hold item that boosts PSYCHIC- type moves.",
+      ja: "エスパータイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Psychic-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "psychic",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("psychic"),
     flingPower: 30,
   },
   charcoal: {
@@ -492,22 +330,10 @@ export const championsItems = {
       en: "Charcoal",
     },
     descriptions: {
-      ja: "ものを　もやす　ねんりょう。 もたせると　ほのおタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of FIRE-type moves.",
+      ja: "ほのおタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Fire-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fire",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("fire"),
     flingPower: 30,
   },
   "dragon-fang": {
@@ -518,22 +344,10 @@ export const championsItems = {
       en: "Dragon Fang",
     },
     descriptions: {
-      ja: "かたくて　するどい　キバ。 もたせると　ドラゴンタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of DRAGON-type moves.",
+      ja: "ドラゴンタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Dragon-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "dragon",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("dragon"),
     flingPower: 70,
   },
   "silk-scarf": {
@@ -544,22 +358,10 @@ export const championsItems = {
       en: "Silk Scarf",
     },
     descriptions: {
-      ja: "はだざわりの　よい　スカーフ。 もたせると　ノーマルタイプの わざの　いりょくが　あがる。",
-      en: "A hold item that raises the power of NORMAL-type moves.",
+      ja: "ノーマルタイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Normal-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "normal",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("normal"),
     flingPower: 10,
   },
   "shell-bell": {
@@ -570,8 +372,8 @@ export const championsItems = {
       en: "Shell Bell",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　こうげきして あいてに　ダメージを　あたえたとき ＨＰを　すこし　かいふく　できる。",
-      en: "A hold item that restores HP upon striking the foe.",
+      ja: "技でダメージを与えた時 そのダメージの1/8 自分のHPを回復する。",
+      en: "When the holder deals damage with its moves, its HP is restored by 1/8 of the damage dealt.",
     },
     effects: [],
     flingPower: 30,
@@ -584,8 +386,8 @@ export const championsItems = {
       en: "Wide Lens",
     },
     descriptions: {
-      ja: "ものが　おおきく　みえる　レンズ。 もたせると　わざの　めいちゅうりつが すこし　あがる。",
-      en: "An item to be held by a Pokémon. It is a magnifying lens that slightly boosts the accuracy of moves.",
+      ja: "持たせると技の命中率が1.1倍になる。",
+      en: "Boosts the accuracy of the holder’s moves by 10%.",
     },
     effects: [],
     flingPower: 10,
@@ -598,22 +400,10 @@ export const championsItems = {
       en: "Muscle Band",
     },
     descriptions: {
-      ja: "ちからが　わいてくる　ハチマキ。 もたせると　ぶつりわざの いりょくが　すこし　あがる。",
-      en: "An item to be held by a Pokémon. It is a headband that slightly boosts the power of physical moves.",
+      ja: "物理技の威力が1.1倍になる。",
+      en: "Boosts the power of the holder’s physical moves by 10%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.1,
-        requirements: [
-          {
-            requirement: "damageClass",
-            damageClass: "physical",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: muscleBandEffects,
     flingPower: 10,
   },
   "wise-glasses": {
@@ -624,22 +414,10 @@ export const championsItems = {
       en: "Wise Glasses",
     },
     descriptions: {
-      ja: "ぶあつい　レンズの　ついた　メガネ。 もたせると　とくしゅわざの いりょくが　すこし　あがる。",
-      en: "An item to be held by a Pokémon. It is a thick pair of glasses that slightly boosts the power of special moves.",
+      ja: "特殊技の威力が1.1倍になる。",
+      en: "Boosts the power of the holder’s special moves by 10%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.1,
-        requirements: [
-          {
-            requirement: "damageClass",
-            damageClass: "special",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: wiseGlassesEffects,
     flingPower: 10,
   },
   "expert-belt": {
@@ -650,21 +428,10 @@ export const championsItems = {
       en: "Expert Belt",
     },
     descriptions: {
-      ja: "つかいこまれた　くろい　おび。 もたせると　こうかばつぐんの　とき わざの　いりょくが　すこし　あがる。",
-      en: "An item to be held by a Pokémon. It is a well-worn belt that slightly boosts the power of supereffective moves.",
+      ja: "使った技が効果バツグンの時、威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s supereffective moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: expertBeltEffects,
     flingPower: 10,
   },
   "light-clay": {
@@ -675,8 +442,8 @@ export const championsItems = {
       en: "Light Clay",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　ひかりのかべや リフレクターを　つかったとき いつもよりも　ながく　のこる。",
-      en: "A Pokémon hold item that extends the duration of barrier moves like Light Screen and Reflect used by the holder.",
+      ja: "持たせたポケモンが「ひかりのかべ」「リフレクター」「オーロラベール」を使ったとき効果時間が3ターン長くなる。",
+      en: "When the holder uses Light Screen, Reflect, or Aurora Veil, the duration is extended by 3 turns. (Total duration: 8 turns)",
     },
     effects: [],
     flingPower: 30,
@@ -689,22 +456,10 @@ export const championsItems = {
       en: "Life Orb",
     },
     descriptions: {
-      ja: "もたせると　こうげきする　たびに ＨＰが　すこし　へってしまうが わざの　いりょくが　あがる。",
-      en: "An item to be held by a Pokémon. It boosts the power of moves, but at the cost of some HP on each hit.",
+      ja: "技の威力が1.3倍になるが、攻撃が成功するたび最大HPの1/10減る。",
+      en: "Boosts the power of the holder’s moves by 30%. However, the holder also loses 1/10 of its max HP each time it successfully lands an attack.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.3,
-        consumable: false,
-      },
-      {
-        effect: "damage",
-        activationTiming: "afterDamage",
-        damageDivisor: 10,
-        consumable: false,
-      },
-    ],
+    effects: lifeOrbEffects,
     flingPower: 30,
   },
   "focus-sash": {
@@ -715,22 +470,10 @@ export const championsItems = {
       en: "Focus Sash",
     },
     descriptions: {
-      ja: "もたせると　ＨＰが　まんたんのとき ひんしになりそうな　わざを　うけても ＨＰ１で　いちどだけ　たえる。",
-      en: "An item to be held by a Pokémon. If it has full HP, the holder will endure one potential KO attack, leaving 1 HP.",
+      ja: "HP満タンの時、一撃でひんしになる技のダメージを受けるとHPを1残して耐える。1度使うとその対戦中は無くなる。",
+      en: "If the holder has full HP and takes damage from a move that would knock it out in one hit, it will endure the hit with 1 HP. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 0,
-        requirements: [
-          {
-            requirement: "hpRatioAtFull",
-          },
-        ],
-        minimumRemainingHp: 1,
-        consumable: true,
-      },
-    ],
+    effects: focusSashEffects,
     flingPower: 10,
   },
   "zoom-lens": {
@@ -741,8 +484,8 @@ export const championsItems = {
       en: "Zoom Lens",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　あいてよりも こうどうするのが　おそいとき わざが　めいちゅう　しやすくなる。",
-      en: "An item to be held by a Pokémon. If the holder moves after the foe, its critical-hit ratio will be boosted.",
+      ja: "持たせたポケモンが相手よりも行動するのが遅いとき、技の命中率が1.2倍になる。",
+      en: "Boosts the accuracy of the holder’s moves by 20% when the holder acts after the targets.",
     },
     effects: [],
     flingPower: 10,
@@ -755,8 +498,8 @@ export const championsItems = {
       en: "Metronome",
     },
     descriptions: {
-      ja: "もたせると　おなじわざを　れんぞくで つかったとき　いりょくが　あがる。 やめると　いりょくは　もどる。",
-      en: "A Pokémon hold item that boosts a move used consecutively. Its effect is reset if another move is used.",
+      ja: "同じ技を連続で使った場合、威力が上がる。2回目で1.2倍、3回目で1.4倍と上がり、最大で2倍まで上がる。やめると元に戻る。",
+      en: "Boosts the power of a move that is used repeatedly. This boost will be 20% on the second usage, 40% on the third, and so on, up to a maximum boost of 100%. If the streak is broken, the move’s power returns to its usual value.",
     },
     effects: [],
     flingPower: 30,
@@ -769,17 +512,10 @@ export const championsItems = {
       en: "Iron Ball",
     },
     descriptions: {
-      ja: "もたせると　すばやさが　さがる。 ひこうタイプや　ふゆう　ポケモンは じめんわざが　あたって　しまう。",
-      en: "A Pokémon hold item that cuts Speed. It makes Flying-type and levitating holders susceptible to Ground moves.",
+      ja: "持たせている間は素早さが半減する。ひこうタイプや特性「ふゆう」のポケモンはじめん技が当たってしまう。",
+      en: "Halves the holder’s Speed stat. If the holder is off the ground, it will be grounded, meaning it can be affected by Ground-type moves, as well as the Spikes, Toxic Spikes, and Sticky Web statuses.",
     },
-    effects: [
-      {
-        effect: "statMultiplier",
-        stat: "speed",
-        multiplier: 0.5,
-        consumable: false,
-      },
-    ],
+    effects: [],
     flingPower: 130,
   },
   "icy-rock": {
@@ -790,8 +526,8 @@ export const championsItems = {
       en: "Icy Rock",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　あられを つかうと　いつもより　あられの じかんが　ながくなる。",
-      en: "A Pokémon hold item that extends the duration of the move Hail used by the holder.",
+      ja: "持たせたポケモンが「ゆきふらし」「ゆきげしき」「さむいギャグ」で天気を「ゆき」にした時の効果時間が3ターン長くなる。",
+      en: "When the holder summons snow with its moves or Ability, the duration is extended by 3 turns. (Total duration: 8 turns)",
     },
     effects: [],
     flingPower: 40,
@@ -804,8 +540,8 @@ export const championsItems = {
       en: "Smooth Rock",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　すなあらしを つかうと　いつもより　すなあらしの じかんが　ながくなる。",
-      en: "A Pokémon hold item that extends the duration of the move Sandstorm used by the holder.",
+      ja: "持たせたポケモンが「すなあらし」や「すなおこし」で天候をすなあらしにした際に効果時間が3ターン長くなる。",
+      en: "When the holder summons a sandstorm with its moves or Ability, the duration is extended by 3 turns. (Total duration: 8 turns)",
     },
     effects: [],
     flingPower: 10,
@@ -818,8 +554,8 @@ export const championsItems = {
       en: "Heat Rock",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　にほんばれを つかうと　いつもより　はれの じかんが　ながくなる。",
-      en: "A Pokémon hold item that extends the duration of the move Sunny Day used by the holder.",
+      ja: "持たせたポケモンが「にほんばれ」「ひでり」「ひひいろのこどう」で天候をはれにした際に効果時間が3ターン長くなる。",
+      en: "When the holder summons harsh sunlight with its moves or Ability, the duration is extended by 3 turns. (Total duration: 8 turns)",
     },
     effects: [],
     flingPower: 60,
@@ -832,8 +568,8 @@ export const championsItems = {
       en: "Damp Rock",
     },
     descriptions: {
-      ja: "もたせた　ポケモンが　あまごいを つかうと　いつもより　あめの じかんが　ながくなる。",
-      en: "A Pokémon hold item that extends the duration of the move Rain Dance used by the holder.",
+      ja: "持たせたポケモンが「あまごい」「あめふらし」で天候をあめにした際に効果時間が3ターン長くなる。",
+      en: "When the holder summons rain with its moves or Ability, the duration is extended by 3 turns. (Total duration: 8 turns)",
     },
     effects: [],
     flingPower: 60,
@@ -846,17 +582,10 @@ export const championsItems = {
       en: "Choice Scarf",
     },
     descriptions: {
-      ja: "ちょっと　こだわった　スカーフ。 もたせると　すばやさは　あがるが おなじ　わざしか　だせなくなる。",
-      en: "An item to be held by a Pokémon. This scarf boosts Speed, but allows the use of only one kind of move.",
+      ja: "素早さが1.5倍になるが、1度技を出すと交代するまでその技しか出せなくなる。",
+      en: "Boosts the holder’s Speed stat by 50%. However, once the holder uses a move, it becomes unable to use any other move but that one until it switches out of battle.",
     },
-    effects: [
-      {
-        effect: "statMultiplier",
-        stat: "speed",
-        multiplier: 1.5,
-        consumable: false,
-      },
-    ],
+    effects: [],
     flingPower: 10,
   },
   "shed-shell": {
@@ -867,8 +596,8 @@ export const championsItems = {
       en: "Shed Shell",
     },
     descriptions: {
-      ja: "じょうぶで　かたい　ぬけがら。 もたせた　ポケモンは　ひかえの ポケモンと　かならず　いれかわれる。",
-      en: "A tough, discarded carapace to be held by a Pokémon. It enables the holder to switch with a waiting Pokémon in battle.",
+      ja: "持たせると交代を封じる効果を受けても控えのポケモンと必ず入れ替われる。",
+      en: "Enables the holder to ignore any effects that would usually prevent it from switching out of battle and being replaced by another party Pokémon.",
     },
     effects: [],
     flingPower: 10,
@@ -881,8 +610,8 @@ export const championsItems = {
       en: "Big Root",
     },
     descriptions: {
-      ja: "もたせると　ＨＰを　すいとる　わざで いつもより　おおく　じぶんの　ＨＰを かいふくできる。",
-      en: "A Pokémon hold item that boosts the power of HP-stealing moves to let the holder recover more HP.",
+      ja: "HPを吸い取る技で回復する量が1.3倍になる。ねをはる、ちからをすいとる等も1.3倍になる。",
+      en: "Boosts the amount of HP restored through HP-absorbing moves by 30%. HP restored by moves such as Ingrain and Strength Sap will also be boosted by 30%.",
     },
     effects: [],
     flingPower: 10,
@@ -895,8 +624,8 @@ export const championsItems = {
       en: "Cheri Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると まひを　かいふくする。 ",
-      en: "A hold item that heals paralysis in battle.",
+      ja: "まひ状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures being paralyzed. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -909,8 +638,8 @@ export const championsItems = {
       en: "Chesto Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると ねむりを　かいふくする。 ",
-      en: "A hold item that awakens POKéMON in battle.",
+      ja: "ねむり状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures being asleep. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -923,8 +652,8 @@ export const championsItems = {
       en: "Pecha Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると どくを　かいふくする。 ",
-      en: "A hold item that heals poisoning in battle.",
+      ja: "どく状態・もうどく状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures being poisoned or badly poisoned. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -937,8 +666,8 @@ export const championsItems = {
       en: "Rawst Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると やけどを　かいふくする。 ",
-      en: "A hold item that heals a burn in battle.",
+      ja: "やけど状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures being burned. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -951,8 +680,8 @@ export const championsItems = {
       en: "Aspear Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こおりを　かいふくする。 ",
-      en: "A hold item that defrosts POKéMON in battle.",
+      ja: "こおり状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures being frozen. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -965,8 +694,8 @@ export const championsItems = {
       en: "Leppa Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると ＰＰを　１０だけ　かいふくする。 ",
-      en: "A hold item that restores 10 PP in battle.",
+      ja: "PPが0になった技のPPを10回復する。1度使うとその対戦中は無くなる。",
+      en: "Restores 10 PP to a move when its PP is fully depleted. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -979,8 +708,8 @@ export const championsItems = {
       en: "Oran Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると ＨＰを　１０だけ　かいふくする。 ",
-      en: "A hold item that restores 10 HP in battle.",
+      ja: "残りHPが最大HPの1/2以下になった時10回復する。1度使うとその対戦中は無くなる。",
+      en: "Restores 10 HP to the holder when its HP drops to 1/2 or less of its max. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -993,8 +722,8 @@ export const championsItems = {
       en: "Persim Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こんらんを　かいふくする。 ",
-      en: "A hold item that heals confusion in battle.",
+      ja: "こんらん状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures being confused. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -1007,8 +736,8 @@ export const championsItems = {
       en: "Lum Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると すべての　じょうたい　いじょうを かいふくする。",
-      en: "A hold item that heals status in battle.",
+      ja: "全ての状態異常、こんらん状態を回復する。1度使うとその対戦中は無くなる。",
+      en: "Cures any status condition or confusion. Disappears for the duration of the battle after a single use.",
     },
     effects: [],
     flingPower: 10,
@@ -1021,23 +750,10 @@ export const championsItems = {
       en: "Sitrus Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると ＨＰを　すこしだけ　かいふくする。 ",
-      en: "A hold item that restores 30 HP in battle.",
+      ja: "残りHPが最大HPの1/2以下になった時、最大HPの1/4回復する。1度使うとその対戦中は無くなる。",
+      en: "Restores 1/4 of the holder’s max HP when the holder’s HP drops to 1/2 or less of its max. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "recovery",
-        activationTiming: "afterDamage",
-        recoveryDivisor: 4,
-        requirements: [
-          {
-            requirement: "hpRatioAtOrBelow",
-            hpRatio: 0.5,
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: sitrusBerryEffects,
     flingPower: 10,
   },
   "occa-berry": {
@@ -1048,25 +764,10 @@ export const championsItems = {
       en: "Occa Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　ほのお　わざを うけたとき　いりょくが　よわまる。",
-      en: "Weakens a supereffective Fire-type attack against the holding Pokémon.",
+      ja: "効果バツグンのほのおタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Fire-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fire",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("fire"),
     flingPower: 10,
   },
   "passho-berry": {
@@ -1077,25 +778,10 @@ export const championsItems = {
       en: "Passho Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　みず　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Water-type attack.",
+      ja: "効果バツグンのみずタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Water-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "water",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("water"),
     flingPower: 10,
   },
   "wacan-berry": {
@@ -1106,25 +792,10 @@ export const championsItems = {
       en: "Wacan Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　でんき　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Electric-type attack.",
+      ja: "効果バツグンのでんきタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Electric-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "electric",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("electric"),
     flingPower: 10,
   },
   "rindo-berry": {
@@ -1135,25 +806,10 @@ export const championsItems = {
       en: "Rindo Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　くさ　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Grass-type attack.",
+      ja: "効果バツグンのくさタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Grass-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "grass",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("grass"),
     flingPower: 10,
   },
   "yache-berry": {
@@ -1164,25 +820,10 @@ export const championsItems = {
       en: "Yache Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　こおり　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Ice-type attack.",
+      ja: "効果バツグンのこおりタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Ice-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ice",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("ice"),
     flingPower: 10,
   },
   "chople-berry": {
@@ -1193,25 +834,10 @@ export const championsItems = {
       en: "Chople Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　かくとう　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Fighting-type attack.",
+      ja: "効果バツグンのかくとうタイプの技を受けた時ダメージを半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Fighting-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fighting",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("fighting"),
     flingPower: 10,
   },
   "kebia-berry": {
@@ -1222,25 +848,10 @@ export const championsItems = {
       en: "Kebia Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　どく　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Poison-type attack.",
+      ja: "効果バツグンのどくタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Poison-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "poison",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("poison"),
     flingPower: 10,
   },
   "shuca-berry": {
@@ -1251,25 +862,10 @@ export const championsItems = {
       en: "Shuca Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　じめん　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Ground-type attack.",
+      ja: "効果バツグンのじめんタイプの技を受けた時ダメージを半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Ground-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ground",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("ground"),
     flingPower: 10,
   },
   "coba-berry": {
@@ -1280,25 +876,10 @@ export const championsItems = {
       en: "Coba Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　ひこう　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Flying-type attack.",
+      ja: "効果バツグンのひこうタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Flying-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "flying",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("flying"),
     flingPower: 10,
   },
   "payapa-berry": {
@@ -1309,25 +890,10 @@ export const championsItems = {
       en: "Payapa Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　エスパー　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Psychic-type attack.",
+      ja: "効果バツグンのエスパータイプの技を受けた時ダメージを半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Psychic-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "psychic",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("psychic"),
     flingPower: 10,
   },
   "tanga-berry": {
@@ -1338,25 +904,10 @@ export const championsItems = {
       en: "Tanga Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　むし　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Bug-type attack.",
+      ja: "効果バツグンのむしタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Bug-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "bug",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("bug"),
     flingPower: 10,
   },
   "charti-berry": {
@@ -1367,25 +918,10 @@ export const championsItems = {
       en: "Charti Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　いわ　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Rock-type attack.",
+      ja: "効果バツグンのいわタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Rock-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "rock",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("rock"),
     flingPower: 10,
   },
   "kasib-berry": {
@@ -1396,25 +932,10 @@ export const championsItems = {
       en: "Kasib Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　ゴースト　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Ghost-type attack.",
+      ja: "効果バツグンのゴーストタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Ghost-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "ghost",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("ghost"),
     flingPower: 10,
   },
   "haban-berry": {
@@ -1425,25 +946,10 @@ export const championsItems = {
       en: "Haban Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　ドラゴン　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Dragon-type attack.",
+      ja: "効果バツグンのドラゴンタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Dragon-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "dragon",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("dragon"),
     flingPower: 10,
   },
   "colbur-berry": {
@@ -1454,25 +960,10 @@ export const championsItems = {
       en: "Colbur Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　あく　わざを うけたとき　いりょくが　よわまる。",
-      en: "Weakens a supereffective Dark-type attack against the holding Pokémon.",
+      ja: "効果バツグンのあくタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Dark-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "dark",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("dark"),
     flingPower: 10,
   },
   "babiri-berry": {
@@ -1483,25 +974,10 @@ export const championsItems = {
       en: "Babiri Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　はがね　わざを うけたとき　いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s supereffective Steel-type attack.",
+      ja: "効果バツグンのはがねタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Steel-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "steel",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("steel"),
     flingPower: 10,
   },
   "roseli-berry": {
@@ -1512,25 +988,10 @@ export const championsItems = {
       en: "Roseli Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると こうかばつぐんの　フェアリー　わざを うけたとき　いりょくが　よわまる。",
-      en: "If held by a Pokémon, this Berry will lessen the damage taken from one supereffective Fairy-type attack.",
+      ja: "効果バツグンのフェアリータイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a supereffective Fairy-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fairy",
-          },
-          {
-            requirement: "superEffective",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: createSuperEffectiveTypeResistBerryEffects("fairy"),
     flingPower: 10,
   },
   "chilan-berry": {
@@ -1541,22 +1002,10 @@ export const championsItems = {
       en: "Chilan Berry",
     },
     descriptions: {
-      ja: "ポケモンに　もたせると ノーマル　わざを　うけたとき いりょくが　よわまる。",
-      en: "A Poffin ingredient. If held by a Pokémon, it weakens a foe’s Normal-type attack.",
+      ja: "ノーマルタイプの技を受けた時ダメージが半減する。1度使うとその対戦中は無くなる。",
+      en: "Halves the damage taken when the holder is hit with a Normal-type move. Disappears for the duration of the battle after a single use.",
     },
-    effects: [
-      {
-        effect: "receivedDamageMultiplier",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "normal",
-          },
-        ],
-        consumable: true,
-      },
-    ],
+    effects: chilanBerryEffects,
     flingPower: 10,
   },
   "fairy-feather": {
@@ -1567,22 +1016,10 @@ export const championsItems = {
       en: "Fairy Feather",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "フェアリータイプの技の威力が1.2倍になる。",
+      en: "Boosts the power of the holder’s Fairy-type moves by 20%.",
     },
-    effects: [
-      {
-        effect: "damageMultiplier",
-        multiplier: 1.2,
-        requirements: [
-          {
-            requirement: "moveType",
-            moveType: "fairy",
-          },
-        ],
-        consumable: false,
-      },
-    ],
+    effects: createTypeBoostEffects("fairy"),
     flingPower: null,
   },
   "light-ball": {
@@ -1593,8 +1030,8 @@ export const championsItems = {
       en: "Light Ball",
     },
     descriptions: {
-      ja: "ピカチュウに　もたせると こうげきと　とくこうの　いりょくが あがる　ふしぎな　たま。",
-      en: "A hold item that raises the SP. ATK of PIKACHU.",
+      ja: "ピカチュウの攻撃・特攻が2倍になる。わざ「なげつける」で投げつけると相手をまひ状態にする。",
+      en: "When held by a Pikachu, doubles the holder’s Attack and Sp. Atk.",
     },
     effects: [],
     flingPower: 30,
@@ -1607,8 +1044,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "オーダイルがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Feraligatr to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1621,8 +1058,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "メガニウムがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Meganium to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1635,8 +1072,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "エンブオーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Emboar to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1649,8 +1086,8 @@ export const championsItems = {
       en: "Beedrillite",
     },
     descriptions: {
-      ja: "スピアーに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Beedrill hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "スピアーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Beedrill to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1663,8 +1100,8 @@ export const championsItems = {
       en: "Ampharosite",
     },
     descriptions: {
-      ja: "デンリュウに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Ampharos hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "デンリュウがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Ampharos to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1677,8 +1114,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ガメノデスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Barbaracle to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1691,8 +1128,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "スターミーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Starmie to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1705,8 +1142,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ウツボットがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Victreebel to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1719,8 +1156,8 @@ export const championsItems = {
       en: "Altarianite",
     },
     descriptions: {
-      ja: "チルタリスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Altaria hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "チルタリスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Altaria to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1733,8 +1170,8 @@ export const championsItems = {
       en: "Banettite",
     },
     descriptions: {
-      ja: "ジュペッタに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Banette hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ジュペッタがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Banette to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1747,8 +1184,8 @@ export const championsItems = {
       en: "Cameruptite",
     },
     descriptions: {
-      ja: "バクーダに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Camerupt hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "バクーダがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Camerupt to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1761,8 +1198,8 @@ export const championsItems = {
       en: "Mawilite",
     },
     descriptions: {
-      ja: "クチートに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Mawile hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "クチートがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Mawile to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1775,8 +1212,8 @@ export const championsItems = {
       en: "Absolite",
     },
     descriptions: {
-      ja: "アブソルに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Absol hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "アブソルがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Absol to Mega Evolve into Mega Absol.",
     },
     effects: [],
     flingPower: 80,
@@ -1789,8 +1226,8 @@ export const championsItems = {
       en: "Slowbronite",
     },
     descriptions: {
-      ja: "ヤドランに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Slowbro hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ヤドランがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Slowbro to Mega Evolve. It has no effect on Galarian Slowbro.",
     },
     effects: [],
     flingPower: 80,
@@ -1803,8 +1240,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "カイリューがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Dragonite to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1817,8 +1254,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ユキメノコがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Froslass to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1831,8 +1268,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ルチャブルがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Hawlucha to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1845,8 +1282,8 @@ export const championsItems = {
       en: "Tyranitarite",
     },
     descriptions: {
-      ja: "バンギラスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Tyranitar hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "バンギラスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Tyranitar to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1859,8 +1296,8 @@ export const championsItems = {
       en: "Pidgeotite",
     },
     descriptions: {
-      ja: "ピジョットに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Pidgeot hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ピジョットがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Pidgeot to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1873,8 +1310,8 @@ export const championsItems = {
       en: "Manectite",
     },
     descriptions: {
-      ja: "ライボルトに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Manectric hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ライボルトがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Manectric to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1887,8 +1324,8 @@ export const championsItems = {
       en: "Houndoominite",
     },
     descriptions: {
-      ja: "ヘルガーに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Houndoom hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ヘルガーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Houndoom to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1901,8 +1338,8 @@ export const championsItems = {
       en: "Audinite",
     },
     descriptions: {
-      ja: "タブンネに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Audino hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "タブンネがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Audino to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1915,8 +1352,8 @@ export const championsItems = {
       en: "Lopunnite",
     },
     descriptions: {
-      ja: "ミミロップに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Lopunny hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ミミロップがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Lopunny to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1929,8 +1366,8 @@ export const championsItems = {
       en: "Sablenite",
     },
     descriptions: {
-      ja: "ヤミラミに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Sableye hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ヤミラミがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Sableye to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1943,8 +1380,8 @@ export const championsItems = {
       en: "Sharpedonite",
     },
     descriptions: {
-      ja: "サメハダーに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Sharpedo hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "サメハダーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Sharpedo to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1957,8 +1394,8 @@ export const championsItems = {
       en: "Gyaradosite",
     },
     descriptions: {
-      ja: "ギャラドスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Gyarados hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ギャラドスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Gyarados to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1971,8 +1408,8 @@ export const championsItems = {
       en: "Lucarionite",
     },
     descriptions: {
-      ja: "ルカリオに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Lucario hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ルカリオがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Lucario to Mega Evolve into Mega Lucario.",
     },
     effects: [],
     flingPower: 80,
@@ -1985,8 +1422,8 @@ export const championsItems = {
       en: "Heracronite",
     },
     descriptions: {
-      ja: "ヘラクロスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Heracross hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ヘラクロスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Heracross to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -1999,8 +1436,8 @@ export const championsItems = {
       en: "Aerodactylite",
     },
     descriptions: {
-      ja: "プテラに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Aerodactyl hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "プテラがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Aerodactyl to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2013,8 +1450,8 @@ export const championsItems = {
       en: "Alakazite",
     },
     descriptions: {
-      ja: "フーディンに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Alakazam hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "フーディンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Alakazam to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2027,8 +1464,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ジジーロンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Drampa to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2041,8 +1478,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "シビルドンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Eelektross to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2055,8 +1492,8 @@ export const championsItems = {
       en: "Glalitite",
     },
     descriptions: {
-      ja: "オニゴーリに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Glalie hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "オニゴーリがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Glalie to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2069,8 +1506,8 @@ export const championsItems = {
       en: "Pinsirite",
     },
     descriptions: {
-      ja: "カイロスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Pinsir hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "カイロスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Pinsir to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2083,8 +1520,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "タイレーツがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Falinks to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2097,8 +1534,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ペンドラーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Scolipede to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2111,8 +1548,8 @@ export const championsItems = {
       en: "Gardevoirite",
     },
     descriptions: {
-      ja: "サーナイトに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Gardevoir hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "サーナイトがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Gardevoir to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2125,8 +1562,8 @@ export const championsItems = {
       en: "Galladite",
     },
     descriptions: {
-      ja: "エルレイドに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Gallade hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "エルレイドがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Gallade to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2139,8 +1576,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "エアームドがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Skarmory to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2153,8 +1590,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ピクシーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Clefable to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2167,8 +1604,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ドラミドロがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Dragalge to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2181,8 +1618,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ズルズキンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Scrafty to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2195,8 +1632,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "カエンジシがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Pyroar to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2209,8 +1646,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "カラマネロがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Malamar to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2223,8 +1660,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ドリュウズがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Excadrill to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2237,8 +1674,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "シャンデラがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Chandelure to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2251,8 +1688,8 @@ export const championsItems = {
       en: "Aggronite",
     },
     descriptions: {
-      ja: "ボスゴドラに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Aggron hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ボスゴドラがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Aggron to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2265,8 +1702,8 @@ export const championsItems = {
       en: "Metagrossite",
     },
     descriptions: {
-      ja: "メタグロスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Metagross hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "メタグロスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Metagross to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2279,8 +1716,8 @@ export const championsItems = {
       en: "Gengarite",
     },
     descriptions: {
-      ja: "ゲンガーに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Gengar hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ゲンガーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Gengar to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2293,8 +1730,8 @@ export const championsItems = {
       en: "Medichamite",
     },
     descriptions: {
-      ja: "チャーレムに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Medicham hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "チャーレムがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Medicham to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2307,8 +1744,8 @@ export const championsItems = {
       en: "Abomasite",
     },
     descriptions: {
-      ja: "ユキノオーに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Abomasnow hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ユキノオーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Abomasnow to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2321,8 +1758,8 @@ export const championsItems = {
       en: "Scizorite",
     },
     descriptions: {
-      ja: "ハッサムに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Scizor hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ハッサムがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Scizor to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2335,8 +1772,8 @@ export const championsItems = {
       en: "Garchompite",
     },
     descriptions: {
-      ja: "ガブリアスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Garchomp hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ガブリアスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Garchomp to Mega Evolve into Mega Garchomp.",
     },
     effects: [],
     flingPower: 80,
@@ -2349,8 +1786,8 @@ export const championsItems = {
       en: "Steelixite",
     },
     descriptions: {
-      ja: "ハガネールに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Steelix hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ハガネールがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Steelix to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2363,8 +1800,8 @@ export const championsItems = {
       en: "Kangaskhanite",
     },
     descriptions: {
-      ja: "ガルーラに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Kangaskhan hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ガルーラがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Kangaskhan to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2377,8 +1814,8 @@ export const championsItems = {
       en: "Charizardite X",
     },
     descriptions: {
-      ja: "リザードンに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Charizard hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "リザードンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Charizard to Mega Evolve into Mega Charizard X.",
     },
     effects: [],
     flingPower: 80,
@@ -2391,8 +1828,8 @@ export const championsItems = {
       en: "Charizardite Y",
     },
     descriptions: {
-      ja: "リザードンに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Charizard hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "リザードンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Charizard to Mega Evolve into Mega Charizard Y.",
     },
     effects: [],
     flingPower: 80,
@@ -2405,8 +1842,8 @@ export const championsItems = {
       en: "Blastoisinite",
     },
     descriptions: {
-      ja: "カメックスに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Blastoise hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "カメックスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Blastoise to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2419,8 +1856,8 @@ export const championsItems = {
       en: "Venusaurite",
     },
     descriptions: {
-      ja: "フシギバナに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Venusaur hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "フシギバナがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Venusaur to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2433,8 +1870,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ゲッコウガがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Greninja to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2447,8 +1884,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "マフォクシーがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Delphox to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2461,8 +1898,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ブリガロンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Chesnaught to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2475,8 +1912,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "フラエッテ(えいえんのはな)がバトル中メガシンカ可能になる。",
+      en: "A held item that allows Eternal Flower Floette to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2489,8 +1926,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ライチュウがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Raichu to Mega Evolve into Mega Raichu X. It has no effect on Alolan Raichu.",
     },
     effects: [],
     flingPower: 80,
@@ -2503,8 +1940,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ライチュウがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Raichu to Mega Evolve into Mega Raichu Y. It has no effect on Alolan Raichu.",
     },
     effects: [],
     flingPower: 80,
@@ -2517,8 +1954,8 @@ export const championsItems = {
       en: "Sceptilite",
     },
     descriptions: {
-      ja: "ジュカインに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Sceptile hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ジュカインがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Sceptile to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2531,8 +1968,8 @@ export const championsItems = {
       en: "Swampertite",
     },
     descriptions: {
-      ja: "ラグラージに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One of a variety of mysterious Mega Stones. Have Swampert hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "ラグラージがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Swampert to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2545,8 +1982,8 @@ export const championsItems = {
       en: "Blazikenite",
     },
     descriptions: {
-      ja: "バシャーモに　もたせておくと たたかいのとき　メガシンカが　できる ふしぎな　メガストーンの　いっしゅ。",
-      en: "One variety of the mysterious Mega Stones. Have Blaziken hold it, and this stone will enable it to Mega Evolve during battle.",
+      ja: "バシャーモがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Blaziken to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2559,8 +1996,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ムクホークがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Staraptor to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2573,8 +2010,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "チリーンがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Chimecho to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2587,8 +2024,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ケケンカニがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Crabominable to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2601,8 +2038,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "スコヴィランがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Scovillain to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2615,8 +2052,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ゴルーグがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Golurk to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2629,8 +2066,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "ニャオニクスがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Meowstic to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
@@ -2643,8 +2080,8 @@ export const championsItems = {
       en: "",
     },
     descriptions: {
-      ja: "",
-      en: "",
+      ja: "キラフロルがバトル中メガシンカ可能になる。",
+      en: "A held item that allows Glimmora to Mega Evolve.",
     },
     effects: [],
     flingPower: 80,
