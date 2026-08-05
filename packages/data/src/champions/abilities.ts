@@ -1,12 +1,18 @@
-import type { Ability } from "@poke-calc/core";
-
 import {
   adaptabilityEffects,
   analyticEffects,
+  disguiseEffects,
+  iceBodyEffects,
+  multiscaleEffects,
+  parentalBondEffects,
+  roughSkinEffects,
+  skillLinkEffects,
   strongJawEffects,
+  sturdyEffects,
   technicianEffects,
   toughClawsEffects,
-} from "../common/ability-effects.js";
+  type Ability,
+} from "@poke-calc/core";
 
 export const championsAbilities = {
   adaptability: {
@@ -358,14 +364,7 @@ export const championsAbilities = {
       ja: "からだを　おおう　ばけのかわで　 １かい　こうげきを　ふせぐことが　できる。",
       en: "Once per battle, the shroud that covers the Pokémon can protect it from an attack.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 0,
-        consumable: true,
-        activationDamageDivisor: 8,
-      },
-    ],
+    effects: disguiseEffects,
   },
   dragonize: {
     id: 309,
@@ -859,19 +858,7 @@ export const championsAbilities = {
       ja: "あられのとき　HPを すこしずつ　かいふく。",
       en: "The Pokémon regains HP in a hailstorm.",
     },
-    effects: [
-      {
-        effect: "recovery",
-        activationTiming: "turnEnd",
-        recoveryDivisor: 16,
-        requirements: [
-          {
-            requirement: "weather",
-            weather: "snow",
-          },
-        ],
-      },
-    ],
+    effects: iceBodyEffects,
   },
   illuminate: {
     id: 35,
@@ -1326,17 +1313,7 @@ export const championsAbilities = {
       ja: "ＨＰが　まんたんのときに ダメージが　すくなくなる。",
       en: "Reduces damage when HP is full.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "hpRatioAtFull",
-          },
-        ],
-      },
-    ],
+    effects: multiscaleEffects,
   },
   mummy: {
     id: 152,
@@ -1453,14 +1430,7 @@ export const championsAbilities = {
       ja: "おやこ　２ひきで こうげきする。",
       en: "Parent and child attack together.",
     },
-    effects: [
-      {
-        side: "attacker",
-        effect: "additionalHit",
-        hitCount: 1,
-        damageMultiplier: 0.25,
-      },
-    ],
+    effects: parentalBondEffects,
   },
   pickpocket: {
     id: 124,
@@ -1772,16 +1742,7 @@ export const championsAbilities = {
       ja: "ふれた　あいてを キズつける。",
       en: "Hurts to touch.",
     },
-    effects: [
-      {
-        side: "defender",
-        effect: "contactDamage",
-        hpRatio: {
-          numerator: 1,
-          denominator: 8,
-        },
-      },
-    ],
+    effects: roughSkinEffects,
   },
   "sand-force": {
     id: 159,
@@ -1976,12 +1937,7 @@ export const championsAbilities = {
       ja: "れんぞく　わざを たくさん　だせる。",
       en: "Increases the frequency of multi-strike moves.",
     },
-    effects: [
-      {
-        side: "attacker",
-        effect: "maximizeMoveHitCount",
-      },
-    ],
+    effects: skillLinkEffects,
   },
   "slush-rush": {
     id: 202,
@@ -2228,18 +2184,7 @@ export const championsAbilities = {
       ja: "いちげきで たおされない。",
       en: "Negates 1-hit KO attacks.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 1,
-        minimumRemainingHp: 1,
-        requirements: [
-          {
-            requirement: "hpRatioAtFull",
-          },
-        ],
-      },
-    ],
+    effects: sturdyEffects,
   },
   "suction-cups": {
     id: 21,
@@ -2683,14 +2628,7 @@ export const championsAbilities = {
       ja: "単体攻撃が2回当たり、2回目のダメージが下がる。",
       en: "Makes single-target attacks hit twice, with reduced damage on the second hit.",
     },
-    effects: [
-      {
-        side: "attacker",
-        effect: "additionalHit",
-        hitCount: 1,
-        damageMultiplier: 0.25,
-      },
-    ],
+    effects: parentalBondEffects,
   },
 
   skillLink: {
@@ -2704,11 +2642,6 @@ export const championsAbilities = {
       ja: "連続技が必ず最大回数命中する。",
       en: "Makes multi-hit moves always hit the maximum number of times.",
     },
-    effects: [
-      {
-        side: "attacker",
-        effect: "maximizeMoveHitCount",
-      },
-    ],
+    effects: skillLinkEffects,
   },
 } satisfies Record<string, Ability>;

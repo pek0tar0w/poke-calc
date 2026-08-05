@@ -1,5 +1,3 @@
-import type { Item } from "@poke-calc/core";
-
 import {
   assaultVestEffects,
   chilanBerryEffects,
@@ -14,7 +12,8 @@ import {
   lifeOrbEffects,
   muscleBandEffects,
   wiseGlassesEffects,
-} from "../common/item-effects/index.js";
+  type Item,
+} from "@poke-calc/core";
 
 export const scarletVioletItems = {
   "occa-berry": {

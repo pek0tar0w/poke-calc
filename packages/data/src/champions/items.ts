@@ -1,5 +1,3 @@
-import type { Item } from "@poke-calc/core";
-
 import {
   chilanBerryEffects,
   createSuperEffectiveTypeResistBerryEffects,
@@ -11,7 +9,8 @@ import {
   muscleBandEffects,
   sitrusBerryEffects,
   wiseGlassesEffects,
-} from "../common/item-effects/index.js";
+  type Item,
+} from "@poke-calc/core";
 
 export const championsItems = {
   "bright-powder": {

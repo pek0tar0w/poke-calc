@@ -1,12 +1,18 @@
-import type { Ability } from "@poke-calc/core";
-
 import {
   adaptabilityEffects,
   analyticEffects,
+  disguiseEffects,
+  iceBodyEffects,
+  multiscaleEffects,
+  parentalBondEffects,
+  roughSkinEffects,
+  skillLinkEffects,
   strongJawEffects,
+  sturdyEffects,
   technicianEffects,
   toughClawsEffects,
-} from "../common/ability-effects.js";
+  type Ability,
+} from "@poke-calc/core";
 
 export const scarletVioletAbilities = {
   adaptability: {
@@ -449,14 +455,7 @@ export const scarletVioletAbilities = {
       ja: "からだを　おおう　ばけのかわで　 １かい　こうげきを　ふせぐことが　できる。",
       en: "Once per battle, the shroud that covers the Pokémon can protect it from an attack.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 0,
-        consumable: true,
-        activationDamageDivisor: 8,
-      },
-    ],
+    effects: disguiseEffects,
   },
   download: {
     id: 88,
@@ -976,19 +975,7 @@ export const scarletVioletAbilities = {
       ja: "あられのとき　HPを すこしずつ　かいふく。",
       en: "The Pokémon gradually regains HP in snow.",
     },
-    effects: [
-      {
-        effect: "recovery",
-        activationTiming: "turnEnd",
-        recoveryDivisor: 16,
-        requirements: [
-          {
-            requirement: "weather",
-            weather: "snow",
-          },
-        ],
-      },
-    ],
+    effects: iceBodyEffects,
   },
   "ice-face": {
     id: 248,
@@ -1495,17 +1482,7 @@ export const scarletVioletAbilities = {
       ja: "ＨＰが　まんたんのときに ダメージが　すくなくなる。",
       en: "Reduces the amount of damage the Pokémon takes while its HP is full.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 0.5,
-        requirements: [
-          {
-            requirement: "hpRatioAtFull",
-          },
-        ],
-      },
-    ],
+    effects: multiscaleEffects,
   },
   "mycelium-might": {
     id: 298,
@@ -2038,16 +2015,7 @@ export const scarletVioletAbilities = {
       ja: "ふれた　あいてを キズつける。",
       en: "The Pokémon's rough skin damages attackers that make direct contact with it.",
     },
-    effects: [
-      {
-        side: "defender",
-        effect: "contactDamage",
-        hpRatio: {
-          numerator: 1,
-          denominator: 8,
-        },
-      },
-    ],
+    effects: roughSkinEffects,
   },
   "run-away": {
     id: 50,
@@ -2294,12 +2262,7 @@ export const scarletVioletAbilities = {
       ja: "れんぞく　わざを たくさん　だせる。",
       en: "Maximizes the number of times multistrike moves hit.",
     },
-    effects: [
-      {
-        side: "attacker",
-        effect: "maximizeMoveHitCount",
-      },
-    ],
+    effects: skillLinkEffects,
   },
   "slow-start": {
     id: 112,
@@ -2572,18 +2535,7 @@ export const scarletVioletAbilities = {
       ja: "いちげきで たおされない。",
       en: "The Pokémon cannot be knocked out by a single hit as long as its HP is full. One-hit KO moves will also fail to knock it out.",
     },
-    effects: [
-      {
-        effect: "damageReduction",
-        multiplier: 1,
-        minimumRemainingHp: 1,
-        requirements: [
-          {
-            requirement: "hpRatioAtFull",
-          },
-        ],
-      },
-    ],
+    effects: sturdyEffects,
   },
   "suction-cups": {
     id: 21,
@@ -3339,14 +3291,7 @@ export const scarletVioletAbilities = {
       ja: "単体攻撃が2回当たり、2回目のダメージが下がる。",
       en: "Makes single-target attacks hit twice, with reduced damage on the second hit.",
     },
-    effects: [
-      {
-        side: "attacker",
-        effect: "additionalHit",
-        hitCount: 1,
-        damageMultiplier: 0.25,
-      },
-    ],
+    effects: parentalBondEffects,
   },
 
   skillLink: {
@@ -3360,11 +3305,6 @@ export const scarletVioletAbilities = {
       ja: "連続技が必ず最大回数命中する。",
       en: "Makes multi-hit moves always hit the maximum number of times.",
     },
-    effects: [
-      {
-        side: "attacker",
-        effect: "maximizeMoveHitCount",
-      },
-    ],
+    effects: skillLinkEffects,
   },
 } satisfies Record<string, Ability>;
