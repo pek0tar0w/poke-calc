@@ -8,6 +8,22 @@ import type {
 import type { DamagingMove } from "../src/model/move/index.js";
 
 import { calculateDamage } from "../src/calculation/index.js";
+import {
+  adaptabilityEffects,
+  analyticEffects,
+  assaultVestEffects,
+  chilanBerryEffects,
+  choiceBandEffects,
+  createSuperEffectiveTypeResistBerryEffects,
+  leftoversEffects,
+  lifeOrbEffects,
+  parentalBondEffects,
+  sitrusBerryEffects,
+  skillLinkEffects,
+  strongJawEffects,
+  technicianEffects,
+  toughClawsEffects,
+} from "../src/effect/index.js";
 
 const defaultBoosts = {
   attack: 0,
@@ -127,189 +143,72 @@ const dizzyPunch = createMove({
 
 const leftovers = createItem({
   key: "leftovers",
-  effects: [
-    {
-      effect: "recovery",
-      activationTiming: "turnEnd",
-      recoveryDivisor: 16,
-      consumable: false,
-    },
-  ],
+  effects: leftoversEffects,
 });
 
 const sitrusBerry = createItem({
   key: "sitrus-berry",
-  effects: [
-    {
-      effect: "recovery",
-      activationTiming: "afterDamage",
-      recoveryDivisor: 4,
-      consumable: true,
-      requirements: [
-        {
-          requirement: "hpRatioAtOrBelow",
-          hpRatio: 0.5,
-        },
-      ],
-    },
-  ],
+  effects: sitrusBerryEffects,
 });
 
 const lifeOrb = createItem({
   key: "life-orb",
-  effects: [
-    {
-      effect: "damageMultiplier",
-      multiplier: 1.3,
-      consumable: false,
-    },
-  ],
+  effects: lifeOrbEffects,
 });
 
 const choiceBand = createItem({
   key: "choice-band",
-  effects: [
-    {
-      effect: "statMultiplier",
-      stat: "attack",
-      multiplier: 1.5,
-      consumable: false,
-    },
-  ],
+  effects: choiceBandEffects,
 });
 
 const assaultVest = createItem({
   key: "assault-vest",
-  effects: [
-    {
-      effect: "statMultiplier",
-      stat: "specialDefense",
-      multiplier: 1.5,
-      consumable: false,
-    },
-  ],
+  effects: assaultVestEffects,
 });
 
 const occaBerry = createItem({
   key: "occa-berry",
-  effects: [
-    {
-      effect: "damageReduction",
-      multiplier: 0.5,
-      consumable: true,
-      requirements: [
-        {
-          requirement: "moveType",
-          moveType: "fire",
-        },
-        {
-          requirement: "superEffective",
-        },
-      ],
-    },
-  ],
+  effects: createSuperEffectiveTypeResistBerryEffects("fire"),
 });
 
 const chilanBerry = createItem({
   key: "chilan-berry",
-  effects: [
-    {
-      effect: "damageReduction",
-      multiplier: 0.5,
-      consumable: true,
-      requirements: [
-        {
-          requirement: "moveType",
-          moveType: "normal",
-        },
-      ],
-    },
-  ],
+  effects: chilanBerryEffects,
 });
 
 const parentalBond = createAbility({
   key: "parental-bond",
-  effects: [
-    {
-      side: "attacker",
-      effect: "additionalHit",
-      hitCount: 1,
-      damageMultiplier: 0.25,
-    },
-  ],
+  effects: parentalBondEffects,
 });
 
 const skillLink = createAbility({
   key: "skill-link",
-  effects: [
-    {
-      side: "attacker",
-      effect: "maximizeMoveHitCount",
-    },
-  ],
+  effects: skillLinkEffects,
 });
 
 const adaptability = createAbility({
   key: "adaptability",
-  effects: [
-    {
-      side: "attacker",
-      effect: "sameTypeAttackBonusOverride",
-      multiplier: 2,
-    },
-  ],
+  effects: adaptabilityEffects,
 });
 
 const analytic = createAbility({
   key: "analytic",
-  effects: [
-    {
-      side: "attacker",
-      effect: "movePowerMultiplier",
-      multiplier: 1.3,
-    },
-  ],
+  effects: analyticEffects,
 });
 
 const technician = createAbility({
   key: "technician",
-  effects: [
-    {
-      side: "attacker",
-      effect: "movePowerMultiplier",
-      multiplier: 1.5,
-      requirements: [
-        {
-          requirement: "movePowerAtOrBelow",
-          power: 60,
-        },
-      ],
-    },
-  ],
+  effects: technicianEffects,
 });
 
 const toughClaws = createAbility({
   key: "tough-claws",
-  effects: [
-    {
-      side: "attacker",
-      effect: "movePowerMultiplier",
-      multiplier: 1.3,
-      requirements: [{ requirement: "makesContact" }],
-    },
-  ],
+  effects: toughClawsEffects,
 });
 
 const strongJaw = createAbility({
   key: "strong-jaw",
-  effects: [
-    {
-      side: "attacker",
-      effect: "movePowerMultiplier",
-      multiplier: 1.5,
-      requirements: [{ requirement: "moveTag", tag: "bite" }],
-    },
-  ],
+  effects: strongJawEffects,
 });
 
 // 公開APIの代表的な返り値を固定する

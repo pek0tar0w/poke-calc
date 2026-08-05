@@ -1,4 +1,18 @@
 export {
+  adaptabilityEffects,
+  analyticEffects,
+  disguiseEffects,
+  iceBodyEffects,
+  multiscaleEffects,
+  parentalBondEffects,
+  roughSkinEffects,
+  skillLinkEffects,
+  strongJawEffects,
+  sturdyEffects,
+  technicianEffects,
+  toughClawsEffects,
+} from "./ability-effects.js";
+export {
   assaultVestEffects,
   chilanBerryEffects,
   choiceBandEffects,

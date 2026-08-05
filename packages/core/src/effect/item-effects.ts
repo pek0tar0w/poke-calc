@@ -1,4 +1,5 @@
-import type { ItemEffect, TypeKey } from "@poke-calc/core";
+import type { ItemEffect } from "../model/item/index.js";
+import type { TypeKey } from "../model/type/index.js";
 
 /** ターン終了時に最大HPの1/16を回復する効果 */
 export const leftoversEffects = [
